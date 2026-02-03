@@ -6,21 +6,22 @@ project:
   # Only render root pages and index.* in each post folder (not every .md/.qmd/.ipynb in subdirs)
   render:
     - index.qmd
-    - about.qmd
+    # - about.qmd
     - "posts/*/index.qmd"
     - "posts/*/index.md"
     - "posts/*/index.ipynb"
 
+
 website:
-  title: "Dibya's Blog"
+  title: "pivotools" # will appear in the top left corner of the page
   navbar:
     right:
-      - about.qmd
+      # - about.qmd 
       - icon: github
-        href: https://github.com/gutfeeling
-      - icon: twitter-x
-        href: https://x.com/dibyasays
-  site-url: https://dibya.online
+        href: https://github.com/
+      - icon: twitter
+        href: https://twitter.com
+  site-url: https://pivotools.github.io
 format:
   html:
     theme: cosmo
