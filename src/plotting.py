@@ -1021,8 +1021,48 @@ def create_baseline_interleaved_scatter(
     fig.update_xaxes(**xaxis_update, row=1, col=1)
     fig.update_yaxes(**yaxis_update, row=1, col=1)
 
+    # Legend: two entries for baseline vs interleaved (dummy traces, no data)
+    series_names = cfg.get("series_names") or {}
+    name_baseline = series_names.get("baseline", "Plain CoT")
+    name_interleaved = series_names.get("interleaved", "Agentic Coding")
+    marker_size = marker_cfg.get("size", 12)
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="markers",
+            name=name_baseline,
+            marker=dict(
+                symbol=shape_baseline,
+                color=color_baseline,
+                size=marker_size,
+                opacity=marker_cfg.get("opacity", 0.9),
+            ),
+            showlegend=True,
+        ),
+        row=1,
+        col=1,
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="markers",
+            name=name_interleaved,
+            marker=dict(
+                symbol=shape_interleaved,
+                color=color_interleaved,
+                size=marker_size,
+                opacity=marker_cfg.get("opacity", 0.9),
+            ),
+            showlegend=True,
+        ),
+        row=1,
+        col=1,
+    )
+
     fig.update_layout(
-        showlegend=False,
+        showlegend=True,
         height=layout_cfg.get("height", 400),
         width=layout_cfg.get("width", 520),
         margin=layout_cfg.get("margin", dict(l=60, r=30, t=40, b=60)),

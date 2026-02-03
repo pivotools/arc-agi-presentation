@@ -40,6 +40,9 @@ figures:
 
   scatter_baseline_vs_interleaved:
     interactive: false  # Set to false for static plot
+    series_names:
+      baseline: "Plain CoT"
+      interleaved: "Agentic Coding"
     axis:
       x_title: "Cost per task [$]"
       y_title: "Score [%]"
@@ -56,7 +59,7 @@ figures:
       color: "rgba(128,128,128,0.5)"
     layout:
       height: 400
-      width: 550
+      width: 640
       margin: { l: 60, r: 30, t: 40, b: 60 }
     data_spec:
       required_fields: [modelDisplayName, score, costPerTask]
