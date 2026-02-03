@@ -21,13 +21,9 @@ website:
         href: https://github.com/
       - icon: twitter
         href: https://twitter.com
-  site-url: https://pivotools.github.io
+  site-url: https://pivotools.github.io/pivotools-quarto-blog
 format:
   html:
     theme: cosmo
     css: styles.css
-resources:
-  - CNAME    # Github Action otherwise publishes to username.github.io
-
-
 
