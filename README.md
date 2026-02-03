@@ -89,7 +89,6 @@ The blog uses Python for `src/` helpers (plotting, data loading, references conv
 **Create and use a venv (from the blog directory):**
 
 ```bash
-cd blog
 python3 -m venv .venv
 source .venv/bin/activate   # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt

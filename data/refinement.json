@@ -12,7 +12,7 @@
       "modelGroup": "gpt-oss-120b",
       "providerId": "OpenAI",
       "modelReleaseDate": null,
-      "paperUrl": "https://link.to.our.blog.post",
+      "paperUrl": "https://pivotools.github.io/posts/agentic_coding_arc_agi/",
       "codeUrl": "https://github.com/gutfeeling/arc-agi-2-submission/commit/bb7f7760d6bdf5f9381ba2a9504ebd67b7da9c56",
       "dataUrl": null,
       "score": 0.2889,
@@ -24,7 +24,6 @@
       "baseModelFamily": "GPT OSS 120b",
       "thinkingBudgetK": null,
       "effortLevel": "High",
-      "colorAuthor": "gutfeeling",
       "metadata": {
         "commitId": "bb7f7760d6bdf5f9381ba2a9504ebd67b7da9c56",
         "experimentDescription": "Interleaved thinking with rejection sampling (also with unnaturalness detector) + generalization",
@@ -42,7 +41,7 @@
       "modelGroup": "gpt-5-2-2025-12-11-thinking",
       "providerId": "OpenAI",
       "modelReleaseDate": null,
-      "paperUrl": "https://link.to.our.blog.post",
+      "paperUrl": "https://pivotools.github.io/posts/agentic_coding_arc_agi/",
       "codeUrl": "https://github.com/gutfeeling/arc-agi-2-submission/commit/8e28df36bb5e32430b4b2e4c943fd73d9219d6cf",
       "dataUrl": null,
       "score": 0.7990,
@@ -54,7 +53,6 @@
       "baseModelFamily": "GPT 5.2",
       "thinkingBudgetK": null,
       "effortLevel": "X-High",
-      "colorAuthor": "gutfeeling",
       "metadata": {
         "commitId": "8e28df36bb5e32430b4b2e4c943fd73d9219d6cf",
         "experimentDescription": "Interleaved thinking + rejection sampling (also with unnaturalness detector) + generalization, max. 5 majority voting samples, early stopping when two generalized solutions agree",
