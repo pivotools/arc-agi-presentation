@@ -1,5 +1,5 @@
 ---
-title: "Dibya's Blog"
+title: "pivotools Blog"
 listing:
   contents: posts
   sort: "date desc"
