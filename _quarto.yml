@@ -14,6 +14,7 @@ project:
 
 website:
   title: "pivotools" # will appear in the top left corner of the page
+  description: "News and updates from the pivotools team"
   navbar:
     right:
       # - about.qmd 
@@ -22,6 +23,13 @@ website:
       - icon: twitter
         href: https://twitter.com
   site-url: https://pivotools.github.io/pivotools-quarto-blog
+  open-graph:
+    site-name: "pivotools"
+    image-width: 1200
+    image-height: 630
+  twitter-card:
+    card-style: "summary_large_image"
+
 format:
   html:
     theme: cosmo
