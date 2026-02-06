@@ -118,6 +118,45 @@ For the **agentic_coding_arc_agi** post:
 
 **In-text citations:** In the post’s `text/*.md` files, references use Pandoc syntax: `[@ref1]` for a single citation and `[@ref6; @ref7]` for multiple. The notebook YAML points to `text/references.bib` and `../../style/ieee.csl` and enables `link-citations` and `link-bibliography`.
 
+## Link previews (Open Graph)
+
+When you share a post URL (e.g. on Slack, Twitter/X, LinkedIn), the link preview (image, title, description) is driven by **Open Graph** and **Twitter Card** meta tags. The site is configured in `_quarto.yml` with `website.open-graph` and `website.twitter-card` so that Quarto emits these tags.
+
+### Per-post setup
+
+In each post’s front matter (e.g. the first cell of `index.ipynb`), add an **`open-graph`** block so that post gets a custom preview:
+
+- **`open-graph.image`** — Preview image. Use a **relative path** (e.g. `image-preview.png`); Quarto resolves it to an absolute URL using `site-url`. Prefer an image sized for social (e.g. 1200×630 or a 50% resize) so validators don’t complain about size.
+- **`open-graph.description`** — Description for the preview. Recommended **155–200 characters** so validators and platforms show a full snippet.
+- **Title** — The page `title` is used for the preview. Recommended **60–95 characters** for better visibility in search and shares.
+
+You do **not** need Twitter-specific fields in the post; the site-level `twitter-card` uses the same title, description, and image.
+
+### `og:url` (canonical URL)
+
+Quarto does **not** emit the `og:url` meta tag. Some validators (e.g. ogpreview.io) expect it. To satisfy them, add it manually per post via **`include-in-header`** in the post’s `format.html`:
+
+```yaml
+format:
+  html:
+    # ... other options (code-overflow, etc.) ...
+    include-in-header:
+      text: "<meta property=\"og:url\" content=\"https://pivotools.github.io/pivotools-quarto-blog/posts/your_post_slug/\">"
+```
+
+Use the post’s canonical URL (with trailing slash). Repeat for each post where you want `og:url` set.
+
+**`og:type`** — Quarto does not emit `og:type`. For blog posts, add `article` in the same `include-in-header` block so validators and platforms know the content type:
+
+```yaml
+text: "<meta property=\"og:url\" content=\"https://...\">\n<meta property=\"og:type\" content=\"article\">"
+```
+
+### Checking previews without a Twitter account
+
+- **[OGPreview.io](https://ogpreview.io/)** — Paste the post URL to see previews for Twitter/X, Facebook, LinkedIn, Slack, Discord.
+- **[Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)** — No login required; uses the same Open Graph tags and gives a good indication of how the link will look when shared.
+
 ## Styling options
 
 Styling is split into (1) Quarto project and document YAML and (2) programmatic figure styling in YAML.
