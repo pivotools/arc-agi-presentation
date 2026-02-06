@@ -1,5 +1,7 @@
 ---
 title: "pivotools Blog"
+open-graph:
+  description: "News and updates from the pivotools team"
 listing:
   contents: posts
   sort: "date desc"

@@ -24,8 +24,6 @@ website:
         href: https://twitter.com
   site-url: https://pivotools.github.io/pivotools-quarto-blog
   open-graph:
-    title: "pivotools Blog"
-    description: "News and updates from the pivotools team"
     site-name: "pivotools"
     image-width: 1200
     image-height: 630
