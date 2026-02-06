@@ -2,6 +2,7 @@
 title: "pivotools Blog"
 open-graph:
   description: "News and updates from the pivotools team"
+  image: default-preview.png
 listing:
   contents: posts
   sort: "date desc"
