@@ -130,7 +130,7 @@
       "modelReleaseDate": null,
       "paperUrl": "https://pivotools.github.io/pivotools-quarto-blog/posts/agentic_coding_arc_agi/",
       "codeUrl": "https://huggingface.co/datasets/arcprize/arc_agi_v2_public_eval/tree/main/gpt-5-2-2025-12-11-thinking-xhigh",
-      "dataUrl": "https://huggingface.co/datasets/arcagi2/arcagi2-agentic-coding-publication",
+      "dataUrl": "https://huggingface.co/datasets/arcprize/arc_agi_v2_public_eval/tree/main/gpt-5-2-2025-12-11-thinking-xhigh",
       "score": 0.5981,
       "costPerTask": 2.05,
       "resultsUrl": null,
