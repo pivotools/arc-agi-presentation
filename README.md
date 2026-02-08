@@ -157,6 +157,26 @@ text: "<meta property=\"og:url\" content=\"https://...\">\n<meta property=\"og:t
 - **[OGPreview.io](https://ogpreview.io/)** — Paste the post URL to see previews for Twitter/X, Facebook, LinkedIn, Slack, Discord.
 - **[Facebook Sharing Debugger](https://developers.facebook.com/tools/debug/)** — No login required; uses the same Open Graph tags and gives a good indication of how the link will look when shared.
 
+## Analytics (Plausible)
+
+[Plausible Analytics](https://plausible.io) is included for privacy-friendly, lightweight analytics. The snippet is in **`plausible.html`** and injected into every page via **`_quarto.yml`** → `format.html.include-in-header` (see [Plausible integration guides](https://plausible.io/docs/integration-guides)).
+
+### How it fits this repo
+
+- **Build:** Quarto renders static HTML into `_output/`. The Plausible script is part of each page’s `<head>`.
+- **Deploy:** Whatever publishes `_output/` (e.g. GitHub Actions copying to `gh-pages` or into the branch that GitHub Pages serves) will serve the script; no extra step.
+- **Domain in Plausible:** The site is a **GitHub project page** at `https://pivotools.github.io/pivotools-quarto-blog/`. In Plausible you add the **hostname** only: **`pivotools.github.io`**. Paths like `/pivotools-quarto-blog/` and `/pivotools-quarto-blog/posts/...` are tracked automatically as page paths.
+
+### Redirect (`pivotools.github.io` → project page)
+
+If you have a redirect from `pivotools.github.io` to `pivotools.github.io/pivotools-quarto-blog`, traffic can arrive via either URL. Plausible still sees the same hostname (`pivotools.github.io`) and full path, so you get one site in the dashboard. If the redirect is external (e.g. different host), add that host as an extra domain in Plausible if you want it tracked under the same or a separate site.
+
+### Caveats
+
+- **Adblockers:** The script is loaded from `plausible.io` (third-party). Some adblockers block it; counts can be lower than “true” traffic. For first-party hosting to reduce blocking, see [Plausible: Run as first-party connection](https://plausible.io/docs/proxy/introduction).
+- **Verification:** After deploy, open the live site → View Page Source → search for `plausible.init`. If it’s there, the snippet is active. In the Plausible dashboard, use their “Check if Plausible is installed correctly” / test visit tool to confirm events are received.
+- **SPA / hash routing:** This blog is multi-page (full reloads). If you ever use hash-based routing, you’d need `plausible.init({ hashBasedRouting: true })` in `plausible.html`; not needed for the current setup.
+
 ## Styling options
 
 Styling is split into (1) Quarto project and document YAML and (2) programmatic figure styling in YAML.
