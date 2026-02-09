@@ -19,9 +19,9 @@ website:
     right:
       # - about.qmd 
       - icon: github
-        href: https://github.com/
-      - icon: twitter
-        href: https://twitter.com
+        href: https://github.com/gutfeeling/arc-agi-2-submission
+      - icon: twitter-x
+        href: https://x.com/dibyasays
   site-url: https://pivotools.github.io/pivotools-quarto-blog
   open-graph:
     site-name: "pivotools"
