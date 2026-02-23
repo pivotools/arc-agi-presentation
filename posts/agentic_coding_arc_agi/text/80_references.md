@@ -37,3 +37,4 @@
 [35] [Data from the experiments in this post](https://huggingface.co/datasets/arcagi2/arcagi2-agentic-coding-publication)
 [36] [Does Reinforcement Learning Really Incentivize Reasoning Capacity in LLMs Beyond the Base Model?](https://arxiv.org/abs/2504.13837)
 [37] [Responses API patch that we used to reliably elicit interleaved thinking in GPT OSS 120B](https://github.com/gutfeeling/arc-agi-2-submission/blob/master/src/vllm_patch/harmony_utils.py)
+[38] [Do AI Models Perform Human-like Abstract Reasoning Across Modalities?](https://arxiv.org/abs/2510.02125)
