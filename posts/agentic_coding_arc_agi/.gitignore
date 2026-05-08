@@ -1,0 +1,12 @@
+/.quarto/
+**/*.quarto_ipynb
+
+# Quarto-rendered presentation outputs (source: presentation.qmd)
+/presentation.html
+/presentation_files/
+
+# Quarto-rendered article outputs (source: index.ipynb)
+/_manuscript/
+/index_files/
+/index.docx
+/manuscript.tar.gz

@@ -4,6 +4,7 @@
 /_site/
 /_freeze/
 /_output/
+**/_extensions/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
