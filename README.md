@@ -38,6 +38,17 @@ rm -rf _freeze && quarto render . --execute
 
 This is the single command that bypasses the frozen cache for a full site build.
 
+### Presentation (reveal.js slides)
+
+The `agentic_coding_arc_agi` post has a companion slide deck at `posts/agentic_coding_arc_agi/presentation.qmd`. It is a reveal.js presentation derived from the article — one slide per Markdown header. It does **not** execute Python; instead it reuses figures already produced by rendering `index.ipynb` (under `index_files/figure-pdf/`, the post directory, and `figs/`). Render the article first on a fresh checkout:
+
+```bash
+quarto render posts/agentic_coding_arc_agi/index.ipynb --execute
+quarto render posts/agentic_coding_arc_agi/presentation.qmd --to revealjs
+```
+
+Output is written next to the source as `posts/agentic_coding_arc_agi/presentation.html` (with a sibling `presentation_files/` for the reveal.js runtime). Both are git-ignored. Open the HTML in any browser; press `?` to see reveal.js shortcuts.
+
 ## Preventing committed notebook output
 
 To avoid committing cell outputs and execution metadata in `.ipynb` files, use a **pre-commit hook** that strips output from staged notebooks before each commit. The hook lives in the **repository root** (the repo that contains `blog/`), not inside `blog/`:
