@@ -20,375 +20,205 @@ format:
     hash-type: number
 ---
 
-## Summary {.scrollable}
+# Intro
 
-When reasoning models get a Python REPL, ARC AGI 2 performance jumps across the board.
-
-- **GPT OSS 120B High** &nbsp; 6.11 % &rarr; **26.38 %**
-- **Minimax M2.1** &nbsp; 3.06 % &rarr; **10.56 %**
-- **GPT 5.2 XHigh** &nbsp; 59.81 % &rarr; **73.36 %**
-
-Same prompt, same loop &mdash; just add a REPL.
-
-![](bar_baseline_vs_interleaved.png){fig-align="center" width="62%"}
-
-## Introduction {.scrollable}
-
-- ARC AGI is a benchmark for **human-like fluid intelligence**.
-- Models meta-learn a 2D grid transformation at test time and apply it.
-- ARC AGI 1 measured *existence* of fluid intelligence; ARC AGI 2 measures the *level*.
-- Frontier reasoning models pushed the verified leaderboard to **54.2 %** in 2025.
-
-**Our claim:** the leaderboard is *not* the ceiling &mdash; additional fluid intelligence becomes available simply by giving the model a REPL.
-
-![An ARC AGI 2 puzzle: infer the transformation, apply it to the test grid.](index_files/figure-pdf/fig-puzzle-example-output-1.png){fig-align="center" width="48%"}
-
-## How our solver works {.scrollable}
-
-A minimal **agentic tool-call loop**, like the one popularised by Claude Code.
-
-1. Frame each puzzle as a **program-synthesis** problem: produce
-   `solution(grid: list[list[int]]) -> list[list[int]]`
-   that maps every training input to its training output.
-2. Provide a **stateful IPython REPL** with NumPy, SciPy, NetworkX, scikit-image, PIL, Z3, &hellip;
-3. The model executes code dozens of times, then commits a `solution`.
-
-The function is both a **generator** of the output and a **faithful explanation** of the transformation &mdash; an artefact plain-CoT solvers don't produce.
-
-![Puzzle 45a5af55 with the model's solution code: code is the explanation.](index_files/figure-pdf/fig-puzzle-with-code-output-1.png){fig-align="center" width="55%"}
-
-## Interleaved thinking {.scrollable}
-
-Test-time compute scaling, extended to **multi-step tool use**.
-
-- The model thinks **between** tool calls, not only before them.
-- It can propose a hypothesis, run code, observe the failure, revise, and proceed.
-- Compute is allocated *flexibly* to refinement decisions that depend on ground-truth feedback.
-- Trained for explicitly during agentic RL (e.g. RLVR with a code-execution environment).
-
-Providers that claim support: OpenAI (o3, o4-mini, GPT OSS), Anthropic (Claude 4+), Google (Gemini 2.5+), Z.AI (GLM 4.5+), Minimax (M2+), Moonshot (Kimi K2 Thinking+).
-
-![Basic thinking (left) vs interleaved thinking (right).](figs/interleaved_thinking_schematic.svg){fig-align="center" width="48%"}
-
-![Interleaved thinking on an ARC puzzle &mdash; code execution grounds the model to a Python-encoded ground truth.](figs/interleaved_thinking_examples.png){fig-align="center" width="48%"}
-
-## Results
-
-- Full ARC AGI 2 **public evaluation set: 120 puzzles**.
-- Official metric: **pass@2** (we run twice, submit two candidates).
-- Compared head-to-head against plain-CoT baselines on the same model.
-
-::: {.callout-note title="How to read these numbers"}
-Not directly comparable to leaderboard scores, which use a private set to control for memorisation. The signal we care about is the **gap vs. plain CoT on the same model**.
-:::
-
-## GPT OSS 120B (reasoning effort "high")
-
-| | Plain CoT | Agentic Coding |
-|---|---:|---:|
-| **Score** | 6.11 % | **26.38 %** |
-| **Cost / puzzle** | \$0.23 | \$0.47 |
-
-A **>4&times; absolute** improvement &mdash; from near-noise into frontier-model territory, on a medium-sized open-weight model.
-
-## Minimax M2.1
-
-| | Plain CoT | Agentic Coding |
-|---|---:|---:|
-| **Score** | 3.06 % | **10.56 %** |
-| **Cost / puzzle** | \$0.22 | \$1.27 |
-
-Absolute performance is modest, but the **relative gain mirrors GPT OSS 120B** &mdash; the effect is not model-specific.
-
-## GPT 5.2 (reasoning effort "xhigh") {.scrollable}
-
-| | Plain CoT | Agentic Coding |
-|---|---:|---:|
-| **Score** | 59.81 % | **73.36 %** |
-| **Cost / puzzle** | \$2.05 | \$5.22 |
-
-*107-puzzle subset (Responses API 1-hour timeout; baseline taken from ARC Prize Foundation HF data, see article fn. 1).*
-
-Even at frontier baseline performance, agentic coding adds a **double-digit absolute gain**.
-
-![Cost (x) vs score (y) across models &mdash; plain CoT vs agentic coding.](index_files/figure-pdf/fig-baseline-interleaved-scatter-output-1.png){fig-align="center" width="55%"}
-
-## Connection to prior work
-
-- **Icecuber, 2020** &mdash; classic discrete program search over a hand-built DSL.
-- **Greenblatt, 2024** &mdash; LLM as proposer, massive sampling + iterative refinement.
-- **OpenAI o3 (preview), late 2024** &mdash; human-level on ARC AGI 1; emergent test-time *search in natural language*.
-- **ARC AGI 2 release** &mdash; near-noise scores from o3-class models at first.
-
-## Two threads of progress in 2025
-
-According to ARC Prize Foundation's own analysis:
+## Who we are
 
 ::: {.columns}
-::: {.column width="50%"}
-**Stronger reasoning models**
+::: {.column width="33%"}
+**Dibya Chakravorty**
 
-Grok 4, GPT-5.1, Gemini 3 Pro / Deep Think / Flash, Claude Opus 4.5, GPT-5.2 &hellip;
+Physics major; AGI-curious since *The Emperor's New Mind*.
 
-Costs dropped by orders of magnitude.
+Generalist Python developer & cloud architect.
+
+Organises the [AGI Munich meetup](https://www.meetup.com/de-de/munchen-artificial-general-intelligence-meetup-group/).
+
+[GitHub](https://github.com/gutfeeling) &middot; [Website](https://dibya.online)
+:::
+::: {.column width="33%"}
+**Debsankha Manik**
+
+Theoretical physicist by training.
+
+Dynamical systems, graph theory; data science &times; discrete optimisation.
+
+Loves teaching.
+
+[GitHub](https://github.com/debsankha) &middot; [Scholar](https://scholar.google.com/citations?hl=en&user=DktbWEIAAAAJ)
+:::
+::: {.column width="33%"}
+**Bernhard Altaner**
+
+Physics & maths in Konstanz / Cambridge; PhD Göttingen on information & entropy.
+
+Academia in Luxembourg & Munich on chemical evolution.
+
+Now R&D in smart energy management.
+
+[Scholar](https://scholar.google.com/citations?user=eJir3-oAAAAJ) &middot; [Mastodon](https://chaos.social/@beralt)
+:::
 :::
 
-::: {.column width="50%"}
-**Refinement systems on top**
+*With Nicolas Berg &mdash; co-host of the AGI Munich meetup.*
 
-Sakana AB-MCTS, Berman's evolutionary methods, Poetiq's pipelines &hellip;
+## ARC AGI 2: easy for humans, hard for AI? {.scrollable}
 
-Explicit outer loops authored by humans.
-:::
-:::
+A puzzle has a few **training pairs** and one or more **test inputs**. Infer the rule, apply it.
 
-## Stronger reasoning models
-
-- **2025 performance champion:** GPT 5.2 Pro (High) &mdash; **54.2 %** at \$15.72 / puzzle.
-- **2025 efficiency champion:** Gemini 3 Flash Preview (High) &mdash; 33.6 % at **\$0.231 / puzzle**.
-
-Reasoning models lifted **pass@1** dramatically &mdash; the need for massive sampling has largely disappeared.
-
-## Refinement systems on top of reasoning models
-
-Big jumps still come from **explicit outer loops** that wrap a reasoning model:
-
-- **Sakana AB-MCTS** &mdash; sampling + refinement + multi-model collaboration.
-- **Jeremy Berman** &mdash; evolutionary methods adapted to new reasoning models.
-- **Poetiq** &mdash; refinement plus optional multi-model collaboration; strong verified results.
-
-These outer loops are **hand-authored**.
-
-## Width, depth, and what changed {.scrollable}
-
-A simple search analogy:
-
-- **Massive sampling** &nbsp;=&nbsp; search **width**
-- **Refinement** &nbsp;=&nbsp; search **depth**
-
-**2024:** large width *and* deep human-engineered loops.
-
-**2025:** stronger models killed most of the width &mdash; depth was still mostly human-supplied.
-
-**Our finding:** interleaved thinking collapses much of that depth **inside a single model turn**. Refinement becomes a *learned* capability, not a hand-authored procedure.
-
-![Number of tool calls per turn (GPT-OSS-120B) &mdash; a proxy for refinement-signal density.](index_files/figure-pdf/fig-gpt-oss-num-tool-calls-output-1.png){fig-align="center" width="50%"}
-
-## Interleaved thinking is currently fragile {.scrollable}
-
-The capability is real, but the stack is brittle. Things that bit us:
-
-- **Provider APIs:** errors, soft failures (no interleaved thinking returned).
-- **Inference engines** (vLLM, SGLang): Harmony chat-template parsing bugs.
-- **Middleware** (OpenRouter): degraded tool calling across providers; "exacto" whitelist as a partial fix.
-- **Closed APIs** (e.g. Gemini): malformed tool calls can silently terminate the interaction.
-
-We patched vLLM's Responses API and added client-side hardening before getting reliable runs.
-
-::: {.callout-note title="Practical takeaway"}
-If a model that should support interleaved thinking looks unexpectedly weak:
-
-1. Loss of prior reasoning state in stateless APIs (replay reasoning blocks!).
-2. Incorrect chat-template implementation in the inference engine.
-3. Silent suppression of malformed tool calls.
-4. Middleware not translating API calls faithfully.
-5. Tool errors not surfaced back to the model.
-:::
-
-## Conclusion
-
-- **Agentic coding unlocks fluid intelligence** that's invisible in plain CoT.
-- A medium-sized **open-weight** model becomes ARC-AGI-2 competitive under this regime.
-- The same recipe transfers unchanged to a frontier commercial model.
-- Open question: is the gain from **stronger verification** (code execution) or **qualitatively different reasoning patterns**?
-- We have early signs that sampling + majority voting can push the score further &mdash; **OpenAI credit donations welcome**.
-
-*Get in touch if you want us to test another interleaved-thinking-capable model.*
-
-## About us
-
-We're a small group of hobbyists working on hard problems in AI.
+![A single ARC AGI 2 puzzle: training examples (top), test input (bottom).](index_files/figure-pdf/fig-puzzle-example-output-1.png){fig-align="center" width="55%"}
 
 ::: {.fragment}
-**Dibya Chakravorty** &nbsp;&middot;&nbsp; **Debsankha Manik** &nbsp;&middot;&nbsp; **Bernhard Altaner** &nbsp;&middot;&nbsp; **Nicolas Berg**
+**The "AGI" framing:** ARC AGI targets *fluid intelligence* &mdash; the ability to acquire and apply a *new* skill at test time, on a task you have never seen before. Memorisation does not help.
 :::
 
-## Dibya Chakravorty
+## ARC AGI 2: the challenge
 
-- Physics major; interested in AGI since *The Emperor's New Mind*.
-- Generalist Python developer & cloud architect.
-- Organises the [AGI Munich meetup](https://www.meetup.com/de-de/munchen-artificial-general-intelligence-meetup-group/).
-- Independent ML research, applications, education.
+- **Benchmark axes:** score *and* cost per puzzle &mdash; you cannot just throw compute at it.
+- **Kaggle competition** with a private test set to control for memorisation.
+- **Public verified leaderboard** for transparent submissions.
 
-[Email](mailto:dibyachakravorty@gmail.com) &nbsp;|&nbsp; [GitHub](https://github.com/gutfeeling) &nbsp;|&nbsp; [Website](https://dibya.online) &nbsp;|&nbsp; [X](https://x.com/dibyasays)
+::: {.callout-note title="State of the art when we started"}
+[TODO: leaderboard SotA % and cost / puzzle, ~Summer 2025] &mdash; o3-class models scored near noise on ARC AGI 2 at release.
+:::
 
-## Debsankha Manik
+## Our original plan
 
-- Theoretical physicist by training.
-- Research interests: dynamical systems, graph theory.
-- Works at the intersection of data science and discrete optimisation.
-- Has developed and taught data-science courses for graduate students.
-- Interested in open-source, privacy-preserving AI.
+A standard recipe for pushing an open-weight model on a hard reasoning benchmark:
 
-[Email](mailto:dmanik@debsankha.net) &nbsp;|&nbsp; [GitHub](https://github.com/debsankha) &nbsp;|&nbsp; [Scholar](https://scholar.google.com/citations?hl=en&user=DktbWEIAAAAJ)
+1. **Synthetic data** &mdash; generate a large corpus of ARC-like puzzles with successful solution traces.
+2. **Fine-tuning** &mdash; cold-start a smaller open-weight model on those traces (SFT).
+3. **RLVR** &mdash; reinforcement learning with verifiable rewards on top, using the puzzle's own grading as signal.
 
-## Bernhard Altaner
+The aim was a small, cheap model that could compete on the Kaggle leaderboard.
 
-- Physics & maths in Konstanz and Cambridge; PhD in Göttingen on information & entropy.
-- Academia in Luxembourg & Munich on chemical evolution and the origins of life.
-- Now in R&D on smart energy management; side projects like this one.
-- Philosophical interest: consciousness as an evolutionary consequence of self-modelling.
-
-[Email](mailto:bernhard@beralt.com) &nbsp;|&nbsp; [Scholar](https://scholar.google.com/citations?user=eJir3-oAAAAJ) &nbsp;|&nbsp; [Mastodon](https://chaos.social/@beralt)
-
-## Nicolas Berg
-
-- IT at the Karlsruhe Institute of Technology; engineer in the Munich automotive industry.
-- Drawn into AGI through Dibya's meetup &mdash; now co-host.
-- Co-building a company developing an AI coach for students, educators, mentors, and maker communities &mdash; focused on learner agency.
-
-[Email](mailto:nicoberg_arc@fastmail.com) &nbsp;|&nbsp; [X](https://x.com/NicoBerg101)
-
-## Our story
-
-- **Summer 2025:** started this project aiming at the ARC Prize Kaggle competition.
-- Found that o3 / o4-mini could generate high-quality synthetic ARC puzzles.
-- Plan: train a smaller model via agentic RL on those traces.
-- For cold-start SFT we needed open-weight successful traces &mdash; we picked **GPT-OSS-120B**.
-- Surprise: just placing the open-weight model in an agentic-coding regime produced **scores we didn't think possible** for a medium-sized OSS model.
-- That observation became this post.
-
-## Acknowledgements
-
-- [Lambda](https://lambda.ai) &mdash; generous platform credits; this work would not exist without it.
-- [Hyperbolic](https://www.hyperbolic.ai/) &mdash; free credits supporting the research.
-- [ARC Prize Foundation](https://arprize.org) &mdash; for the platform and the inspiration.
-- **Somayeh Vojdani** and **Tariq Baig-Meininghaus** for stimulating discussions and continued support.
-- Dibya thanks his wife **Aurica Schön** and son **Milan Schön** for their patience and support.
-
-## References
-
-Full bibliography in the [blog post](https://pivotools.github.io/pivotools-quarto-blog/posts/agentic_coding_arc_agi/).
-
-Key entries:
-
-- Chollet, *On the Measure of Intelligence* (ARC AGI).
-- ARC Prize Foundation, *ARC Prize 2025: Technical Report*.
-- Beger et al., *ConceptARC + REPL access*.
-- Code & data: [arc-agi-2-submission](https://github.com/gutfeeling/arc-agi-2-submission), HF dataset of evaluation traces.
-
-## Appendix
-
-The remaining slides reproduce the **system prompt**, the **solver prompt**, and the **list of installed Python libraries** used inside the stateful REPL.
-
-## System prompt {.scrollable .smaller}
-
-````markdown
-# Tools
-
-## python
-
-Use this tool to execute Python code in your chain of thought.
-
-When you send a message containing Python code to python, it will be executed
-in a stateful Jupyter notebook environment. The environment supports common
-third-party libraries like numpy, scipy, shapely, networkx, scikit-image,
-more-itertools, pillow, python-constraint, ortools and z3-solver. python will
-respond with the output of the execution or time out after 120.0 seconds.
-
-### Usage guideline
-
-1. Use the variables and functions already loaded in the Jupyter notebook
-   instead of defining them yourself. The user message will provide a complete
-   list of such variables and functions.
-2. Prefer to write reusable functions. These will persist in the stateful
-   Jupyter notebook and can be referenced in later code snippets without
-   having to define them again.
-````
-
-## Solver prompt {.scrollable .smaller}
-
-````markdown
-You are an expert ARC AGI puzzle solver. Please solve the puzzle given below.
-
-# Background information about ARC AGI puzzles
-
-Each task consists of a small number of demonstration examples (3.3 on
-average), and a small number of test examples (1 - 3).
-
-Each example consists of an "input grid" and an "output grid". Each "grid" is
-a literal grid of colored squares. There are 10 unique colors. A grid can be
-any height or width between 1x1 and 30x30, inclusive.
-
-The color code is as follows:
-
-0 - black, 1 - navy blue, 2 - red, 3 - green, 4 - yellow, 5 - gray,
-6 - pink, 7 - orange, 8 - sky blue, 9 - maroon
-
-The mapping from integers (0-9) to color names is arbitrary and should be
-treated as categorical labels; the transformation rule never relies on the
-specific integer-color pairing.
-
-ARC AGI puzzle solutions feel "natural" to humans. Natural rules tend to
-build on visual priors and small-number counting. Rules that depend on
-non-visual considerations or inelegant mechanics are considered "unnatural".
-
-Common patterns puzzles use to increase difficulty:
-
-- Rule composition
-- Contextual application (simple if/else on a clear visual feature)
-- In-grid symbol definition
-- Iterated steps
-- Approximate features (slight broken symmetry, off-center axes, etc.)
-- Non-locality
-
-# Puzzle to solve
-
-{{puzzle}}
-
-# Task aids
-
-You may execute code in the Jupyter notebook environment.
-
-Variables available in the Jupyter notebook:
-
-- `puzzle`: dict with keys "train" and "test". Each entry has "input" and
-  optionally "output", as list-of-lists of integers (0 - 9).
-
-Your very first code execution should be `puzzle.keys()` to check data access.
-Don't print the `puzzle` dict; it consumes valuable token budget.
-
-# Your task
-
-Construct a function `solution(grid: list[list[int]])` that implements the
-transformation. The solution must work on all training examples and
-generalise to the test inputs. Hard-coding training outputs is not acceptable.
-
-# Output format (STRICT)
-
-A single Python code block fenced by ```python ... ``` containing a
-self-contained `solution` function with all imports.
-````
-
-## Full list of libraries {.smaller}
-
-Pre-installed in the stateful IPython REPL:
+## Talk roadmap
 
 ::: {.columns}
-::: {.column width="50%"}
-- `numpy`
-- `scipy`
-- `shapely`
-- `networkx`
-- `scikit-image`
+::: {.column width="33%"}
+**Journey & pivots**
+
+What we set out to do, where the plan broke, and what we did instead.
 :::
-::: {.column width="50%"}
-- `more-itertools`
-- `pillow`
-- `python-constraint`
-- `ortools`
-- `z3-solver`
+::: {.column width="33%"}
+**Technical core**
+
+Agentic coding, interleaved thinking, and the converged solver.
+:::
+::: {.column width="33%"}
+**Implications**
+
+What the result means for ARC AGI 2 and for "fluid intelligence" more broadly.
 :::
 :::
 
-*Thanks for your attention!*
+# Main
+
+## Synthetic puzzles
+
+**Goal:** ~8k high-quality ARC-like puzzles to fuel SFT and (later) RL.
+
+- **Generator:** o3 / o4-mini, prompted to invent a transformation rule *and* the demonstration grids.
+- **Prompt engineering** mattered a lot: rule-first vs. grids-first, explicit "natural rule" criteria, diversity constraints.
+- **What worked:** asking for the *rule in natural language* before the grids; rejecting trivially-recoverable rules; small-number / visual-prior framing.
+- **What didn't:** letting the model invent grids first &mdash; the rule was usually unrecoverable or degenerate.
+
+::: {.callout-note title="Outcome"}
+We obtained ~8k puzzles with verified solution traces &mdash; enough to start cold-start SFT.
+:::
+
+## Fine-tuning small models
+
+- **Goal:** distil successful traces from a strong teacher into a smaller open-weight student.
+- The student would then be the **bootstrap policy for RLVR**.
+- **The wall we hit:** ARC traces are *long*. Once the model started to think + execute code + observe + revise, **context-length** blew past what was practical for RL roll-outs.
+- **Implication:** before RL was even possible, we needed a regime where the model uses long context *productively*.
+
+::: {.fragment}
+That regime turned out to be **agentic harnesses with tool calls** &mdash; and it changed the whole project.
+:::
+
+## Agentic regime and interleaved thinking {.scrollable}
+
+The model thinks **between** tool calls, not only before them: hypothesise &rarr; run code &rarr; observe &rarr; revise.
+
+![Basic thinking (left) vs interleaved thinking (right).](figs/interleaved_thinking_schematic.svg){fig-align="center" width="55%"}
+
+**Technical challenges getting here:**
+
+- vLLM + **Harmony** chat-template parsing bugs.
+- Stateless Responses APIs losing prior reasoning state across tool calls.
+- Middleware (OpenRouter) silently degrading tool calling.
+
+::: {.fragment}
+**The big surprise:** once the plumbing worked, **GPT-OSS-120B** &mdash; a medium-sized open-weight model &mdash; scored *dramatically* better on ARC AGI 2 in this agentic regime than in plain CoT.
+:::
+
+::: {.fragment}
+**Our hypothesis:** agentic RL training (RLVR with code execution) leaves **dormant capabilities** in models that are not exposed in plain-CoT use. An agentic harness *unlocks* them &mdash; even in smaller models.
+:::
+
+## The main pivot
+
+We dropped the original training plan.
+
+- **Forget** synthetic-data SFT &rarr; RLVR for now.
+- **Focus** on leveraging agentic capabilities that already exist in current open-weight reasoning models.
+- New question: what is the *minimal* harness that surfaces these capabilities?
+
+::: {.callout-note title="Trials with keeping state &mdash; main takeaways"}
+- **Stateful REPL beats stateless tool calls:** intermediate variables (parsed grids, helper functions) survive across turns, which mirrors how humans solve these.
+- **Replay reasoning blocks** between turns on stateless APIs &mdash; otherwise the model loses its train of thought.
+- **Surface tool errors verbatim** to the model. Silent failures break the loop more than loud ones.
+:::
+
+## Converged setup
+
+A minimal **agentic tool-call loop**, in the style popularised by Claude Code.
+
+1. **Program-synthesis objective:** produce
+   `solution(grid: list[list[int]]) -> list[list[int]]`
+   that maps every training input to its training output.
+2. **Stateful IPython REPL** with NumPy, SciPy, NetworkX, scikit-image, PIL, Z3, &hellip;
+3. **Tool-call loop:** the model executes code dozens of times, then commits a `solution`.
+
+The function is both a **generator** of the output *and* a **faithful explanation** of the transformation &mdash; an artefact plain-CoT solvers don't produce.
+
+## Program synthesis framing {.scrollable}
+
+All puzzle state &mdash; hypotheses, intermediate observations, failed attempts &mdash; lives as **Python source code and comments** in the REPL.
+
+- **State as code:** the model edits a function, not a chain of words.
+- **Verification is free:** running the function on training pairs *is* the test.
+- **Refinement is local:** a failed assertion points at the line to fix.
+
+![Puzzle 45a5af55 with the model's solution code: code is the explanation.](index_files/figure-pdf/fig-puzzle-with-code-output-1.png){fig-align="center" width="60%"}
+
+![A short trace: hypothesis &rarr; code &rarr; observation &rarr; revision, all grounded by execution.](figs/interleaved_thinking_examples.png){fig-align="center" width="50%"}
+
+## Results {.scrollable}
+
+Full ARC AGI 2 **public eval set** (120 puzzles), official **pass@2** metric, head-to-head against plain CoT on the same model.
+
+| Model | Plain CoT | Agentic Coding | Cost / puzzle |
+|---|---:|---:|---:|
+| **GPT 5.2 XHigh** | 59.81 % | **73.36 %** | \$2.05 &rarr; \$5.22 |
+| **GPT OSS 120B High** | 6.11 % | **26.38 %** | \$0.23 &rarr; \$0.47 |
+| **Minimax M2.1** | 3.06 % | **10.56 %** | \$0.22 &rarr; \$1.27 |
+
+- **Frontier:** GPT 5.2 picks up a double-digit absolute gain even from a strong baseline.
+- **Open weights:** GPT-OSS-120B jumps **>4&times;** &mdash; from near-noise into frontier-model territory.
+
+![Cost (x) vs score (y): plain CoT vs agentic coding across models.](index_files/figure-pdf/fig-baseline-interleaved-scatter-output-1.png){fig-align="center" width="50%"}
+
+## Interpretation within the broader ecosystem
+
+- **ARC Prize Discord** &mdash; active community of independent researchers; many are converging on agentic / refinement-style approaches.
+- **Gemini 3 Pro / Deep Think, Claude Opus 4.5** &mdash; frontier models that *also* benefit from agentic harnesses; the effect is not GPT-specific.
+- **Refinement systems** (Sakana AB-MCTS, Berman, Poetiq) supply the outer loop *by hand* &mdash; interleaved thinking collapses much of that depth **inside a single model turn**.
+
+::: {.callout-note title="Where we landed"}
+We did **not** submit to the Kaggle leaderboard. Our finding &mdash; *agentic coding unlocks fluid intelligence already present in current models* &mdash; is the contribution we wanted to share, independent of any leaderboard ranking.
+:::
+
+*Get in touch if you'd like us to test another interleaved-thinking-capable model.*
