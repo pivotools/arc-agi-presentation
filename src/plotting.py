@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from html import escape
 from pathlib import Path
-from typing import Any, Callable, Mapping, Sequence
+from typing import Any, Callable, Literal, Mapping, Sequence
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -18,6 +18,8 @@ from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
 from pygments.util import ClassNotFound
+
+ShowTestArg = bool | Literal["only"]
 
 # ---------------------------------------------------------------------------
 # ARC color palette (loaded from style.yml or fallback to original ARC scheme)
@@ -127,6 +129,7 @@ def _calculate_optimal_dimensions(
     margin: dict[str, int],
     horizontal_spacing: float,
     vertical_spacing: float,
+    pairs_per_row: int = 2,
 ) -> tuple[int, int, int]:
     """
     Calculate optimal figure dimensions and cell size to ensure integer pixel sizes.
@@ -152,9 +155,11 @@ def _calculate_optimal_dimensions(
     
     if max_rows == 0 or max_cols == 0:
         return (400, 300, 20)  # Default fallback
-    
-    n_rows = (len(pairs) + 1) // 2  # Number of subplot rows
-    n_cols = 4  # 4 subplots per row
+
+    P = max(1, pairs_per_row)
+    n_pairs = len(pairs)
+    n_rows = (n_pairs + P - 1) // P
+    n_cols = 2 * P  # each pair: input | output
     
     margin_l = margin.get("l", 5)
     margin_r = margin.get("r", 5)
@@ -165,7 +170,7 @@ def _calculate_optimal_dimensions(
     # Start with a reasonable default or calculate from target_width
     if target_width is not None:
         # Estimate: available width = target_width - margins
-        # Account for spacing: with 4 columns, we have 3 gaps
+        # Account for spacing: n_cols subplot columns -> (n_cols - 1) gaps
         # Each gap is horizontal_spacing fraction of the plot area width
         # Simplified: assume spacing takes ~horizontal_spacing * (n_cols-1) of total width
         plot_area_width = target_width - margin_l - margin_r
@@ -208,49 +213,91 @@ def _calculate_optimal_dimensions(
     return (figure_width, figure_height, cell_size)
 
 
-def _build_puzzle_figure(puzzle: Mapping[str, Any], show_test: bool = False, width: int | None = None, gap=1) -> go.Figure:
-    """Build figure with 2 pairs per row (4 subplots per row: input1|output1|input2|output2). Test output is '?'."""
+def _puzzle_pair_subplot_cols(
+    pair_index: int,
+    n_pairs: int,
+    pairs_per_row: int,
+) -> tuple[int, int]:
+    """
+    Return 1-based subplot column indices (input, output) for training/test pair `pair_index`.
+
+    Full rows have ``pairs_per_row`` pairs (``2 * pairs_per_row`` subplot columns). If the last
+    row is incomplete, that row's pairs are centered in the row.
+    """
+    P = max(1, pairs_per_row)
+    n_rows = (n_pairs + P - 1) // P
+    pairs_in_last_row = n_pairs - (n_rows - 1) * P
+    last_row_start = (n_rows - 1) * P
+    if pair_index >= last_row_start and pairs_in_last_row < P:
+        k = pair_index - last_row_start
+        start = (2 * P - 2 * pairs_in_last_row) // 2 + 1
+        return (start + 2 * k, start + 2 * k + 1)
+    pos = pair_index % P
+    return (2 * pos + 1, 2 * pos + 2)
+
+
+def _build_puzzle_figure(
+    puzzle: Mapping[str, Any],
+    show_test: ShowTestArg = False,
+    width: int | None = None,
+    gap=1,
+    pairs_per_row: int = 2,
+) -> go.Figure:
+    """
+    Build a figure of input/output grids per pair.
+
+    ``pairs_per_row`` sets how many input–output pairs are placed on one row (default ``2``,
+    i.e. four subplot columns: in|out|in|out). Test output cells show ``?``.
+
+    ``show_test``: ``False`` — training pairs only; ``True`` — training plus test inputs
+    (unknown output as ``?``); ``\"only\"`` — test pairs only (same ``?`` convention).
+    """
     train = puzzle.get("train", [])
-    test = puzzle.get("test", []) if show_test else []
-    # Pairs: (input_grid, output_grid or None for test)
+    test_raw = puzzle.get("test", [])
     pairs: list[tuple[list[list[int]], list[list[int]] | None]] = []
-    for ex in train:
-        pairs.append((ex["input"], ex["output"]))
-    for ex in test:
-        pairs.append((ex["input"], None))  # None -> show "?"
+    if isinstance(show_test, str) and show_test.strip().lower() == "only":
+        for ex in test_raw:
+            pairs.append((ex["input"], None))
+    elif show_test is True:
+        for ex in train:
+            pairs.append((ex["input"], ex["output"]))
+        for ex in test_raw:
+            pairs.append((ex["input"], None))
+    else:
+        for ex in train:
+            pairs.append((ex["input"], ex["output"]))
     n_pairs = len(pairs)
     if n_pairs == 0:
         return go.Figure()
 
-    n_rows = (n_pairs + 1) // 2  # 2 pairs per row
-    
+    P = max(1, pairs_per_row)
+    n_rows = (n_pairs + P - 1) // P
+    n_subplot_cols = 2 * P
+
     # Calculate optimal dimensions for pixel-perfect rendering
     margin = dict(l=5, r=5, t=20, b=5)
     horizontal_spacing = 0.04
     vertical_spacing = 0.08
-    figure_width, figure_height, _cell_size = _calculate_optimal_dimensions(
-        pairs, width, gap, margin, horizontal_spacing, vertical_spacing
+    figure_width, figure_height, cell_size = _calculate_optimal_dimensions(
+        pairs, width, gap, margin, horizontal_spacing, vertical_spacing, pairs_per_row=P
     )
-    
-    fig = make_subplots(rows=n_rows, cols=4, horizontal_spacing=horizontal_spacing, vertical_spacing=vertical_spacing)
+
+    fig = make_subplots(
+        rows=n_rows,
+        cols=n_subplot_cols,
+        horizontal_spacing=horizontal_spacing,
+        vertical_spacing=vertical_spacing,
+    )
 
     for p, (in_grid, out_grid) in enumerate(pairs):
-        row = p // 2 + 1
-        # Default layout: 2 pairs per row -> (input1|output1|input2|output2)
-        # If we have an odd number of pairs, center the single last pair
-        # in the middle columns (2 and 3) of the last row instead of left-aligning.
-        if n_pairs % 2 == 1 and p == n_pairs - 1:
-            col_in = 2
-            col_out = 3
-        else:
-            col_in = (p % 2) * 2 + 1
-            col_out = (p % 2) * 2 + 2
+        row = p // P + 1
+        col_in, col_out = _puzzle_pair_subplot_cols(p, n_pairs, P)
         fig.add_trace(arc_heatmap(in_grid, gap=gap), row=row, col=col_in)
         if out_grid is not None:
             fig.add_trace(arc_heatmap(out_grid, gap=gap), row=row, col=col_out)
         # For test output we add no trace; subplot stays empty, "?" annotation added below
 
-    n_subplots = n_rows * 4
+    n_subplots = n_rows * n_subplot_cols
     for idx in range(1, n_subplots + 1):
         suffix = "" if idx == 1 else str(idx)
         fig.update_yaxes(
@@ -273,40 +320,48 @@ def _build_puzzle_figure(puzzle: Mapping[str, Any], show_test: bool = False, wid
     }
     fig.update_layout(**layout_dict)
 
-    # Calculate triangle size based on figure dimensions for proper scaling
-    # Base size scales with figure width (triangles are horizontal)
-    triangle_scale = max(1.0, figure_width / 600.0)  # Scale relative to 600px base width
-    # Triangle size in paper coordinates (0-1 range)
-    # Make base height equal to horizontal width for less pointy appearance
-    triangle_width = max(0.015, 0.025 * triangle_scale)
-    triangle_height = 2*triangle_width  # Base height equals horizontal width
-    
+    # Triangle / "?" markers use paper coords. Triangle height tracks layout cell_size;
+    # "?" font is derived from the test output subplot size ÷ grid so it matches a cell
+    # on screen (layout cell_size can be a few px while the drawn cell is larger).
+    paper_aspect = figure_width / max(1.0, float(figure_height))
+    triangle_height_px = max(10.0, 4.0 * float(cell_size))
+
     # Right-pointing triangles between input → output for each pair; "?" on test output cells
-    for p, (_, out_grid) in enumerate(pairs):
-        row = p // 2 + 1
-        # Mirror the same centering logic used when adding heatmap traces so that
-        # arrows and "?" annotations line up with the visible subplots.
-        if n_pairs % 2 == 1 and p == n_pairs - 1:
-            col_in = 2
-            col_out = 3
-        else:
-            col_in = (p % 2) * 2 + 1
-            col_out = (p % 2) * 2 + 2
-        idx_in = (row - 1) * 4 + col_in
-        idx_out = (row - 1) * 4 + col_out
+    for p, (in_grid, out_grid) in enumerate(pairs):
+        row = p // P + 1
+        col_in, col_out = _puzzle_pair_subplot_cols(p, n_pairs, P)
+        idx_in = (row - 1) * n_subplot_cols + col_in
+        idx_out = (row - 1) * n_subplot_cols + col_out
         xaxis_in_name = "xaxis" if idx_in == 1 else f"xaxis{idx_in}"
         xaxis_out_name = f"xaxis{idx_out}"
+        yaxis_in_name = "yaxis" if idx_in == 1 else f"yaxis{idx_in}"
         if xaxis_in_name not in fig.layout or xaxis_out_name not in fig.layout:
             continue
         d_in = fig.layout[xaxis_in_name].domain
         d_out = fig.layout[xaxis_out_name].domain
-        row_frac = (row - 0.5) / n_rows
-        y_mid = 1.0 - row_frac
-        
+        if yaxis_in_name in fig.layout:
+            dy = fig.layout[yaxis_in_name].domain
+            y_mid = (dy[0] + dy[1]) / 2
+        else:
+            dy = (0.0, 1.0)
+            row_frac = (row - 0.5) / n_rows
+            y_mid = 1.0 - row_frac
+
+        yaxis_out_name = "yaxis" if idx_out == 1 else f"yaxis{idx_out}"
+        dy_out = fig.layout[yaxis_out_name].domain if yaxis_out_name in fig.layout else dy
+        y_mid_out = (dy_out[0] + dy_out[1]) / 2
+
         # Calculate exact center between subplots
         # x_mid is the center point between the right edge of input and left edge of output
         x_mid = (d_in[1] + d_out[0]) / 2
-        
+
+        gap_x = max(1e-6, d_out[0] - d_in[1])
+        triangle_height = triangle_height_px / float(figure_height)
+        triangle_width = triangle_height / paper_aspect
+        if triangle_width > gap_x * 0.88:
+            triangle_width = gap_x * 0.88
+            triangle_height = triangle_width * paper_aspect
+
         # Right-pointing triangle: centered at x_mid, pointing right
         # Triangle points: left-top (base), right tip, left-bottom (base)
         tip_x = x_mid + triangle_width / 2
@@ -323,33 +378,57 @@ def _build_puzzle_figure(puzzle: Mapping[str, Any], show_test: bool = False, wid
         )
         if out_grid is None:
             output_x_mid = (d_out[0] + d_out[1]) / 2
+            nr = max(len(in_grid) if in_grid else 0, 1)
+            nc = max(len(in_grid[0]) if in_grid and in_grid[0] else 0, 1)
+            out_w_px = (d_out[1] - d_out[0]) * float(figure_width)
+            out_h_px = (dy_out[1] - dy_out[0]) * float(figure_height)
+            cell_px = min(out_w_px / nc, out_h_px / nr)
+            # "?" ~ one cell visually; on dense grids tie to triangle / cell_size.
+            # Size is 4× that baseline (two +100% steps) for slide legibility.
+            _base = max(
+                22,
+                min(
+                    420,
+                    round(
+                        max(
+                            cell_px * 5.5,
+                            float(cell_size) * 5.0,
+                            triangle_height_px * 1.15,
+                        )
+                    ),
+                ),
+            )
+            mark_font = int(min(1680, max(88, round(_base * 4))))
             fig.add_annotation(
                 x=output_x_mid,
-                y=y_mid,
+                y=y_mid_out,
                 xref="paper",
                 yref="paper",
                 xanchor="center",
                 yanchor="middle",
                 text="?",
                 showarrow=False,
-                font=dict(size=96, color="#666"),
+                font=dict(size=mark_font, color="#666"),
             )
     return fig
 
 
 def show_puzzle(
     puzzle_id: str,
-    show_test: bool = False,
+    show_test: ShowTestArg = False,
     show_code: bool = False,
     width: int | None = None,
     gap=1,
+    pairs_per_row: int = 2,
 ) -> go.Figure | HTML:
     """
     Load and display an ARC puzzle by id.
 
     - Loads puzzle from data/puzzles/{puzzle_id}.json.
-    - Layout: 2 pairs per row (4 subplots per row: input1 | output1 | input2 | output2).
-    - Train and optionally test pairs; test output cells show "?".
+    - Layout: ``pairs_per_row`` input–output pairs per row (default ``2`` → four subplots per row:
+      input1 | output1 | input2 | output2).
+    - ``show_test``: ``False`` — training pairs only; ``True`` — training plus test inputs
+      (unknown output as ``?``); ``\"only\"`` (case-insensitive) — **test** pairs only.
     - If show_code=True: also show solution code from data/puzzles/{puzzle_id}.py,
       or "no code found" if the file is missing. Returns HTML. Otherwise returns go.Figure.
     - width: Optional target figure width in pixels. Actual width is calculated to ensure
@@ -357,6 +436,7 @@ def show_puzzle(
     - gap: Gap between grid cells in pixels. Default 1 for visible grid lines.
            Figure dimensions are automatically calculated to ensure pixel-perfect rendering.
            Non-integer values may cause antialiasing effects when viewing.
+    - pairs_per_row: How many (input, output) pairs to place on one horizontal row (minimum 1).
     """
     from src.data import get_solution_path, load_puzzle
 
@@ -367,7 +447,9 @@ def show_puzzle(
     except Exception as e:
         raise RuntimeError(f"Failed to load puzzle {puzzle_id}: {e}") from e
 
-    fig = _build_puzzle_figure(puzzle, show_test=show_test, width=width, gap=gap)
+    fig = _build_puzzle_figure(
+        puzzle, show_test=show_test, width=width, gap=gap, pairs_per_row=pairs_per_row
+    )
 
     if not show_code:
         return fig
