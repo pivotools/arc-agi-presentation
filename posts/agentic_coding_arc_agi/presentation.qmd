@@ -1,10 +1,14 @@
 ---
-title: "Agentic coding improves ARC AGI 2 performance across models"
+title: "Do LLMs have fluid intelligence?"
+subtitle: "Lessons from competing in ARC AGI 2"
 author: "Dibya Chakravorty, Debsankha Manik & Bernhard Altaner"
-date: "2026-02-02"
+date: "2026-05-22"
+# Match _quarto.yml: run from repo root so `src` imports resolve (same as index.ipynb).
+execute:
+  execute-dir: project
 format:
   revealjs:
-    theme: simple
+    theme: [simple, presentation-theme.scss]
     slide-number: true
     transition: fade
     incremental: false
@@ -21,6 +25,69 @@ format:
 ---
 
 # Intro
+
+## What is ARC AGI 2?
+
+:::: {.columns}
+::: {.column width="75%"}
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+
+# Same as index.ipynb: Jupyter/Quarto may not put the blog root on sys.path.
+import sys
+from pathlib import Path
+
+def _find_blog_root():
+    path = Path(".").resolve()
+    for _ in range(10):
+        if (path / "src" / "plotting.py").exists():
+            return path
+        if (path / "blog" / "src" / "plotting.py").exists():
+            return path / "blog"
+        path = path.parent
+    return Path(".").resolve()
+
+blog_root = _find_blog_root()
+if str(blog_root) not in sys.path:
+    sys.path.insert(0, str(blog_root))
+```
+
+::: {.fragment}
+- From the examples...
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+
+from src.plotting import show_puzzle, display_figure
+fig = show_puzzle("9aaea919", show_code=False, show_test=False, width=880,gap=0.33,pairs_per_row=3)
+display_figure(fig, "puzzle")
+```
+:::
+
+::: {.fragment}
+- ...infer the transformation...
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+
+from src.plotting import show_puzzle, display_figure
+fig = show_puzzle("9aaea919", show_code=False, show_test="only", width=880,gap=0.33,pairs_per_row=2)
+display_figure(fig, "puzzle")
+```
+:::
+
+
+:::
+::: {.column width="25%"}
+**Sidebar**
+- Optional context  
+- Links, glossary, “did you know”…  
+:::
+::::
 
 ## Who we are
 
