@@ -24,12 +24,6 @@ format:
     hash-type: number
 ---
 
-# Intro
-
-## What is ARC AGI 2?
-
-:::: {.columns}
-::: {.column width="75%"}
 ```{python}
 #| echo: false
 #| output: false
@@ -54,80 +48,130 @@ if str(blog_root) not in sys.path:
     sys.path.insert(0, str(blog_root))
 ```
 
-::: {.fragment}
-- From the examples...
-```{python}
-#| echo: false
-#| output: true
-#| execute: true
-
-from src.plotting import show_puzzle, display_figure
-fig = show_puzzle("9aaea919", show_code=False, show_test=False, width=880,gap=0.33,pairs_per_row=3)
-display_figure(fig, "puzzle")
-```
-:::
-
-::: {.fragment}
-- ...infer the transformation...
-```{python}
-#| echo: false
-#| output: true
-#| execute: true
-
-from src.plotting import show_puzzle, display_figure
-fig = show_puzzle("9aaea919", show_code=False, show_test="only", width=880,gap=0.33,pairs_per_row=2)
-display_figure(fig, "puzzle")
-```
-:::
 
 
-:::
-::: {.column width="25%"}
-**Sidebar**
-- Optional context  
-- Links, glossary, “did you know”…  
-:::
-::::
 
-## Who we are
+
+## About us
+### From an AGI meetup in Munich to a small AI lab
 
 ::: {.columns}
 ::: {.column width="33%"}
 **Dibya Chakravorty**
+![](./img/Dibya.png){fig-align="center" width="80%"}
 
-Physics major; AGI-curious since *The Emperor's New Mind*.
 
-Generalist Python developer & cloud architect.
+- Physics major; AGI-curious since *The Emperor's New Mind*.
 
-Organises the [AGI Munich meetup](https://www.meetup.com/de-de/munchen-artificial-general-intelligence-meetup-group/).
+- Generalist Python developer & cloud architect.
 
-[GitHub](https://github.com/gutfeeling) &middot; [Website](https://dibya.online)
+- Organises the [AGI Munich meetup](https://www.meetup.com/de-de/munchen-artificial-general-intelligence-meetup-group/).
+
 :::
 ::: {.column width="33%"}
 **Debsankha Manik**
+![](./img/debsankha.jpg){fig-align="center" width="80%"}
 
-Theoretical physicist by training.
+- Theoretical physicist by training.
 
-Dynamical systems, graph theory; data science &times; discrete optimisation.
+- Dynamical systems, graph theory; data science &times; discrete optimisation.
 
-Loves teaching.
+- Loves teaching.
 
-[GitHub](https://github.com/debsankha) &middot; [Scholar](https://scholar.google.com/citations?hl=en&user=DktbWEIAAAAJ)
+
 :::
 ::: {.column width="33%"}
+
 **Bernhard Altaner**
+![](./img/bernhard.jpg){fig-align="center" width="80%"}
 
-Physics & maths in Konstanz / Cambridge; PhD Göttingen on information & entropy.
+- Physics and maths, academic positions on information processing in complex systems.
 
-Academia in Luxembourg & Munich on chemical evolution.
+- Interested AI and consciousness.
 
-Now R&D in smart energy management.
+- Likes to have GlaDOS managing his smart home.
 
-[Scholar](https://scholar.google.com/citations?user=eJir3-oAAAAJ) &middot; [Mastodon](https://chaos.social/@beralt)
 :::
 :::
 
 *With Nicolas Berg &mdash; co-host of the AGI Munich meetup.*
+
+
+
+## ARC AGI 2
+### What are we talking about?
+
+::: {.incremental}
+- **ARC-AGI:** Abstraction and Reasoning Corpus for Artificial General Intelligence
+- **Task:** Transform pixel grids, where transformation rule is inferred from a few input–output pairs
+- **Example:**
+:::
+::: {.fragment}
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+#| fig-cap: "From the 'training pairs'..."
+
+from src.plotting import show_puzzle, display_figure
+fig = show_puzzle("9aaea919", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
+display_figure(fig, "puzzle")
+```
+:::
+
+::: {.fragment}
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+#| fig-cap: "...infer the transformation rule!"
+
+from src.plotting import show_puzzle, display_figure
+fig = show_puzzle("9aaea919", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
+display_figure(fig, "puzzle")
+```
+:::
+
+
+## ARC AGI 2
+### Easy for humans, hard for AI?
+
+::: {.incremental}
+- ARC puzzles seem **intuitive** to us humans, but...
+- ... are not well-defined **mathematically**.
+- **Core human preceptive priors**: objects, groups, proximity, numbers, spatial relationships, etc.
+- **World model** needed to reason about the task?
+- **Example:** A very intuitive and easy puzzle a 5-year old would solve...
+:::
+::: {.fragment}
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+#| fig-cap: "...should surely be easy for AI as well, right?"
+
+from src.plotting import show_puzzle, display_figure
+fig = show_puzzle("28a6681f", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
+display_figure(fig, "puzzle")
+```
+:::
+
+::: {.fragment}
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+#| fig-cap: "Right?!"
+
+from src.plotting import show_puzzle, display_figure
+fig = show_puzzle("28a6681f", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
+display_figure(fig, "puzzle")
+```
+:::
+
+
+
+
 
 ## ARC AGI 2: easy for humans, hard for AI? {.scrollable}
 

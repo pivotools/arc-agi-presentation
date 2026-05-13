@@ -6,8 +6,8 @@
 
 // --- Colors ---
 $body-bg: #fff;
-$body-color: #444444;
-$text-muted: lighten($body-color, 50%);
+$body-color: #333333;
+$text-muted: lighten($body-color, 30%);
 $link-color: #2a76dd;
 $link-color-hover: lighten($link-color, 15%);
 $selection-bg: lighten($link-color, 25%);
@@ -29,8 +29,8 @@ $presentation-line-height: 1.3;
 // --- Headings ---
 $presentation-h1-font-size: 2.5em;
 $presentation-h2-font-size: 1.6em;
-$presentation-h3-font-size: 1.3em;
-$presentation-h4-font-size: 1em;
+$presentation-h3-font-size: 1em;
+$presentation-h4-font-size: .7em;
 $presentation-heading-font: $font-family-sans-serif;
 $presentation-heading-color: $body-color;
 $presentation-heading-line-height: 1.2;
@@ -61,6 +61,8 @@ $presentation-slide-text-align: left;
 $presentation-title-slide-text-align: center;
 // Title slide only (YAML `subtitle:` → `<p class="subtitle">`). Not a built-in Quarto Sass key.
 $presentation-subtitle-font-size: 2.5rem;
+// Figure captions (markdown images, floats, knitr-style `p.caption`)
+$presentation-figure-caption-font-size: 0.55em;
 
 // --- Callouts (common tunables) ---
 $callout-border-width: 0.3rem;
@@ -80,4 +82,63 @@ $callout-margin-bottom: 1rem;
 #title-slide .subtitle,
 div.reveal div.slides section.quarto-title-block .subtitle {
   font-size: $presentation-subtitle-font-size;
+}
+
+/*-- scss:rules --*/
+.reveal .slides section > h2 + h3 {
+  font-weight: 400;
+  font-style: italic;
+  color: $text-muted;
+  margin-top: -0.35em;
+  margin-bottom: 0.75em;
+}
+
+/* Center figures (YAML fig-align: center adds classes; slide body stays text-align: left) */
+.reveal .slides section .quarto-figure,
+.reveal .slides section figure.quarto-float {
+  text-align: center;
+}
+
+.reveal .slides section .cell-output-display {
+  text-align: center;
+}
+
+/* Plotly: fixed-width block `.plotly-graph-div` ignores parent text-align — center like block images */
+.reveal .slides section .plotly-graph-div {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Executable cells: full slide content width (Plotly sits inside .fragment > .cell) */
+.reveal .slides section .cell {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.reveal .slides section .cell-output-display.quarto-float {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Block images: center by default (`fig-align: center` in presentation.qmd; slide body stays left-aligned) */
+.reveal .slides section img.quarto-figure-center,
+.reveal .slides section img.r-stretch.quarto-figure-center,
+.reveal .slides section p > img:only-child:not(.quarto-figure-left):not(.quarto-figure-right),
+.reveal .slides section > img:not(.quarto-figure-left):not(.quarto-figure-right) {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Figure captions: centered + muted (HTML blog uses Cosmo + .quarto-figure centering) */
+.reveal .slides section p.caption,
+.reveal .slides section figcaption,
+.reveal .slides section .quarto-float-caption {
+  text-align: center;
+  color: $text-muted;
+  font-size: $presentation-figure-caption-font-size;
+  margin-top: 0.35em;
+  line-height: 1.25;
 }
