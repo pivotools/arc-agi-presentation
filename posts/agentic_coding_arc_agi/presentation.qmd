@@ -3,11 +3,15 @@ title: "Do LLMs have fluid intelligence?"
 subtitle: "Lessons from competing in ARC AGI 2"
 author: "Dibya Chakravorty, Debsankha Manik & Bernhard Altaner"
 date: "2026-05-22"
+# Shown between subtitle and authors via `title-slide.html` partial.
+title-banner-image: ./image.png
 # Match _quarto.yml: run from repo root so `src` imports resolve (same as index.ipynb).
 execute:
   execute-dir: project
 format:
   revealjs:
+    template-partials:
+      - title-slide.html
     theme: [simple, presentation-theme.scss]
     slide-number: true
     transition: fade
@@ -171,43 +175,37 @@ display_figure(fig, "puzzle")
 
 
 
-## ARC-AGI as a benchmark** 
-### The distant past before "vibe coding" became mainstream
+## ARC-AGI as a benchmark 
+### Blast from the past before "vibe coding" became mainstream
 
 - **Two-dimensional challenge:** score *and* cost per puzzle
-- **State of the art:** *ARC-AGI 1 was not saturated then, ARC-AGI 2 just out*
-    - **ARC-AGI 1:** OpenAI GPT-4o, 50% pass@2
+- **State of the art April 2025:** *ARC-AGI 1 was not saturated then, ARC-AGI 2 just out*
+    - **ARC-AGI 1:** OpenAI ChatGPT-o1-pro, 50% pass@2
     - **ARC-AGI 2:** barely any nontrivial scores
+    - **No established meta**: LLM-based and domain-specific language approaches used
 
-        ![Wayback machine on 2025-04-17](.img/state-of-arc-april-25.png){fig-align="center" width="55%"}
-        https://web.archive.org/web/20250417155533/https://arcprize.org/leaderboard
-
-    - ARC-AGI 2 was **not "solved"** back then:
-      - really hard challenge,
-      - No "established meta"
-      - LLM-based vs DSL approaches
+![Wayback snapshot of arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" width="60%" .lightbox}
 
 
 
-## ARC AGI 2: easy for humans, hard for AI? {.scrollable}
 
-A puzzle has a few **training pairs** and one or more **test inputs**. Infer the rule, apply it.
 
-![A single ARC AGI 2 puzzle: training examples (top), test input (bottom).](index_files/figure-pdf/fig-puzzle-example-output-1.png){fig-align="center" width="55%"}
+## Challenge accepted!
+### Leeroy Jenkins, Dunning-Krueger and YOLO
 
-::: {.fragment}
-**The "AGI" framing:** ARC AGI targets *fluid intelligence* &mdash; the ability to acquire and apply a *new* skill at test time, on a task you have never seen before. Memorisation does not help.
-:::
+  - context:
+    + First open weight reasoning model was DeepSeek R1 (Jan 2025)
+    + Tool use was thought to be a big topic in 2025.
+  - Reasoning:
+    - So using a reasoning model made sense. But low scores with O1/O3 on ARC AGI 2 => We concluded just context/harness engineering is not enough ==>
+    - Domain specific fine tuning was known to work (e.g. math tasks). So we thought: why not finetune a reasoning model with tool use?
+  - Our initial plan:
+    - Generate synthetic data for this domain.
+    - Finetune open weights models (with reasoning and tool use). 
+  - And so the story begins...
 
-## ARC AGI 2: the challenge
 
-- **Benchmark axes:** score *and* cost per puzzle &mdash; you cannot just throw compute at it.
-- **Kaggle competition** with a private test set to control for memorisation.
-- **Public verified leaderboard** for transparent submissions.
 
-::: {.callout-note title="State of the art when we started"}
-[TODO: leaderboard SotA % and cost / puzzle, ~Summer 2025] &mdash; o3-class models scored near noise on ARC AGI 2 at release.
-:::
 
 ## Our original plan
 

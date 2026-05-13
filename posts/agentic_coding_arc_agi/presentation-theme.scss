@@ -64,6 +64,19 @@ $presentation-subtitle-font-size: 2.5rem;
 // Figure captions (markdown images, floats, knitr-style `p.caption`)
 $presentation-figure-caption-font-size: 0.55em;
 
+// GLightbox (`.lightbox`): independent of `$body-bg` / `$body-color`.
+$lightbox-caption-font-family: $font-family-sans-serif;
+$lightbox-caption-color: #cccccc;
+// Dimmed area behind the lightbox; GLightbox `.goverlay` + Quarto `lightbox.css`.
+$lightbox-backdrop-bg: rgba(0, 0, 0, 0.82);
+// Behind the enlarged image (`.gslide-media`).
+$lightbox-media-bg: #0f1114;
+// Caption strip under the image (beats `.glightbox-clean .gslide-description { background: #fff }`).
+$lightbox-description-bg: #161a22;
+
+// Title-slide banner: set max height; image keeps aspect ratio (see `title-banner-image` in presentation.qmd).
+$title-banner-height: 22rem;
+
 // --- Callouts (common tunables) ---
 $callout-border-width: 0.3rem;
 $callout-border-scale: 0%;
@@ -84,7 +97,63 @@ div.reveal div.slides section.quarto-title-block .subtitle {
   font-size: $presentation-subtitle-font-size;
 }
 
-/*-- scss:rules --*/
+/* Widescreen strip between subtitle and authors (`title-slide.html` + `title-banner-image`) */
+.reveal .slides section.quarto-title-block .quarto-title-banner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: 0.35em 0 0.85em;
+}
+
+.reveal .slides section.quarto-title-block .quarto-title-banner img {
+  display: block;
+  max-height: $title-banner-height;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  border-radius: $border-radius;
+}
+
+/* GLightbox: typography + panel backgrounds (beat glightbox.min + Quarto lightbox.css + `.glightbox-clean` #fff) */
+body:not(.glightbox-mobile) .goverlay {
+  background: $lightbox-backdrop-bg;
+}
+
+body.glightbox-mobile .goverlay {
+  background: $lightbox-backdrop-bg;
+}
+
+body:not(.glightbox-mobile) .glightbox-container .gslide .gslide-media,
+body:not(.glightbox-mobile) .glightbox-container .gslide-media {
+  background-color: $lightbox-media-bg;
+}
+
+body.glightbox-mobile .glightbox-container .gslide .gslide-media,
+body.glightbox-mobile .glightbox-container .gslide-media {
+  background-color: $lightbox-media-bg;
+}
+
+body:not(.glightbox-mobile) .glightbox-container .gslide .gslide-description,
+body:not(.glightbox-mobile) .glightbox-container.glightbox-clean .gslide-description,
+body:not(.glightbox-mobile) .glightbox-container .gslide .gslide-description .gslide-title,
+body:not(.glightbox-mobile) .glightbox-container .gslide .gslide-description .gslide-desc,
+body:not(.glightbox-mobile) .glightbox-container.glightbox-clean .gdesc-inner {
+  font-family: $lightbox-caption-font-family;
+  color: $lightbox-caption-color;
+  background-color: $lightbox-description-bg;
+}
+
+body.glightbox-mobile .glightbox-container .gslide .gslide-description,
+body.glightbox-mobile .glightbox-container.glightbox-clean .gslide-description,
+body.glightbox-mobile .glightbox-container .gslide .gslide-description .gslide-title,
+body.glightbox-mobile .glightbox-container .gslide .gslide-description .gslide-desc,
+body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
+  font-family: $lightbox-caption-font-family;
+  color: $lightbox-caption-color;
+  background-color: $lightbox-description-bg;
+}
+
 .reveal .slides section > h2 + h3 {
   font-weight: 400;
   font-style: italic;
