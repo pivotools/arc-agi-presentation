@@ -99,7 +99,7 @@ if str(blog_root) not in sys.path:
 
 
 ## ARC AGI 2
-### What are we talking about?
+### What is this talking about?
 
 ::: {.incremental}
 - **ARC-AGI:** Abstraction and Reasoning Corpus for Artificial General Intelligence
@@ -170,6 +170,22 @@ display_figure(fig, "puzzle")
 :::
 
 
+
+## ARC-AGI as a benchmark** 
+### The distant past before "vibe coding" became mainstream
+
+- **Two-dimensional challenge:** score *and* cost per puzzle
+- **State of the art:** *ARC-AGI 1 was not saturated then, ARC-AGI 2 just out*
+    - **ARC-AGI 1:** OpenAI GPT-4o, 50% pass@2
+    - **ARC-AGI 2:** barely any nontrivial scores
+
+        ![Wayback machine on 2025-04-17](.img/state-of-arc-april-25.png){fig-align="center" width="55%"}
+        https://web.archive.org/web/20250417155533/https://arcprize.org/leaderboard
+
+    - ARC-AGI 2 was **not "solved"** back then:
+      - really hard challenge,
+      - No "established meta"
+      - LLM-based vs DSL approaches
 
 
 
