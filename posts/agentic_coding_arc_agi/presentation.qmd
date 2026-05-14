@@ -26,6 +26,26 @@ format:
     history: true
     controls: true
     hash-type: number
+    # Reveal 5.1 only registers preview clicks on <a href="http(s)...">; relative
+    # file links need a tiny shim (include-after-body) that calls showPreview().
+    include-after-body:
+      - text: |
+          <script type="text/javascript">
+          (function () {
+            function bindRevealPlotlyPreviews() {
+              document.querySelectorAll("a.reveal-plotly-preview[href]").forEach(function (anchor) {
+                anchor.addEventListener("click", function (e) {
+                  e.preventDefault();
+                  var href = anchor.getAttribute("href");
+                  if (!href || typeof Reveal === "undefined" || typeof Reveal.showPreview !== "function") return;
+                  var abs = new URL(href, window.location.href).href;
+                  Reveal.showPreview(abs);
+                });
+              });
+            }
+            bindRevealPlotlyPreviews();
+          })();
+          </script>
 ---
 
 ```{python}
@@ -110,7 +130,7 @@ if str(blog_root) not in sys.path:
 - **Task:** Transform pixel grids, where transformation rule is inferred from a few input–output pairs
 - **Example:**
 :::
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -121,9 +141,9 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("9aaea919", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-:::
+::::
 
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -134,7 +154,7 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("9aaea919", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-:::
+::::
 
 
 ## ARC AGI 2
@@ -147,7 +167,7 @@ display_figure(fig, "puzzle")
 - **World model** needed to reason about the task?
 - **Example:** A very intuitive and easy puzzle a 5-year old would solve...
 :::
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -158,9 +178,9 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("28a6681f", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-:::
+::::
 
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -171,7 +191,7 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("28a6681f", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-:::
+::::
 
 
 
@@ -230,6 +250,7 @@ Sidebar: show an example of a synthetic puzzle on the next slides.
   - Powerful models were required — for puzzles that are not useless, and for explanations that are actually useful.
   - **Cost:** expensive in practice (opportunistic “free tier” tokens).
   - *Line plot idea:* time vs number of puzzles (OpenAI, DeepSeek).
+
 ::: {.notes}
 Hopefully no one from OpenAI in the audience.
 :::
@@ -331,7 +352,34 @@ Side note from notes: frontier models lacked traces; we ultimately did not pursu
 
 - Score “jumps” as we iterated on harness and models.
 
-![Progress plot (score jumps over time)](./img/scores-jumps-plot.png){fig-align="center" width="75%" .lightbox}
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+from pathlib import Path
+from src.plotting import create_baseline_interleaved_scatter, write_plotly_for_reveal_lightbox
+
+_post = Path("posts/agentic_coding_arc_agi")
+write_plotly_for_reveal_lightbox(
+    create_baseline_interleaved_scatter(),
+    _post / "scores-scatter-interactive.html",
+    fig_key="scatter_baseline_vs_interleaved",
+    preview_png_path=_post / "img" / "scores-scatter-preview.png",
+)
+```
+
+```{=html}
+<div style="text-align:center;margin-top:0.75em">
+  <a href="scores-scatter-interactive.html"
+     class="reveal-plotly-preview"
+     style="display:inline-block;cursor:pointer">
+    <img src="img/scores-scatter-preview.png"
+         alt="Score jumps scatter — click to open interactive chart"
+         class="r-stretch"
+         style="max-height:68vh" />
+  </a>
+</div>
+```
 
 
 
@@ -355,6 +403,50 @@ Side note from notes: frontier models lacked traces; we ultimately did not pursu
   - Abstract-representation angle — e.g. Markovian thinker thread (August 2025).
   - Tool calling + iterative refinement trajectory.
   - Agentica / Confluence — fast convergence to a similar regime in the broader field.
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+# Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
+#   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
+
+from pathlib import Path
+
+from src.plotting import create_horizontal_timeline, write_plotly_for_reveal_lightbox
+
+_post = Path("posts/agentic_coding_arc_agi")
+write_plotly_for_reveal_lightbox(
+    create_horizontal_timeline(),
+    _post / "timeline-interactive.html",
+    fig_key="timeline",
+    preview_png_path=_post / "img" / "timeline-preview.png",
+)
+```
+
+```{=html}
+<!--
+  Standalone Plotly HTML opens in Reveal’s iframe overlay (showPreview).
+  Reveal 5.1’s built-in preview only auto-binds <a href="http...">; for same-dir
+  files we wrap the thumbnail and use class reveal-plotly-preview + include script.
+-->
+<div style="text-align:center;margin-top:0.75em">
+  <a
+    href="timeline-interactive.html"
+    class="reveal-plotly-preview"
+    style="display:inline-block;cursor:pointer;max-height:68vh">
+    <img
+      src="img/timeline-preview.png"
+      alt="Timeline preview — click to open interactive chart"
+      class="r-stretch"
+      style="max-height:68vh" />
+  </a>
+</div>
+<p style="text-align:center;font-size:0.88em;opacity:0.88;margin:0.5em 0 0 0">
+  Team milestones vs broader AI context (example data) — click preview for interactive
+</p>
+```
+
 ::: {.notes}
 Ask Dibya for concrete timeline dates.
 :::
@@ -374,9 +466,7 @@ Ask Dibya for concrete timeline dates.
 
 
 
-## Epilogue
-### Coming back to the title
-
+# Epilogue
 
 
 ## So… did ARC solvers crack the teaser puzzle?
@@ -401,8 +491,10 @@ Confirm which puzzle ended up being the flagship story vs the second intro examp
 
 
 
-## Appendix (backup)
-### To RL or not to RL?
+# Appendix (backup)
+
+## To RL or not to RL?
+### That was the question...
 
 - Built intuition for RL *with tool calling* (e.g. the `verl` stack — very new territory).
   - Rollouts — many candidate solutions per puzzle — are expensive.

@@ -1,0 +1,40 @@
+{
+  "events": [
+    {
+      "name": "team_milestone_kickoff",
+      "date": "2025-04-01",
+      "text": "Team kickoff (example)",
+      "placement": "upper"
+    },
+    {
+      "name": "team_milestone_first_eval",
+      "date": "2025-06-15",
+      "text": "First internal eval pass (example)",
+      "placement": "upper"
+    },
+    {
+      "name": "team_milestone_submission",
+      "date": "2025-11-01",
+      "text": "Final submission prep (example)",
+      "placement": "upper"
+    },
+    {
+      "name": "deepseek_r1_release",
+      "date": "2025-01-20",
+      "text": "DeepSeek R1 open-sourced",
+      "placement": "lower"
+    },
+    {
+      "name": "arc_prize_2025_launch",
+      "date": "2025-03-24",
+      "text": "ARC Prize 2025 (Kaggle) starts",
+      "placement": "lower"
+    },
+    {
+      "name": "gpt_oss_release",
+      "date": "2025-08-05",
+      "text": "OpenAI gpt-oss release",
+      "placement": "lower"
+    }
+  ]
+}

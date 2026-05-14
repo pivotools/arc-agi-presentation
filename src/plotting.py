@@ -7,13 +7,14 @@ scatter/bar figures. Style (colors, shapes) from blog/style/style.yml only.
 
 from __future__ import annotations
 
+from datetime import date, datetime, timedelta
 from html import escape
 from pathlib import Path
 from typing import Any, Callable, Literal, Mapping, Sequence
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-from IPython.display import HTML
+from IPython.display import HTML, display
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
@@ -887,18 +888,75 @@ def add_scatter_traces_to_subplot(
     return fig
 
 
-def display_figure(fig: go.Figure, fig_key: str) -> None:
+def write_plotly_for_reveal_lightbox(
+    fig: go.Figure,
+    html_path: str | Path,
+    *,
+    fig_key: str,
+    preview_png_path: str | Path | None = None,
+    preview_scale: float = 2.0,
+) -> None:
     """
-    Display a Plotly figure with interactivity controlled by style.yml.
-    
-    Args:
-        fig: The Plotly figure to display.
-        fig_key: Key in style.yml figures section (e.g., "scatter_baseline_vs_interleaved",
-                "bar_baseline_vs_interleaved", "tool_calls_histogram", "puzzle").
-    
-    This helper applies the interactivity setting from style.yml when displaying
-    the figure, allowing per-figure control over whether plots are interactive or static.
+    Write a standalone Plotly HTML file with a **local** ``plotly.min.js`` (Plotly
+    ``include_plotlyjs="directory"``) for Reveal.js ``Reveal.showPreview``. CDN script
+    tags with SRI often fail inside nested iframes, which leaves Reveal’s “Unable to load
+    iframe” message. A copied ``plotly.min.js`` (~3–5MB) sits next to the HTML file.
+
+    Use from Quarto with ``execute-dir: project`` and paths under the post directory,
+    e.g. ``posts/.../timeline-interactive.html``. In the ``.qmd`` slide, point
+    ``data-preview-link`` at the same filename (relative to the rendered ``presentation.html``).
+
+    PNG export uses Kaleido (``pip install kaleido``).
+
+    **Reveal.js note:** bundled Reveal (e.g. 5.1) registers iframe previews only for
+    ``<a href="http(s)://...">``. Same-directory ``.html`` sidecars need a thin
+    document-layer click handler that calls ``Reveal.showPreview(resolvedUrl)`` —
+    see this repo’s ``presentation.qmd`` (``reveal-plotly-preview`` + ``include-after-body``).
     """
+    config = _plotly_config_for(fig_key)
+    out = Path(html_path)
+    out.parent.mkdir(parents=True, exist_ok=True)
+
+    # Strip fixed pixel dimensions so Plotly fills the iframe rather than rendering
+    # at a hard-coded width/height.  Work on a copy to avoid mutating the caller's fig.
+    import copy as _copy
+    _fig = _copy.deepcopy(fig)
+    _fig.update_layout(width=None, height=None, autosize=True)
+
+    # Use a local plotly.min.js (directory mode), not CDN+SRI: nested Reveal iframes often
+    # fail to run CDN scripts with integrity checks, which leaves a blank iframe and Reveal's
+    # "Unable to load iframe" fallback visible.
+    _fig.write_html(str(out), config=config, include_plotlyjs="directory", full_html=True)
+
+    # Inject a CSS reset so html/body fill the iframe viewport, and ensure the
+    # graph div also expands to 100 %.
+    _iframe_reset = (
+        "<style>"
+        "html,body{margin:0;padding:0;height:100%;width:100%;overflow:hidden;}"
+        ".plotly-graph-div{height:100%!important;width:100%!important;}"
+        "</style>"
+    )
+    _html = out.read_text(encoding="utf-8")
+    _html = _html.replace("<head>", "<head>" + _iframe_reset, 1)
+    out.write_text(_html, encoding="utf-8")
+
+    if preview_png_path is not None:
+        png = Path(preview_png_path)
+        png.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            fig.write_image(str(png), scale=preview_scale)
+        except Exception as e:
+            raise RuntimeError(
+                "Plotly static export failed (install kaleido: pip install kaleido). "
+                f"Original error: {e}"
+            ) from e
+
+
+def display_figure(
+    fig: go.Figure,
+    fig_key: str,
+) -> None:
+    """Display a Plotly figure with ``config`` from ``style.yml`` (``figures.<fig_key>``)."""
     config = _plotly_config_for(fig_key)
     fig.show(config=config)
 
@@ -1251,6 +1309,287 @@ def create_baseline_interleaved_bars_panels(
         height=layout_cfg.get("height", 400),
         width=layout_cfg.get("width", 520),
         margin=margin,
+        plot_bgcolor="rgba(0,0,0,0)",
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+    return fig
+
+
+# ---------------------------------------------------------------------------
+# Horizontal timeline (team vs field milestones; data from data/timeline.json)
+# ---------------------------------------------------------------------------
+
+
+def _timeline_event_label(ev: Mapping[str, Any]) -> str:
+    """Display string from `text` or alias `test`."""
+    t = ev.get("text")
+    if isinstance(t, str) and t.strip():
+        return t.strip()
+    t2 = ev.get("test")
+    if isinstance(t2, str) and t2.strip():
+        return t2.strip()
+    return ""
+
+
+def _timeline_anchor_y_frac(cfg: Mapping[str, Any], key: str, legacy_key: str) -> float:
+    """Fraction from axis (0) to tick tip (1) where the label center sits; default mid-tick."""
+    v = cfg.get(key)
+    if v is not None:
+        return min(1.0, max(0.05, float(v)))
+    leg = cfg.get(legacy_key)
+    if leg is not None:
+        f = float(leg)
+        if f > 1.02:
+            return 0.5
+        return min(1.0, max(0.05, f))
+    return 0.5
+
+
+def _timeline_label_slant_degrees(
+    parsed: list[tuple[date, str, str, str]],
+    span_days: int,
+    cfg: Mapping[str, Any],
+) -> list[float]:
+    """
+    Per-event textangle (degrees).
+
+    ``label_slant_mode`` (default ``always``):
+
+    - ``always``: slant every label (best for dense copy on slides).
+    - ``never``: horizontal labels.
+    - ``auto``: slant all labels on a placement if that side has 2+ events; otherwise
+      slant when the nearest same-side neighbor is closer than the crowding gap
+      (``label_crowd_min_gap_days``, else ``max(21, int(0.18 * span_days))``).
+    """
+    slant = float(cfg.get("label_slant_deg", -28))
+    if abs(slant) < 1e-6:
+        return [0.0] * len(parsed)
+
+    mode = str(cfg.get("label_slant_mode", "always")).strip().lower()
+    if mode in ("off", "none", "never", "false", "0"):
+        return [0.0] * len(parsed)
+    if mode in ("always", "all", "true", "1"):
+        return [slant] * len(parsed)
+
+    min_gap = cfg.get("label_crowd_min_gap_days")
+    if min_gap is None:
+        min_gap = max(21, int(0.18 * max(span_days, 1)))
+    min_gap_i = max(1, int(min_gap))
+
+    n = len(parsed)
+    out = [0.0] * n
+    by_pl: dict[str, list[int]] = {"upper": [], "lower": []}
+    for i, row in enumerate(parsed):
+        by_pl[row[1]].append(i)
+    for idxs in by_pl.values():
+        if len(idxs) >= 2:
+            for i in idxs:
+                out[i] = slant
+
+    for i in range(n):
+        if out[i] != 0.0:
+            continue
+        d_i, pl_i, _, _ = parsed[i]
+        min_dist: int | None = None
+        for j in range(n):
+            if i == j or parsed[j][1] != pl_i:
+                continue
+            dist = abs((parsed[j][0] - d_i).days)
+            if min_dist is None or dist < min_dist:
+                min_dist = dist
+        if min_dist is not None and min_dist < min_gap_i:
+            out[i] = slant
+    return out
+
+
+def create_horizontal_timeline(
+    events: list[dict] | None = None,
+    style_config: dict | None = None,
+) -> go.Figure:
+    """
+    Plotly figure: horizontal date axis, central baseline, upper and lower ticks.
+
+    Each event dict: name, date (YYYY-MM-DD), placement (upper|lower), text or test.
+
+    If ``events`` is None, loads ``data/timeline.json`` via ``load_timeline()``.
+    Style from ``figures.timeline`` in style.yml.
+
+    Labels use ``xanchor="center"`` and ``yanchor="middle"``. The anchor y is
+    ``± tick_length × (frac + label_anchor_y_extra_tick_frac)`` from the timeline (``frac`` from
+    ``label_anchor_y_frac_*``, default extra ``0.6`` = 60% of tick length past the base point).
+    """
+    style = style_config if style_config is not None else _load_style_yml()
+    cfg = _get_figure_config("timeline", style)
+    layout_cfg = cfg.get("layout") or {}
+    margin = layout_cfg.get("margin", dict(l=72, r=48, t=28, b=72))
+    height = layout_cfg.get("height", 320)
+    width = layout_cfg.get("width", 900)
+    tick_length = float(cfg.get("tick_length", 0.55))
+    line_color = str(cfg.get("line_color", "rgba(60,60,60,0.9)"))
+    upper_color = str(cfg.get("upper_color", "#2ECC40"))
+    lower_color = str(cfg.get("lower_color", "#0074D9"))
+    y_range = cfg.get("y_range", [-1.12, 1.12])
+    if (
+        not isinstance(y_range, (list, tuple))
+        or len(y_range) != 2
+        or not all(isinstance(x, (int, float)) for x in y_range)
+    ):
+        y_range = [-1.12, 1.12]
+    x_pad_ratio = float(cfg.get("x_pad_ratio", 0.06))
+    label_font_size = int(cfg.get("label_font_size", 15))
+    tick_line_width = float(cfg.get("tick_line_width", 1.5))
+    baseline_width = float(cfg.get("baseline_width", 2))
+    anchor_y_frac_upper = _timeline_anchor_y_frac(
+        cfg, "label_anchor_y_frac_upper", "upper_label_pad"
+    )
+    anchor_y_frac_lower = _timeline_anchor_y_frac(
+        cfg, "label_anchor_y_frac_lower", "lower_label_pad"
+    )
+    label_anchor_y_extra_tick_frac = float(cfg.get("label_anchor_y_extra_tick_frac", 0.6))
+
+    if events is None:
+        from src.data import load_timeline
+
+        payload = load_timeline()
+        events_list = list(payload.get("events") or [])
+    else:
+        events_list = list(events)
+
+    parsed: list[tuple[date, str, str, str]] = []
+    for ev in events_list:
+        if not isinstance(ev, dict):
+            continue
+        d_raw = ev.get("date")
+        if not isinstance(d_raw, str):
+            continue
+        try:
+            d = date.fromisoformat(d_raw.strip())
+        except ValueError:
+            continue
+        pl = str(ev.get("placement", "")).strip().lower()
+        if pl not in ("upper", "lower"):
+            continue
+        label = _timeline_event_label(ev)
+        if not label:
+            continue
+        name = str(ev.get("name", ""))
+        parsed.append((d, pl, label, name))
+
+    parsed.sort(key=lambda row: row[0])
+
+    fig = go.Figure()
+
+    if not parsed:
+        fig.update_layout(
+            height=height,
+            width=width,
+            margin=margin,
+            plot_bgcolor="rgba(0,0,0,0)",
+            paper_bgcolor="rgba(0,0,0,0)",
+            xaxis=dict(visible=False),
+            yaxis=dict(visible=False),
+        )
+        return fig
+
+    dates_only = [p[0] for p in parsed]
+    min_d = min(dates_only)
+    max_d = max(dates_only)
+    span_days = max((max_d - min_d).days, 1)
+    pad = max(1, int(round(span_days * x_pad_ratio)))
+    x_min = min_d - timedelta(days=pad)
+    x_max = max_d + timedelta(days=pad)
+
+    fig.add_shape(
+        type="line",
+        x0=datetime(x_min.year, x_min.month, x_min.day),
+        x1=datetime(x_max.year, x_max.month, x_max.day),
+        y0=0,
+        y1=0,
+        xref="x",
+        yref="y",
+        line=dict(color=line_color, width=baseline_width),
+    )
+
+    slants = _timeline_label_slant_degrees(parsed, span_days, cfg)
+
+    for k, (d, pl, label, _name) in enumerate(parsed):
+        dt = datetime(d.year, d.month, d.day)
+        if pl == "upper":
+            y1 = tick_length
+            color = upper_color
+            y_text = tick_length * (anchor_y_frac_upper + label_anchor_y_extra_tick_frac)
+        else:
+            y1 = -tick_length
+            color = lower_color
+            y_text = -tick_length * (anchor_y_frac_lower + label_anchor_y_extra_tick_frac)
+        fig.add_shape(
+            type="line",
+            x0=dt,
+            x1=dt,
+            y0=0,
+            y1=y1,
+            xref="x",
+            yref="y",
+            line=dict(color=color, width=tick_line_width),
+        )
+        label_html = f"<b>{escape(label)}</b>"
+        ann: dict[str, Any] = dict(
+            x=dt,
+            y=y_text,
+            xref="x",
+            yref="y",
+            text=label_html,
+            showarrow=False,
+            xanchor="center",
+            yanchor="middle",
+            font=dict(size=label_font_size, color=color),
+        )
+        ang = slants[k]
+        if abs(ang) >= 1e-6:
+            ann["textangle"] = ang
+        fig.add_annotation(**ann)
+
+    xs_hover = [datetime(p[0].year, p[0].month, p[0].day) for p in parsed]
+    hovers = [
+        f"<b>{escape(p[3])}</b><br>{escape(p[2])}<br>{p[0].isoformat()}"
+        for p in parsed
+    ]
+    fig.add_trace(
+        go.Scatter(
+            x=xs_hover,
+            y=[0.0] * len(parsed),
+            mode="markers",
+            marker=dict(size=16, color="rgba(0,0,0,0.01)", line=dict(width=0)),
+            hovertext=hovers,
+            hovertemplate="%{hovertext}<extra></extra>",
+            showlegend=False,
+        )
+    )
+
+    x0r = datetime(x_min.year, x_min.month, x_min.day)
+    x1r = datetime(x_max.year, x_max.month, x_max.day)
+
+    fig.update_xaxes(
+        type="date",
+        showgrid=True,
+        gridcolor="rgba(0,0,0,0.08)",
+        range=[x0r, x1r],
+        tickformat="%b %Y",
+        title_text="",
+        automargin=True,
+    )
+    fig.update_yaxes(
+        range=list(y_range),
+        showticklabels=False,
+        showgrid=False,
+        zeroline=False,
+        title_text="",
+    )
+    fig.update_layout(
+        height=height,
+        width=width,
+        margin=margin,
+        showlegend=False,
         plot_bgcolor="rgba(0,0,0,0)",
         paper_bgcolor="rgba(0,0,0,0)",
     )

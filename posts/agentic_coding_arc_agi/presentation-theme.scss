@@ -211,3 +211,42 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   margin-top: 0.35em;
   line-height: 1.25;
 }
+
+/* Reveal ``Reveal.showPreview`` iframe overlay
+   --------------------------------------------------
+   Light background instead of the default dark scrim, with the iframe
+   viewport centered both horizontally and vertically. */
+.reveal > .overlay.overlay-preview {
+  background: rgba(230, 230, 230, 0.97) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.reveal > .overlay.overlay-preview .viewport {
+  /* Reveal absolutely-positions .viewport, so flex on the parent has no
+     effect. Use the classic absolute-center trick instead. */
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 90vw !important;
+  height: 90vh !important;
+}
+
+.reveal > .overlay.overlay-preview .viewport iframe {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 1;
+  border: none;
+}
+
+/* Hide the "Unable to load iframe" fallback once loaded (same-origin Plotly
+   sidecars are not X-Frame blocked; the message is a false positive that
+   would otherwise paint over the chart). */
+.reveal > .overlay.overlay-preview.loaded .x-frame-error {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none;
+}

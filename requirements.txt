@@ -3,6 +3,7 @@
 
 jupyter>=1.0
 plotly>=5.0
+kaleido>=0.2.1
 IPython>=8.0
 pygments>=2.0
 PyYAML>=6.0
