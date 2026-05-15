@@ -227,22 +227,25 @@ display_figure(fig, "puzzle")
 ### Our ARC-AGI 2 journey
 
 
+## What is interleaved thinking
+
+
 ## The agentic loop
 
 From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms** a hypothesis, then **validates** it by running code &mdash; refining until every training pair passes.
 
 ```{mermaid}
 %%| fig-align: center
-%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80}} }%%
+%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80, "padding": 0}} }%%
 flowchart LR
-    Prompt["<b>Prompt</b><br/>Puzzle<br/>tools<br/>Goal"]
-    Step1["Analyze grid"]
-    Solution["<b>Solution</b><br/><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code>"]
+    Prompt["<div class='cardLabel'><div class='boxHeader'>Prompt</div><div class='boxBody'><div>Puzzle</div><div>tools</div><div>Goal</div></div></div>"]
+    Step1["<div class='cardLabel'><div class='boxHeader'>Analyze grid</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+    Solution["<div class='cardLabel'><div class='boxHeader'>Solution</div><div class='boxBody'><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code></div></div>"]
 
     subgraph Loop[" "]
         direction TB
-        Step2["Form hypothesis"]
-        Step3["Validate hypothesis"]
+        Step2["<div class='cardLabel'><div class='boxHeader'>Form hypothesis</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+        Step3["<div class='cardLabel'><div class='boxHeader'>Validate hypothesis</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
         Step2 -->|propose| Step3
         Step3 ---->|refine| Step2
     end
