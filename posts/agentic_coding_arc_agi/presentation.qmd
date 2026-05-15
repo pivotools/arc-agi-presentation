@@ -45,6 +45,51 @@ format:
             }
             bindRevealPlotlyPreviews();
           })();
+
+          // Mermaid card-node resize: Mermaid bakes the foreignObject width from a
+          // measurement taken with its own inline `max-width:200px` active. After
+          // SCSS removes that cap, our cardLabel's real intrinsic width is larger
+          // than the rect Mermaid drew. Resize the foreignObject + rect + label
+          // transform to match the rendered content. Idempotent.
+          (function () {
+            function resizeMermaidCards() {
+              document.querySelectorAll("svg .cardLabel").forEach(function (card) {
+                var fo = card.closest("foreignObject");
+                if (!fo) return;
+                var natural = card.offsetWidth;
+                if (!natural) return;
+                var foW = parseFloat(fo.getAttribute("width"));
+                var delta = natural - foW;
+                if (delta <= 1) return; // already wide enough
+                fo.setAttribute("width", natural);
+                var node = fo.closest("g.node");
+                if (!node) return;
+                var rect = node.querySelector("rect.label-container") || node.querySelector("rect");
+                if (rect) {
+                  var oldX = parseFloat(rect.getAttribute("x") || "0");
+                  var oldW = parseFloat(rect.getAttribute("width"));
+                  rect.setAttribute("width", oldW + delta);
+                  rect.setAttribute("x", oldX - delta / 2);
+                }
+                var labelG = fo.closest("g.label");
+                if (labelG) {
+                  var t = labelG.getAttribute("transform") || "";
+                  var m = t.match(/translate\(([-0-9.]+)[, ]+([-0-9.]+)\)/);
+                  if (m) {
+                    var newX = parseFloat(m[1]) - delta / 2;
+                    labelG.setAttribute("transform", "translate(" + newX + ", " + m[2] + ")");
+                  }
+                }
+              });
+            }
+            // Run after Mermaid finishes (it renders asynchronously after page load).
+            var attempts = [100, 400, 1000, 2000];
+            attempts.forEach(function (ms) { setTimeout(resizeMermaidCards, ms); });
+            // Also re-run when reveal swaps slides (mermaid sometimes lazy-renders).
+            if (typeof Reveal !== "undefined" && Reveal.on) {
+              Reveal.on("slidechanged", function () { setTimeout(resizeMermaidCards, 100); });
+            }
+          })();
           </script>
 ---
 

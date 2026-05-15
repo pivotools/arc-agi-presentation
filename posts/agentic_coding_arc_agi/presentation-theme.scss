@@ -259,12 +259,14 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
 .nodeLabel .py-kw { color: #cf222e; }
 .nodeLabel .py-fn { color: #8250df; }
 .nodeLabel:has(.cardLabel) { padding: 0; }
-/* Mermaid wraps each label in an unclassed `<div style="display:table-cell;
-   max-width:200px">` to vertically centre the foreignObject content. The 200px hard
-   cap forces our horizontal sub-box row to render narrower than the body's real
-   intrinsic width, so Mermaid measures the title-only width and sizes the `<rect>`
-   too small. `!important` is required because Mermaid sets the cap via inline style.
-   Display:table-cell is kept so vertical centring still works. */
+/* Mermaid wraps each label in an unclassed
+   `<div style="display:table-cell; max-width:200px; white-space:nowrap; ...">` to
+   vertically centre the foreignObject content. CSS alone (even with !important)
+   doesn't reliably influence Mermaid's measurement pass — the SVG `<foreignObject>`
+   width attribute ends up baked in too small, clipping our horizontal sub-box row.
+   A post-render script in presentation.qmd's include-after-body inspects each
+   `.cardLabel`'s real intrinsic width and resizes the foreignObject + rect to match.
+   This rule still nulls max-width so the rendered HTML expands cleanly. */
 foreignObject > div {
   max-width: none !important;
 }
