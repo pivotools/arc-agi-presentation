@@ -491,6 +491,7 @@ Ask Dibya for concrete timeline dates.
 - **Simplicity + verification**
   - Say what correctness means; don’t prescribe every “thought” motion (partly why models struggle at open-ended art briefs).
 - **Non-lab research still matters**
+  - Harnesses must continuously evolve to keep pace with models expanding innate capabilities.
 - **Few big ideas recur:** reasoning, agentic/tool use, context efficiency.
 
 
