@@ -39,7 +39,7 @@ figures:
       interleaved: "star"
 
   scatter_baseline_vs_interleaved:
-    interactive: false  # Set to false for static plot
+    interactive: true
     series_names:
       baseline: "Plain CoT"
       interleaved: "Agentic Coding"
@@ -92,3 +92,28 @@ figures:
   # ARC puzzle heatmap figures (produced by show_puzzle)
   puzzle:
     interactive: false  # Default to static; set to true for interactive heatmaps
+
+  # Horizontal timeline (data/timeline.json): upper = team, lower = field
+  timeline:
+    interactive: true
+    tick_length: 0.50
+    tick_line_width: 1.25
+    baseline_width: 2
+    line_color: "rgba(55,55,55,0.9)"
+    upper_color: "#2ECC40"
+    lower_color: "#0074D9"
+    x_pad_ratio: 0.06
+    label_font_size: 16
+    label_slant_deg: -26
+    label_slant_mode: always
+    # Y position of label anchor: base fraction along tick from axis, plus extra in tick-length units
+    label_anchor_y_frac_upper: 0.5
+    label_anchor_y_frac_lower: 0.5
+    label_anchor_y_extra_tick_frac: 0.65
+    # label_slant_mode: auto | always | never — auto slants whole row if 2+ events on that side
+    # label_crowd_min_gap_days: optional; auto mode only (defaults ~18% of span, min 21 days)
+    y_range: [-1.38, 1.15]
+    layout:
+      height: 540
+      width: 960
+      margin: { l: 72, r: 96, t: 88, b: 130 }

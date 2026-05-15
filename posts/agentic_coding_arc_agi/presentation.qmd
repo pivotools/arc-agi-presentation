@@ -3,11 +3,15 @@ title: "Do LLMs have fluid intelligence?"
 subtitle: "Lessons from competing in ARC AGI 2"
 author: "Dibya Chakravorty, Debsankha Manik & Bernhard Altaner"
 date: "2026-05-22"
+# Shown between subtitle and authors via `title-slide.html` partial.
+title-banner-image: ./image.png
 # Match _quarto.yml: run from repo root so `src` imports resolve (same as index.ipynb).
 execute:
   execute-dir: project
 format:
   revealjs:
+    template-partials:
+      - title-slide.html
     theme: [simple, presentation-theme.scss]
     slide-number: true
     transition: fade
@@ -22,6 +26,26 @@ format:
     history: true
     controls: true
     hash-type: number
+    # Reveal 5.1 only registers preview clicks on <a href="http(s)...">; relative
+    # file links need a tiny shim (include-after-body) that calls showPreview().
+    include-after-body:
+      - text: |
+          <script type="text/javascript">
+          (function () {
+            function bindRevealPlotlyPreviews() {
+              document.querySelectorAll("a.reveal-plotly-preview[href]").forEach(function (anchor) {
+                anchor.addEventListener("click", function (e) {
+                  e.preventDefault();
+                  var href = anchor.getAttribute("href");
+                  if (!href || typeof Reveal === "undefined" || typeof Reveal.showPreview !== "function") return;
+                  var abs = new URL(href, window.location.href).href;
+                  Reveal.showPreview(abs);
+                });
+              });
+            }
+            bindRevealPlotlyPreviews();
+          })();
+          </script>
 ---
 
 ```{python}
@@ -99,14 +123,14 @@ if str(blog_root) not in sys.path:
 
 
 ## ARC AGI 2
-### What are we talking about?
+### What is this talking about?
 
 ::: {.incremental}
 - **ARC-AGI:** Abstraction and Reasoning Corpus for Artificial General Intelligence
 - **Task:** Transform pixel grids, where transformation rule is inferred from a few input–output pairs
 - **Example:**
 :::
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -117,9 +141,9 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("9aaea919", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-:::
+::::
 
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -130,7 +154,7 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("9aaea919", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-:::
+::::
 
 
 ## ARC AGI 2
@@ -143,7 +167,7 @@ display_figure(fig, "puzzle")
 - **World model** needed to reason about the task?
 - **Example:** A very intuitive and easy puzzle a 5-year old would solve...
 :::
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -154,9 +178,9 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("28a6681f", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-:::
+::::
 
-::: {.fragment}
+:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
@@ -167,197 +191,313 @@ from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("28a6681f", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
+::::
+
+
+
+## ARC-AGI as a benchmark 
+### Blast from the past before "vibe coding" became mainstream
+
+- **Two-dimensional challenge:** score *and* cost per puzzle
+- **State of the art April 2025:** *ARC-AGI 1 was not saturated then, ARC-AGI 2 just out*
+    - **ARC-AGI 1:** OpenAI ChatGPT-o1-pro, 50% pass@2, ~ 50$/puzzle
+    - **ARC-AGI 2:** barely any nontrivial scores
+    - **No established meta**: LLM-based and domain-specific language approaches used
+
+![Wayback snapshot of arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" width="60%" .lightbox}
+
+
+
+
+
+## Challenge accepted!
+### Leeroy Jenkins, Dunning-Krueger and YOLO
+
+  - **Premises** when we started:
+    + first open weight reasoning model was DeepSeek R1 (Jan 2025)
+    + tool use was thought to be a big topic in 2025.
+  - **Our initial plan:** fine tune a reasoning model with tool use!
+    + Generate synthetic data for this domain.
+    + Finetune open weights models (with reasoning and tool use). 
+  - And so the story begins...
+
+
+
+## Main part
+### Our ARC-AGI 2 journey
+
+
+
+## Finetuning requires data
+### Synthetic data or bust
+
+- By design, no large ARC-AGI-comparable puzzle datasets: the benchmark targets *inference-time* pattern recognition.
+- We needed thousands of *genuinely distinct* puzzles — mechanical augmentation of existing puzzles was not enough.
+- We needed *interleaved thinking* traces: `puzzle → thinking → tool call → thinking → output grid`, i.e. program synthesis with a Python REPL.
+- *Optional:* add a pipeline diagram when ready.
+
+
+
+## Synthetic data and solution traces
+### New puzzles, teaching traces for free
+
+::: {.notes}
+Sidebar: show an example of a synthetic puzzle on the next slides.
+:::
+
+- Idea: *create* synthetic puzzles programmatically, with “fake” solution traces, using an LLM plus Python.
+- **Lessons**
+  - Powerful models were required — for puzzles that are not useless, and for explanations that are actually useful.
+  - **Cost:** expensive in practice (opportunistic “free tier” tokens).
+  - *Line plot idea:* time vs number of puzzles (OpenAI, DeepSeek).
+
+::: {.notes}
+Hopefully no one from OpenAI in the audience.
 :::
 
 
 
+## Example synthetic puzzle and solution trace
+### Part 1 — build & prompts
+
+- Build the puzzle programmatically (trace / prompt example).
+- Set up the generation loop so traces match the tool-call format you want for SFT.
 
 
-## ARC AGI 2: easy for humans, hard for AI? {.scrollable}
 
-A puzzle has a few **training pairs** and one or more **test inputs**. Infer the rule, apply it.
+## Example synthetic puzzle and solution trace
+### Part 2 — puzzle & trace
 
-![A single ARC AGI 2 puzzle: training examples (top), test input (bottom).](index_files/figure-pdf/fig-puzzle-example-output-1.png){fig-align="center" width="55%"}
+- Show a representative synthetic puzzle.
+- Show a schematic of the solution trace (thinking + tools + final grid).
 
-::: {.fragment}
-**The "AGI" framing:** ARC AGI targets *fluid intelligence* &mdash; the ability to acquire and apply a *new* skill at test time, on a task you have never seen before. Memorisation does not help.
+
+
+## Move fast and break things
+### SFT + reasoning + tool calling = bleeding edge (and YOLO libraries)
+
+- Fine-tuned “small” Qwen3 models (7B and 14B): still VRAM-hungry for efficient SFT → **Unsloth**.
+- Stock Qwen chat templates on Hugging Face did not handle tool-call tokens correctly → we wrote our own template for SFT.
+
+![TRL-style supervision: train on assistant tokens only (mask user).](./img/train-on-assistant.png){fig-align="center" width="70%" .lightbox}
+
+
+
+## VRAM economy is crucial
+### Our personal RAM crisis
+
+- Unsloth focuses on cutting VRAM — essential even for 7–14B on consumer GPUs.
+- A few nasty surprises along the way.
+- We tracked experiments diligently with MLOps tooling.
+- *Optional:* Weights & Biases screenshot.
+
+
+
+## Goal: end-to-end fine tuning of an agentic pipeline
+### Making a small-memory student think good(TM)
+
+- Solving ARC-AGI 2 involves:
+  - Understanding input and output grids (vision).
+  - Inferring the input → output rule.
+  - Applying that rule to the test grid.
+- *Optional:* scanned flowchart of the harness — complexity is the point (audience need not decode every box).
+
+
+
+## RL training: what is it about
+### You need something to reinforce
+
+- RL makes the “correct” trajectory more likely after enough iterations — the model needs a *germ* of competence first.
+
+![Sketch: correct trajectory becomes more likely under RL](./img/rl-trajectory-diagram.png){fig-align="center" width="72%" .lightbox}
+
+- **Our issue:** SFT’d Qwen models showed little sign of life — no recovery after a wrong approach.
+
+
+
+## Synthetic solutions were never wrong
+### Don’t think of the yellow elephant
+
+- Training traces did not mirror real solving: rarely does everything go right on the first hypothesis.
+- The model that *generated* the puzzle (and knew the answer) was *pretending* to discover the solution — so traces looked unrealistically clean.
+- It never needed to backtrack or recover from a bad idea.
+- **What we’d need:** a model that occasionally solves ARC-AGI 2 with visible reasoning traces to mine for SFT (frontier models often didn’t expose that) — *we never shipped that route in the end.*
+
+::: {.notes}
+Side note from notes: frontier models lacked traces; we ultimately did not pursue this fine-tuning path.
 :::
 
-## ARC AGI 2: the challenge
 
-- **Benchmark axes:** score *and* cost per puzzle &mdash; you cannot just throw compute at it.
-- **Kaggle competition** with a private test set to control for memorisation.
-- **Public verified leaderboard** for transparent submissions.
 
-::: {.callout-note title="State of the art when we started"}
-[TODO: leaderboard SotA % and cost / puzzle, ~Summer 2025] &mdash; o3-class models scored near noise on ARC AGI 2 at release.
-:::
+## First pivot: solver pipeline + interleaved thinking
+### Pivoting toward test-time scaling (thinking-first)
 
-## Our original plan
+- **Stack:** vLLM + Harmony template — engineering overhead.
+- Interleaved-thinking schematic drove the UX of the solver.
+- **Surprise:** GPT-OSS-120B was unexpectedly strong in our agentic harness.
+- **Hypothesis:** agentic RL pretraining wakes “dormant” capabilities worth leveraging even below frontier scale.
 
-A standard recipe for pushing an open-weight model on a hard reasoning benchmark:
 
-1. **Synthetic data** &mdash; generate a large corpus of ARC-like puzzles with successful solution traces.
-2. **Fine-tuning** &mdash; cold-start a smaller open-weight model on those traces (SFT).
-3. **RLVR** &mdash; reinforcement learning with verifiable rewards on top, using the puzzle's own grading as signal.
 
-The aim was a small, cheap model that could compete on the Kaggle leaderboard.
+## The second pivot: keep it simple, stupid
+### The main epiphany
 
-## Talk roadmap
+- Tool calling + interleaved thinking ≫ our overwrought harness complexity.
+- *Example slide idea:* contrast a simplified trace with the older pipeline.
 
-::: {.columns}
-::: {.column width="33%"}
-**Journey & pivots**
 
-What we set out to do, where the plan broke, and what we did instead.
-:::
-::: {.column width="33%"}
-**Technical core**
 
-Agentic coding, interleaved thinking, and the converged solver.
-:::
-::: {.column width="33%"}
-**Implications**
+## State of the art scores
+### First non-trivial results for open-weight models
 
-What the result means for ARC AGI 2 and for "fluid intelligence" more broadly.
-:::
-:::
+- Score “jumps” as we iterated on harness and models.
 
-# Main
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+from pathlib import Path
+from src.plotting import create_baseline_interleaved_scatter, write_plotly_for_reveal_lightbox
 
-## Synthetic puzzles
-
-**Goal:** ~8k high-quality ARC-like puzzles to fuel SFT and (later) RL.
-
-- **Generator:** o3 / o4-mini, prompted to invent a transformation rule *and* the demonstration grids.
-- **Prompt engineering** mattered a lot: rule-first vs. grids-first, explicit "natural rule" criteria, diversity constraints.
-- **What worked:** asking for the *rule in natural language* before the grids; rejecting trivially-recoverable rules; small-number / visual-prior framing.
-- **What didn't:** letting the model invent grids first &mdash; the rule was usually unrecoverable or degenerate.
-
-::: {.callout-note title="Outcome"}
-We obtained ~8k puzzles with verified solution traces &mdash; enough to start cold-start SFT.
-:::
-
-## Fine-tuning small models
-
-- **Goal:** distil successful traces from a strong teacher into a smaller open-weight student.
-- The student would then be the **bootstrap policy for RLVR**.
-- **The wall we hit:** ARC traces are *long*. Once the model started to think + execute code + observe + revise, **context-length** blew past what was practical for RL roll-outs.
-- **Implication:** before RL was even possible, we needed a regime where the model uses long context *productively*.
-
-::: {.fragment}
-That regime turned out to be **agentic harnesses with tool calls** &mdash; and it changed the whole project.
-:::
-
-## Agentic regime and interleaved thinking {.scrollable}
-
-The model thinks **between** tool calls, not only before them: hypothesise &rarr; run code &rarr; observe &rarr; revise.
-
-![Basic thinking (left) vs interleaved thinking (right).](figs/interleaved_thinking_schematic.svg){fig-align="center" width="55%"}
-
-**Technical challenges getting here:**
-
-- vLLM + **Harmony** chat-template parsing bugs.
-- Stateless Responses APIs losing prior reasoning state across tool calls.
-- Middleware (OpenRouter) silently degrading tool calling.
-
-::: {.fragment}
-**The big surprise:** once the plumbing worked, **GPT-OSS-120B** &mdash; a medium-sized open-weight model &mdash; scored *dramatically* better on ARC AGI 2 in this agentic regime than in plain CoT.
-:::
-
-::: {.fragment}
-**Our hypothesis:** agentic RL training (RLVR with code execution) leaves **dormant capabilities** in models that are not exposed in plain-CoT use. An agentic harness *unlocks* them &mdash; even in smaller models.
-:::
-
-## The main pivot
-
-We dropped the original training plan.
-
-- **Forget** synthetic-data SFT &rarr; RLVR for now.
-- **Focus** on leveraging agentic capabilities that already exist in current open-weight reasoning models.
-- New question: what is the *minimal* harness that surfaces these capabilities?
-
-::: {.callout-note title="Trials with keeping state &mdash; main takeaways"}
-- **Stateful REPL beats stateless tool calls:** intermediate variables (parsed grids, helper functions) survive across turns, which mirrors how humans solve these.
-- **Replay reasoning blocks** between turns on stateless APIs &mdash; otherwise the model loses its train of thought.
-- **Surface tool errors verbatim** to the model. Silent failures break the loop more than loud ones.
-:::
-
-## Converged setup
-
-A minimal **agentic tool-call loop**, in the style popularised by Claude Code.
-
-1. **Program-synthesis objective:** produce
-   `solution(grid: list[list[int]]) -> list[list[int]]`
-   that maps every training input to its training output.
-2. **Stateful IPython REPL** with NumPy, SciPy, NetworkX, scikit-image, PIL, Z3, &hellip;
-3. **Tool-call loop:** the model executes code dozens of times, then commits a `solution`.
-
-The function is both a **generator** of the output *and* a **faithful explanation** of the transformation &mdash; an artefact plain-CoT solvers don't produce.
-
-## The agentic loop
-
-From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms** a hypothesis, then **validates** it by running code &mdash; refining until every training pair passes.
-
-```{mermaid}
-%%| fig-align: center
-%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80}} }%%
-flowchart LR
-    Prompt["<b>Prompt</b><br/>Puzzle<br/>tools<br/>Goal"]
-    Step1["Analyze grid"]
-    Solution["<b>Solution</b><br/><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code>"]
-
-    subgraph Loop[" "]
-        direction TB
-        Step2["Form hypothesis"]
-        Step3["Validate hypothesis"]
-        Step2 -->|propose| Step3
-        Step3 ---->|refine| Step2
-    end
-
-    Prompt --> Step1
-    Step1 --> Loop
-    Loop -.-> Solution
-
-    classDef loopRegion fill:none,stroke:#9aa,stroke-dasharray:5 4;
-    class Loop loopRegion;
+_post = Path("posts/agentic_coding_arc_agi")
+write_plotly_for_reveal_lightbox(
+    create_baseline_interleaved_scatter(),
+    _post / "scores-scatter-interactive.html",
+    fig_key="scatter_baseline_vs_interleaved",
+    preview_png_path=_post / "img" / "scores-scatter-preview.png",
+)
 ```
 
-## Program synthesis framing {.scrollable}
+```{=html}
+<div style="text-align:center;margin-top:0.75em">
+  <a href="scores-scatter-interactive.html"
+     class="reveal-plotly-preview"
+     style="display:inline-block;cursor:pointer">
+    <img src="img/scores-scatter-preview.png"
+         alt="Score jumps scatter — click to open interactive chart"
+         class="r-stretch"
+         style="max-height:68vh" />
+  </a>
+</div>
+```
 
-All puzzle state &mdash; hypotheses, intermediate observations, failed attempts &mdash; lives as **Python source code and comments** in the REPL.
 
-- **State as code:** the model edits a function, not a chain of words.
-- **Verification is free:** running the function on training pairs *is* the test.
-- **Refinement is local:** a failed assertion points at the line to fix.
 
-![Puzzle 45a5af55 with the model's solution code: code is the explanation.](index_files/figure-pdf/fig-puzzle-with-code-output-1.png){fig-align="center" width="60%"}
+## Lessons learned
+### A recap from the trenches
 
-![A short trace: hypothesis &rarr; code &rarr; observation &rarr; revision, all grounded by execution.](figs/interleaved_thinking_examples.png){fig-align="center" width="50%"}
+- **Tool use + reasoning look like fluid intelligence**
+  - Python (or similar) grounds the model — filter bad hypotheses and replan.
+  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
+- **Small / open-weight models punch above their reputation**
+  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
+- **Synthetic data isn’t magic**
+  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
 
-## Results {.scrollable}
 
-Full ARC AGI 2 **public eval set** (120 puzzles), official **pass@2** metric, head-to-head against plain CoT on the same model.
 
-| Model | Plain CoT | Agentic Coding | Cost / puzzle |
-|---|---:|---:|---:|
-| **GPT 5.2 XHigh** | 59.81 % | **73.36 %** | \$2.05 &rarr; \$5.22 |
-| **GPT OSS 120B High** | 6.11 % | **26.38 %** | \$0.23 &rarr; \$0.47 |
-| **Minimax M2.1** | 3.06 % | **10.56 %** | \$0.22 &rarr; \$1.27 |
+## At the bleeding edge
+### Timeline: us vs the field
 
-- **Frontier:** GPT 5.2 picks up a double-digit absolute gain even from a strong baseline.
-- **Open weights:** GPT-OSS-120B jumps **>4&times;** &mdash; from near-noise into frontier-model territory.
+- **Format idea:** timeline with *our milestones* above and *community / papers* below.
+  - Abstract-representation angle — e.g. Markovian thinker thread (August 2025).
+  - Tool calling + iterative refinement trajectory.
+  - Agentica / Confluence — fast convergence to a similar regime in the broader field.
 
-![Cost (x) vs score (y): plain CoT vs agentic coding across models.](index_files/figure-pdf/fig-baseline-interleaved-scatter-output-1.png){fig-align="center" width="50%"}
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+# Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
+#   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
 
-## Interpretation within the broader ecosystem
+from pathlib import Path
 
-- **ARC Prize Discord** &mdash; active community of independent researchers; many are converging on agentic / refinement-style approaches.
-- **Gemini 3 Pro / Deep Think, Claude Opus 4.5** &mdash; frontier models that *also* benefit from agentic harnesses; the effect is not GPT-specific.
-- **Refinement systems** (Sakana AB-MCTS, Berman, Poetiq) supply the outer loop *by hand* &mdash; interleaved thinking collapses much of that depth **inside a single model turn**.
+from src.plotting import create_horizontal_timeline, write_plotly_for_reveal_lightbox
 
-::: {.callout-note title="Where we landed"}
-We did **not** submit to the Kaggle leaderboard. Our finding &mdash; *agentic coding unlocks fluid intelligence already present in current models* &mdash; is the contribution we wanted to share, independent of any leaderboard ranking.
+_post = Path("posts/agentic_coding_arc_agi")
+write_plotly_for_reveal_lightbox(
+    create_horizontal_timeline(),
+    _post / "timeline-interactive.html",
+    fig_key="timeline",
+    preview_png_path=_post / "img" / "timeline-preview.png",
+)
+```
+
+```{=html}
+<!--
+  Standalone Plotly HTML opens in Reveal’s iframe overlay (showPreview).
+  Reveal 5.1’s built-in preview only auto-binds <a href="http...">; for same-dir
+  files we wrap the thumbnail and use class reveal-plotly-preview + include script.
+-->
+<div style="text-align:center;margin-top:0.75em">
+  <a
+    href="timeline-interactive.html"
+    class="reveal-plotly-preview"
+    style="display:inline-block;cursor:pointer;max-height:68vh">
+    <img
+      src="img/timeline-preview.png"
+      alt="Timeline preview — click to open interactive chart"
+      class="r-stretch"
+      style="max-height:68vh" />
+  </a>
+</div>
+<p style="text-align:center;font-size:0.88em;opacity:0.88;margin:0.5em 0 0 0">
+  Team milestones vs broader AI context (example data) — click preview for interactive
+</p>
+```
+
+::: {.notes}
+Ask Dibya for concrete timeline dates.
 :::
 
-*Get in touch if you'd like us to test another interleaved-thinking-capable model.*
+
+
+## Practical take-home messages
+### Working better with modern AI
+
+- **Don’t overengineer harnesses** (same failure mode as mega-prompts).
+  - Most harnesses are either too complex or don’t transfer 100% task-to-task.
+  - Like coaching a human on math — specify goals and checks, not every micro-step at fixed depth.
+- **Simplicity + verification**
+  - Say what correctness means; don’t prescribe every “thought” motion (partly why models struggle at open-ended art briefs).
+- **Non-lab research still matters**
+- **Few big ideas recur:** reasoning, agentic/tool use, context efficiency.
+
+
+
+# Epilogue
+
+
+## So… did ARC solvers crack the teaser puzzle?
+### Paying off the intro example (`28a6681f`)
+
+::: {.notes}
+Confirm which puzzle ended up being the flagship story vs the second intro example (`28a6681f`).
+:::
+
+- Fact-check internally: whether *our* run solved this specific grid vs a comparable case study.
+- Even if not back then — many setups solve it cleanly *now*.
+- Tell the concrete story of what the modern stack did (tools, retries, verifier).
+
+
+
+## Do LLMs have fluid intelligence?
+### Closing thoughts (not the bumper sticker)
+
+- LLMs absorb rich human-abstraction vocabulary — pairing that with puzzles shows real capability jumps *when harnessed*.
+- **Fluid intelligence, in practice:** couple conceptual chops to external, well-defined substrates (code, interpreters, specs).
+- **Compression + tools + agentic loops ⇒ emergent, reliable-ish behaviour**
+
+
+
+# Appendix (backup)
+
+## To RL or not to RL?
+### That was the question...
+
+- Built intuition for RL *with tool calling* (e.g. the `verl` stack — very new territory).
+  - Rollouts — many candidate solutions per puzzle — are expensive.
+  - Keeping learner vs inference tokenizer / template details aligned was fiddly.
+
+
