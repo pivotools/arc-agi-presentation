@@ -251,50 +251,51 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   pointer-events: none;
 }
 
-/* Mermaid diagrams: padding + Python syntax highlighting (mirrors GitHub colours) */
-.reveal .nodeLabel {
-  padding: 8px 16px;
-  text-align: center;
+/* Mermaid diagrams: cardLabel structure with filled title bar + content area.
+   Selectors are UN-prefixed (no `.reveal` ancestor) because Mermaid measures the
+   foreignObject inside a temporary `<div>` appended to `<body>` — outside the reveal
+   scope — so scoped selectors would fail at measurement time and Mermaid would size
+   the `<rect>` too narrow, causing the styled content to overflow at view time. */
+.nodeLabel .py-kw { color: #cf222e; }
+.nodeLabel .py-fn { color: #8250df; }
+.nodeLabel:has(.cardLabel) { padding: 0; }
+/* Mermaid wraps each label in an unclassed `<div style="display:table-cell;
+   max-width:200px">` to vertically centre the foreignObject content. The 200px hard
+   cap forces our horizontal sub-box row to render narrower than the body's real
+   intrinsic width, so Mermaid measures the title-only width and sizes the `<rect>`
+   too small. `!important` is required because Mermaid sets the cap via inline style.
+   Display:table-cell is kept so vertical centring still works. */
+foreignObject > div {
+  max-width: none !important;
 }
-.reveal .nodeLabel code {
-  white-space: nowrap;
+.nodeLabel .cardLabel {
+  display: inline-block;
 }
-.reveal .nodeLabel .py-kw { color: #cf222e; }
-.reveal .nodeLabel .py-fn { color: #8250df; }
-
-/* Card-style labels: filled title bar + content area. Drops outer .nodeLabel padding
-   so the header's background fills the full label width (boxHeader/boxBody manage
-   padding). Uses inline-block for horizontal sub-box rows because flex `gap` is not
-   counted toward intrinsic width — Mermaid would otherwise size the rect too narrow
-   and the sub-boxes overflow at render time. */
-.reveal .nodeLabel:has(.cardLabel) {
-  padding: 0;
-}
-.reveal .nodeLabel .boxHeader {
+.nodeLabel .boxHeader {
   padding: 8px 20px;
   background: darken($link-color, 10%);
   color: $body-bg;
   font-weight: 600;
   text-align: center;
 }
-.reveal .nodeLabel .boxBody {
+.nodeLabel .boxBody {
   padding: 12px 22px;
   text-align: center;
 }
-/* Vertical body (Prompt, Solution): stack each child on its own line. */
-.reveal .nodeLabel .boxBody > div,
-.reveal .nodeLabel .boxBody > code {
+/* Vertical body (Prompt, Solution): stack children on their own lines. */
+.nodeLabel .boxBody > div,
+.nodeLabel .boxBody > code {
   display: block;
 }
 /* Horizontal body (Step nodes): inline-block flow with explicit margins. */
-.reveal .nodeLabel .boxBody.horizontal {
+.nodeLabel .boxBody.horizontal {
   white-space: nowrap;
 }
-.reveal .nodeLabel .boxBody.horizontal > * {
+.nodeLabel .boxBody.horizontal > * {
   display: inline-block;
   vertical-align: middle;
 }
-.reveal .nodeLabel .subBox {
+.nodeLabel .subBox {
   margin: 0 4px;
   border: $border-width solid $border-color;
   border-radius: $border-radius;
@@ -302,8 +303,11 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   background: rgba(0, 0, 0, 0.04);
   font-size: 0.85em;
 }
-.reveal .nodeLabel .arrow {
+.nodeLabel .arrow {
   margin: 0 4px;
   font-size: 1.1em;
   color: $text-muted;
+}
+.nodeLabel code {
+  white-space: nowrap;
 }
