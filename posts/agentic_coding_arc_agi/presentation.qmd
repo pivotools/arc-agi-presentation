@@ -433,9 +433,13 @@ Side note from notes: frontier models lacked traces; we ultimately did not pursu
 ### The main epiphany
 
 - Tool calling + interleaved thinking ≫ our overwrought harness complexity.
-- *Example slide idea:* contrast a simplified trace with the older pipeline.
+- *Example slide idea:* contrast a simplified trace with the older pipeline.safsdf
+
+## test timeline
+```{python}
 
 
+```
 
 ## State of the art scores
 ### First non-trivial results for open-weight models
@@ -446,22 +450,25 @@ Side note from notes: frontier models lacked traces; we ultimately did not pursu
 #| echo: false
 #| output: false
 #| execute: true
-from pathlib import Path
-from src.plotting import create_baseline_interleaved_scatter, write_plotly_for_reveal_lightbox
+from src.plotting import create_baseline_interleaved_scatter, write_plotly_for_glightbox
 
-_post = Path("posts/agentic_coding_arc_agi")
-write_plotly_for_reveal_lightbox(
+_post = blog_root / "posts/agentic_coding_arc_agi"
+_out = _post / "presentation-html"
+write_plotly_for_glightbox(
     create_baseline_interleaved_scatter(),
-    _post / "scores-scatter-interactive.html",
+    _out / "scores-scatter-interactive.html",
     fig_key="scatter_baseline_vs_interleaved",
-    preview_png_path=_post / "img" / "scores-scatter-preview.png",
+    preview_png_path=_out / "img" / "scores-scatter-preview.png",
 )
 ```
 
 ```{=html}
 <div style="text-align:center;margin-top:0.75em">
   <a href="scores-scatter-interactive.html"
-     class="reveal-plotly-preview"
+     class="lightbox"
+     data-type="external"
+     data-width="90vw"
+     data-height="85vh"
      style="display:inline-block;cursor:pointer">
     <img src="img/scores-scatter-preview.png"
          alt="Score jumps scatter — click to open interactive chart"
@@ -501,44 +508,38 @@ write_plotly_for_reveal_lightbox(
 # Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
 #   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
 
-from pathlib import Path
+from src.plotting import create_horizontal_timeline, write_plotly_for_glightbox
 
-from src.plotting import create_horizontal_timeline, write_plotly_for_reveal_lightbox
-
-_post = Path("posts/agentic_coding_arc_agi")
-write_plotly_for_reveal_lightbox(
+_post = blog_root / "posts/agentic_coding_arc_agi"
+_out = _post / "presentation-html"
+write_plotly_for_glightbox(
     create_horizontal_timeline(),
-    _post / "timeline-interactive.html",
+    _out / "timeline-interactive.html",
     fig_key="timeline",
-    preview_png_path=_post / "img" / "timeline-preview.png",
+    preview_png_path=_out / "img" / "timeline-preview.png",
+    caption="Team milestones vs broader AI context (example data)",
 )
 ```
 
 ```{=html}
-<!--
-  Standalone Plotly HTML opens in Reveal’s iframe overlay (showPreview).
-  Reveal 5.1’s built-in preview only auto-binds <a href="http...">; for same-dir
-  files we wrap the thumbnail and use class reveal-plotly-preview + include script.
--->
 <div style="text-align:center;margin-top:0.75em">
-  <a
-    href="timeline-interactive.html"
-    class="reveal-plotly-preview"
-    style="display:inline-block;cursor:pointer;max-height:68vh">
-    <img
-      src="img/timeline-preview.png"
-      alt="Timeline preview — click to open interactive chart"
-      class="r-stretch"
-      style="max-height:68vh" />
+  <a href="timeline-interactive.html"
+     class="lightbox"
+     data-type="external"
+     data-width="90vw"
+     data-height="85vh"
+     data-description="Team milestones vs broader AI context (example data)"
+     style="display:inline-block;cursor:pointer">
+    <img src="img/timeline-preview.png"
+         alt="Timeline preview — click to open interactive chart"
+         class="r-stretch"
+         style="max-height:68vh" />
   </a>
 </div>
-<p style="text-align:center;font-size:0.88em;opacity:0.88;margin:0.5em 0 0 0">
-  Team milestones vs broader AI context (example data) — click preview for interactive
-</p>
 ```
 
 ::: {.notes}
-Ask Dibya for concrete timeline dates.
+Ask Dibya for concrete timeline dates.d
 :::
 
 
@@ -547,7 +548,7 @@ Ask Dibya for concrete timeline dates.
 ### Working better with modern AI
 
 - **Don’t overengineer harnesses** (same failure mode as mega-prompts).
-  - Most harnesses are either too complex or don’t transfer 100% task-to-task.
+  - Most harnesses are either too complex or don’t transfer 100% task-to-tasks.
   - Like coaching a human on math — specify goals and checks, not every micro-step at fixed depth.
 - **Simplicity + verification**
   - Say what correctness means; don’t prescribe every “thought” motion (partly why models struggle at open-ended art briefs).
@@ -580,6 +581,57 @@ Confirm which puzzle ended up being the flagship story vs the second intro examp
 - **Fluid intelligence, in practice:** couple conceptual chops to external, well-defined substrates (code, interpreters, specs).
 - **Compression + tools + agentic loops ⇒ emergent, reliable-ish behaviour**
 
+## Lightbox test
+### Figure direct
+
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+from src.plotting import create_dummy_scatter
+
+fig=create_dummy_scatter()
+fig.show()
+```
+
+## Lightbox test — Strategy A (GLightbox iframe)
+### Click the preview to open the interactive figure in a modal
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+#| fig-cap: "hasdfasfas"
+
+from src.plotting import create_dummy_scatter, write_plotly_for_glightbox
+
+_post = blog_root / "posts/agentic_coding_arc_agi"
+_out = _post / "presentation-html"
+write_plotly_for_glightbox(
+    create_dummy_scatter(),
+    _out / "dummy-glightbox-interactive.html",
+    fig_key="dummy",
+    preview_png_path=_out / "img" / "dummy-glightbox-preview.png",
+    caption="Demo scatter — hover to inspect points, scroll to zoom, drag to pan.",
+)
+```
+
+```{=html}
+<div style="text-align:center;margin-top:0.75em">
+  <a href="dummy-glightbox-interactive.html"
+     class="lightbox"
+     data-type="external"
+     data-width="90vw"
+     data-height="85vh"
+     data-description="Demo scatter — hover to inspect points, scroll to zoom, drag to pan."
+     style="display:inline-block;cursor:pointer">
+    <img src="img/dummy-glightbox-preview.png"
+         alt="Interactive chart — click to open"
+         class="r-stretch"
+         style="max-height:68vh;cursor:pointer" />
+  </a>
+</div>
+```
 
 
 # Appendix (backup)
@@ -592,3 +644,19 @@ Confirm which puzzle ended up being the flagship story vs the second intro examp
   - Keeping learner vs inference tokenizer / template details aligned was fiddly.
 
 
+## test
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+# Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
+#   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
+
+from pathlib import Path
+
+from src.plotting import create_horizontal_timeline
+
+fig = create_horizontal_timeline()
+fig.show()
+```

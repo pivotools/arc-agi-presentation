@@ -3,19 +3,31 @@
     {
       "name": "team_milestone_kickoff",
       "date": "2025-04-01",
-      "text": "Team kickoff (example)",
+      "text": "Team formation",
       "placement": "upper"
     },
     {
-      "name": "team_milestone_first_eval",
+      "name": "team_milestone_finetuning_results",
       "date": "2025-06-15",
-      "text": "First internal eval pass (example)",
+      "text": "Negative finetuning results (Qwen2.5 models, no signal)",
       "placement": "upper"
     },
     {
-      "name": "team_milestone_submission",
-      "date": "2025-11-01",
-      "text": "Final submission prep (example)",
+      "name": "team_milestone_first_pivot",
+      "date": "2025-10-10",
+      "text": "Start work agentic solution pipeline",
+      "placement": "upper"
+    },
+    {
+      "name": "team_milestone_second_pivot",
+      "date": "2025-12-05",
+      "text": "Dropping solver complexity",
+      "placement": "upper"
+    },
+    {
+      "name": "team_milestone_SOTA_scores",
+      "date": "2025-12-18",
+      "text": "Strong scores in our pipeline achieved (GPT5.2)",
       "placement": "upper"
     },
     {
@@ -25,7 +37,7 @@
       "placement": "lower"
     },
     {
-      "name": "arc_prize_2025_launch",
+      "name": "arc_prize_2025_kaggle_launch",
       "date": "2025-03-24",
       "text": "ARC Prize 2025 (Kaggle) starts",
       "placement": "lower"
@@ -33,7 +45,25 @@
     {
       "name": "gpt_oss_release",
       "date": "2025-08-05",
-      "text": "OpenAI gpt-oss release",
+      "text": "OpenAI GPT-OSS release",
+      "placement": "lower"
+    },
+    {
+      "name": "arc_prize_2025_kaggle_end",
+      "date": "2025-11-03",
+      "text": "OpenAI GPT-OSS release",
+      "placement": "lower"
+    },
+    {
+      "name": "arc_agi_poetiq_solution",
+      "date": "2025-11-20",
+      "text": "Poetiq ARC-AGI solver released",
+      "placement": "lower"
+    },
+    {
+      "name": "gpt_5.2-scores-released",
+      "date": "2025-12-15",
+      "text": "OpenAI GPT-5.2 scores ~50%",
       "placement": "lower"
     }
   ]

@@ -888,56 +888,144 @@ def add_scatter_traces_to_subplot(
     return fig
 
 
-def write_plotly_for_reveal_lightbox(
+# Injected into <head> of every Plotly sidecar HTML written by this module.
+# CSS: fills the iframe viewport.
+# Reveal stub: quarto preview injects quarto-preview.js into every served HTML
+# file; that script assumes a Reveal.js context and throws ReferenceError when
+# window.Reveal is undefined, crashing before Plotly can initialise.
+_SIDECAR_HEAD_INJECT = (
+    "<style>"
+    "html,body{margin:0;padding:0;height:100%;width:100%;overflow:hidden;}"
+    ".plotly-graph-div{height:100%!important;width:100%!important;}"
+    "</style>"
+    "<script>"
+    # quarto-preview.js is injected by `quarto preview` into every served HTML.
+    # It calls Reveal.isReady() and other methods; without a stub it throws
+    # TypeError before Plotly initialises.  A Proxy catches every property
+    # access and returns a harmless no-op so the crash never happens.
+    "if(typeof window.Reveal==='undefined'){"
+    "window.Reveal=new Proxy({},"
+    "{get:function(t,p){"
+    "if(p==='isReady')return function(){return false;};"
+    "if(p==='getConfig')return function(){return {};};"
+    "if(p==='getState')return function(){return {};};"
+    "return function(){};"
+    "}});"
+    "}"
+    "</script>"
+)
+
+
+def display_figure(
+    fig: go.Figure,
+    fig_key: str,
+) -> None:
+    """Display a Plotly figure with ``config`` from ``style.yml`` (``figures.<fig_key>``)."""
+    config = _plotly_config_for(fig_key)
+    fig.show(config=config)
+
+
+# ---------------------------------------------------------------------------
+# Dummy figure for lightbox demo / testing
+# ---------------------------------------------------------------------------
+
+
+def create_dummy_scatter() -> go.Figure:
+    """Simple scatter figure used to demo the two lightbox strategies."""
+    import random
+    import math
+
+    rng = random.Random(42)
+    n = 80
+    # Box-Muller for normal samples without numpy
+    def _randn() -> float:
+        u1, u2 = rng.random(), rng.random()
+        return math.sqrt(-2 * math.log(max(u1, 1e-12))) * math.cos(2 * math.pi * u2)
+
+    x = [_randn() for _ in range(n)]
+    y = [xi * 0.7 + _randn() * 0.5 for xi in x]
+    colors = [rng.random() for _ in range(n)]
+
+    fig = go.Figure(
+        go.Scatter(
+            x=x,
+            y=y,
+            mode="markers",
+            marker=dict(
+                size=10,
+                color=colors,
+                colorscale="Viridis",
+                showscale=True,
+                colorbar=dict(title="value"),
+                line=dict(width=0.5, color="white"),
+            ),
+            hovertemplate="x=%{x:.2f}<br>y=%{y:.2f}<extra></extra>",
+        )
+    )
+    fig.update_layout(
+        title="Demo scatter — hover/zoom to explore",
+        xaxis_title="x",
+        yaxis_title="y",
+        plot_bgcolor="rgba(245,245,250,1)",
+        paper_bgcolor="rgba(0,0,0,0)",
+    )
+    return fig
+
+
+# ---------------------------------------------------------------------------
+# Strategy A: GLightbox iframe wrapper
+# ---------------------------------------------------------------------------
+
+
+def write_plotly_for_glightbox(
     fig: go.Figure,
     html_path: str | Path,
     *,
     fig_key: str,
     preview_png_path: str | Path | None = None,
     preview_scale: float = 2.0,
-) -> None:
+    lightbox_width: str = "90vw",
+    lightbox_height: str = "85vh",
+    caption: str = "",
+) -> str:
     """
-    Write a standalone Plotly HTML file with a **local** ``plotly.min.js`` (Plotly
-    ``include_plotlyjs="directory"``) for Reveal.js ``Reveal.showPreview``. CDN script
-    tags with SRI often fail inside nested iframes, which leaves Reveal’s “Unable to load
-    iframe” message. A copied ``plotly.min.js`` (~3–5MB) sits next to the HTML file.
+    Write a standalone Plotly HTML + optional preview PNG.
 
-    Use from Quarto with ``execute-dir: project`` and paths under the post directory,
-    e.g. ``posts/.../timeline-interactive.html``. In the ``.qmd`` slide, point
-    ``data-preview-link`` at the same filename (relative to the rendered ``presentation.html``).
+    Returns a raw HTML string: an ``<a class="lightbox" data-type="external">``
+    element wrapping the preview image.  Quarto's GLightbox intercepts the click
+    and opens the interactive HTML inside a modal iframe.
 
-    PNG export uses Kaleido (``pip install kaleido``).
+    ``caption`` — optional caption string rendered as ``data-description`` on
+    the anchor.  GLightbox displays it in the styled description strip below the
+    iframe (inheriting the ``$lightbox-caption-*`` SCSS variables).
 
-    **Reveal.js note:** bundled Reveal (e.g. 5.1) registers iframe previews only for
-    ``<a href="http(s)://...">``. Same-directory ``.html`` sidecars need a thin
-    document-layer click handler that calls ``Reveal.showPreview(resolvedUrl)`` —
-    see this repo’s ``presentation.qmd`` (``reveal-plotly-preview`` + ``include-after-body``).
+    IMPORTANT: embed the returned string via a ``{=html}`` raw block in the
+    ``.qmd``, NOT via ``display(HTML(...))`` — Pandoc strips ``<a>`` elements
+    from notebook HTML outputs.
+
+    ``html_path`` must be a path relative to the **rendered output file**
+    (e.g. ``"scores-scatter-interactive.html"`` when the .qmd renders to
+    ``presentation.html`` in the same directory).
+
+    PNG export requires kaleido (``pip install kaleido``).
     """
-    config = _plotly_config_for(fig_key)
+    import copy as _copy
+
     out = Path(html_path)
     out.parent.mkdir(parents=True, exist_ok=True)
 
-    # Strip fixed pixel dimensions so Plotly fills the iframe rather than rendering
-    # at a hard-coded width/height.  Work on a copy to avoid mutating the caller's fig.
-    import copy as _copy
     _fig = _copy.deepcopy(fig)
-    _fig.update_layout(width=None, height=None, autosize=True)
-
-    # Use a local plotly.min.js (directory mode), not CDN+SRI: nested Reveal iframes often
-    # fail to run CDN scripts with integrity checks, which leaves a blank iframe and Reveal's
-    # "Unable to load iframe" fallback visible.
-    _fig.write_html(str(out), config=config, include_plotlyjs="directory", full_html=True)
-
-    # Inject a CSS reset so html/body fill the iframe viewport, and ensure the
-    # graph div also expands to 100 %.
-    _iframe_reset = (
-        "<style>"
-        "html,body{margin:0;padding:0;height:100%;width:100%;overflow:hidden;}"
-        ".plotly-graph-div{height:100%!important;width:100%!important;}"
-        "</style>"
+    _fig.update_layout(
+        width=None, height=None, autosize=True,
+        paper_bgcolor="white",
+        plot_bgcolor="white",
     )
+    # Always fully interactive — this is the interactive half of the pair.
+    _interactive_config = {"scrollZoom": True}
+    _fig.write_html(str(out), config=_interactive_config, include_plotlyjs="directory", full_html=True)
+
     _html = out.read_text(encoding="utf-8")
-    _html = _html.replace("<head>", "<head>" + _iframe_reset, 1)
+    _html = _html.replace("<head>", "<head>" + _SIDECAR_HEAD_INJECT, 1)
     out.write_text(_html, encoding="utf-8")
 
     if preview_png_path is not None:
@@ -951,14 +1039,36 @@ def write_plotly_for_reveal_lightbox(
                 f"Original error: {e}"
             ) from e
 
-
-def display_figure(
-    fig: go.Figure,
-    fig_key: str,
-) -> None:
-    """Display a Plotly figure with ``config`` from ``style.yml`` (``figures.<fig_key>``)."""
-    config = _plotly_config_for(fig_key)
-    fig.show(config=config)
+    href = out.name
+    img_tag = (
+        f'<img src="img/{Path(preview_png_path).name}" '
+        f'alt="Interactive chart — click to open" '
+        f'class="r-stretch" style="max-height:68vh;cursor:pointer" />'
+        if preview_png_path
+        else f'<span style="padding:2em;border:2px dashed #aaa;cursor:pointer">'
+             f'Click to open interactive chart</span>'
+    )
+    # Use GLightbox natively via class="lightbox" data-type="external".
+    # NOTE: data-type="external" NOT "iframe" — the GLightbox version bundled by
+    # Quarto only triggers the iframe renderer (Z()) for type "external"; "iframe"
+    # falls into a no-op branch and renders blank.
+    # data-description → GLightbox renders it in .gslide-description below the
+    # iframe, styled by $lightbox-caption-* SCSS variables in presentation-theme.scss.
+    # IMPORTANT: embed via {=html} raw block, NOT display(HTML(...)) — Pandoc
+    # strips <a> elements from notebook HTML outputs.
+    desc_attr = f'\n     data-description="{caption}"' if caption else ""
+    return (
+        f'<div style="text-align:center;margin-top:0.75em">\n'
+        f'  <a href="{href}"\n'
+        f'     class="lightbox"\n'
+        f'     data-type="external"\n'
+        f'     data-width="{lightbox_width}"\n'
+        f'     data-height="{lightbox_height}"{desc_attr}\n'
+        f'     style="display:inline-block;cursor:pointer">\n'
+        f'    {img_tag}\n'
+        f'  </a>\n'
+        f'</div>\n'
+    )
 
 
 # ---------------------------------------------------------------------------

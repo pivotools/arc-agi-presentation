@@ -1,0 +1,11 @@
+# Dedicated project config for the presentation.
+# Keeps all rendered HTML artifacts (presentation.html, presentation_files/,
+# sidecar interactive HTMLs, preview PNGs, plotly.min.js) together in one
+# subfolder instead of polluting the source directory.
+#
+# Usage (from repo root):
+#   quarto render posts/agentic_coding_arc_agi/presentation.qmd --execute --to revealjs
+#   quarto preview posts/agentic_coding_arc_agi/presentation.qmd --execute --to revealjs
+project:
+  type: default
+  output-dir: presentation-html
