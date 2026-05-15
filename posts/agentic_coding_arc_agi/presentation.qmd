@@ -26,6 +26,71 @@ format:
     history: true
     controls: true
     hash-type: number
+    # Reveal 5.1 only registers preview clicks on <a href="http(s)...">; relative
+    # file links need a tiny shim (include-after-body) that calls showPreview().
+    include-after-body:
+      - text: |
+          <script type="text/javascript">
+          (function () {
+            function bindRevealPlotlyPreviews() {
+              document.querySelectorAll("a.reveal-plotly-preview[href]").forEach(function (anchor) {
+                anchor.addEventListener("click", function (e) {
+                  e.preventDefault();
+                  var href = anchor.getAttribute("href");
+                  if (!href || typeof Reveal === "undefined" || typeof Reveal.showPreview !== "function") return;
+                  var abs = new URL(href, window.location.href).href;
+                  Reveal.showPreview(abs);
+                });
+              });
+            }
+            bindRevealPlotlyPreviews();
+          })();
+
+          // Mermaid card-node resize: Mermaid bakes the foreignObject width from a
+          // measurement taken with its own inline `max-width:200px` active. After
+          // SCSS removes that cap, our cardLabel's real intrinsic width is larger
+          // than the rect Mermaid drew. Resize the foreignObject + rect + label
+          // transform to match the rendered content. Idempotent.
+          (function () {
+            function resizeMermaidCards() {
+              document.querySelectorAll("svg .cardLabel").forEach(function (card) {
+                var fo = card.closest("foreignObject");
+                if (!fo) return;
+                var natural = card.offsetWidth;
+                if (!natural) return;
+                var foW = parseFloat(fo.getAttribute("width"));
+                var delta = natural - foW;
+                if (delta <= 1) return; // already wide enough
+                fo.setAttribute("width", natural);
+                var node = fo.closest("g.node");
+                if (!node) return;
+                var rect = node.querySelector("rect.label-container") || node.querySelector("rect");
+                if (rect) {
+                  var oldX = parseFloat(rect.getAttribute("x") || "0");
+                  var oldW = parseFloat(rect.getAttribute("width"));
+                  rect.setAttribute("width", oldW + delta);
+                  rect.setAttribute("x", oldX - delta / 2);
+                }
+                var labelG = fo.closest("g.label");
+                if (labelG) {
+                  var t = labelG.getAttribute("transform") || "";
+                  var m = t.match(/translate\(([-0-9.]+)[, ]+([-0-9.]+)\)/);
+                  if (m) {
+                    var newX = parseFloat(m[1]) - delta / 2;
+                    labelG.setAttribute("transform", "translate(" + newX + ", " + m[2] + ")");
+                  }
+                }
+              });
+            }
+            // Run after Mermaid finishes (it renders asynchronously after page load).
+            var attempts = [100, 400, 1000, 2000];
+            attempts.forEach(function (ms) { setTimeout(resizeMermaidCards, ms); });
+            // Also re-run when reveal swaps slides (mermaid sometimes lazy-renders).
+            if (typeof Reveal !== "undefined" && Reveal.on) {
+              Reveal.on("slidechanged", function () { setTimeout(resizeMermaidCards, 100); });
+            }
+          })();
+          </script>
 ---
 
 ```{python}
@@ -207,22 +272,25 @@ display_figure(fig, "puzzle")
 ### Our ARC-AGI 2 journey
 
 
+## What is interleaved thinking
+
+
 ## The agentic loop
 
 From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms** a hypothesis, then **validates** it by running code &mdash; refining until every training pair passes.
 
 ```{mermaid}
 %%| fig-align: center
-%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80}} }%%
+%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80, "padding": 0}} }%%
 flowchart LR
-    Prompt["<b>Prompt</b><br/>Puzzle<br/>tools<br/>Goal"]
-    Step1["Analyze grid"]
-    Solution["<b>Solution</b><br/><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code>"]
+    Prompt["<div class='cardLabel'><div class='boxHeader'>Prompt</div><div class='boxBody'><div>Puzzle</div><div>tools</div><div>Goal</div></div></div>"]
+    Step1["<div class='cardLabel'><div class='boxHeader'>Analyze grid</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+    Solution["<div class='cardLabel'><div class='boxHeader'>Solution</div><div class='boxBody'><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code></div></div>"]
 
     subgraph Loop[" "]
         direction TB
-        Step2["Form hypothesis"]
-        Step3["Validate hypothesis"]
+        Step2["<div class='cardLabel'><div class='boxHeader'>Form hypothesis</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+        Step3["<div class='cardLabel'><div class='boxHeader'>Validate hypothesis</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
         Step2 -->|propose| Step3
         Step3 ---->|refine| Step2
     end
