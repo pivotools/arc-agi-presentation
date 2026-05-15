@@ -227,6 +227,35 @@ display_figure(fig, "puzzle")
 ### Our ARC-AGI 2 journey
 
 
+## The agentic loop
+
+From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms** a hypothesis, then **validates** it by running code &mdash; refining until every training pair passes.
+
+```{mermaid}
+%%| fig-align: center
+%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80}} }%%
+flowchart LR
+    Prompt["<b>Prompt</b><br/>Puzzle<br/>tools<br/>Goal"]
+    Step1["Analyze grid"]
+    Solution["<b>Solution</b><br/><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code>"]
+
+    subgraph Loop[" "]
+        direction TB
+        Step2["Form hypothesis"]
+        Step3["Validate hypothesis"]
+        Step2 -->|propose| Step3
+        Step3 ---->|refine| Step2
+    end
+
+    Prompt --> Step1
+    Step1 --> Loop
+    Loop -.-> Solution
+
+    classDef loopRegion fill:none,stroke:#9aa,stroke-dasharray:5 4;
+    class Loop loopRegion;
+```
+
+
 
 ## Finetuning requires data
 ### Synthetic data or bust
