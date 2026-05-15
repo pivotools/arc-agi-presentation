@@ -51,6 +51,7 @@
         "source=${localWorkspaceFolder}/.devcontainer/ssh,target=/root/.ssh,type=bind,consistency=cached",
         "source=${localWorkspaceFolder}/.devcontainer/.bash_history,target=/root/.bash_history,type=bind,consistency=cached",
         "source=${localWorkspaceFolder}/.devcontainer/claude-code-config,target=/root/.claude,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/../data,target=/data,type=bind,consistency=cached"
     ],
     "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/post-create-commands.sh",
     "postStartCommand": "bash ${containerWorkspaceFolder}/.devcontainer/post-start-commands.sh",

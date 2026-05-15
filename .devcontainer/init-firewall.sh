@@ -84,6 +84,7 @@ for domain in \
     "github-cloud.githubusercontent.com" \
     "vscode.blob.core.windows.net" \
     "pkg.julialang.org" \
+    "dl.google.com" \
     "update.code.visualstudio.com"; do
     echo "Resolving $domain..."
     ips=$(dig +noall +answer A "$domain" | awk '$4 == "A" {print $5}')

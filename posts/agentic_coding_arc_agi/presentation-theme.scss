@@ -142,3 +142,13 @@ div.reveal div.slides section.quarto-title-block .subtitle {
   margin-top: 0.35em;
   line-height: 1.25;
 }
+
+/* Mermaid diagrams: padding + Python syntax highlighting (mirrors GitHub colours) */
+.reveal .nodeLabel {
+  padding: 8px 16px 8px 16px;
+}
+.reveal .nodeLabel code {
+  white-space: nowrap;
+}
+.reveal .nodeLabel .py-kw { color: #cf222e; }
+.reveal .nodeLabel .py-fn { color: #8250df; }
