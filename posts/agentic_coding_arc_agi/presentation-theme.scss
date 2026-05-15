@@ -115,6 +115,35 @@ div.reveal div.slides section.quarto-title-block .subtitle {
   border-radius: $border-radius;
 }
 
+/* GLightbox external/iframe + caption fix.
+ *
+ * When a description is present GLightbox adds class `desc-bottom` to
+ * .ginner-container, turning it into a flex-column whose inline height is
+ * set to data-height (e.g. 85vh) by the Z() handler.
+ *
+ * GLightbox's own CSS gives .gslide-description { flex: 1 0 100% } — that is
+ * flex-basis 100% of the container WITH flex-shrink:0.  In a 85vh column
+ * container that makes the description claim all 85vh, leaving .gslide-media
+ * with 0 height; the iframe inside it (height:100%) is therefore invisible.
+ *
+ * Fix: reset description to natural/auto height, and let .gslide-media grow
+ * to fill the remainder. */
+.glightbox-container .ginner-container .gslide-description {
+  flex: 0 0 auto !important;
+}
+
+.glightbox-container .ginner-container .gslide-media {
+  flex: 1 1 0% !important;
+  min-height: 0 !important;
+}
+
+.glightbox-container .ginner-container .gslide-media iframe {
+  width: 100% !important;
+  height: 100% !important;
+  display: block !important;
+  min-height: 0 !important;
+}
+
 /* GLightbox: typography + panel backgrounds (beat glightbox.min + Quarto lightbox.css + `.glightbox-clean` #fff) */
 body:not(.glightbox-mobile) .goverlay {
   background: $lightbox-backdrop-bg;
@@ -211,11 +240,11 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   margin-top: 0.35em;
   line-height: 1.25;
 }
-
-/* Reveal ``Reveal.showPreview`` iframe overlay
+/*
+ Reveal ``Reveal.showPreview`` iframe overlay
    --------------------------------------------------
    Light background instead of the default dark scrim, with the iframe
-   viewport centered both horizontally and vertically. */
+   viewport centered both horizontally and vertically. 
 .reveal > .overlay.overlay-preview {
   background: rgba(230, 230, 230, 0.97) !important;
   display: flex !important;
@@ -224,8 +253,8 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
 }
 
 .reveal > .overlay.overlay-preview .viewport {
-  /* Reveal absolutely-positions .viewport, so flex on the parent has no
-     effect. Use the classic absolute-center trick instead. */
+   Reveal absolutely-positions .viewport, so flex on the parent has no
+     effect. Use the classic absolute-center trick instead. 
   position: absolute !important;
   top: 50% !important;
   left: 50% !important;
@@ -241,15 +270,8 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   z-index: 1;
   border: none;
 }
+*/
 
-/* Hide the "Unable to load iframe" fallback once loaded (same-origin Plotly
-   sidecars are not X-Frame blocked; the message is a false positive that
-   would otherwise paint over the chart). */
-.reveal > .overlay.overlay-preview.loaded .x-frame-error {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none;
-}
 
 /* Mermaid diagrams: padding + Python syntax highlighting (mirrors GitHub colours) */
 .reveal .nodeLabel {

@@ -183,3 +183,9 @@ cython_debug/
 # archived posts
 archived_posts/
 presentation_internal_notes.md
+
+# IDE / editor specific
+.vscode/
+.specstory/
+.cursorindexingignore
+mdnotes.md

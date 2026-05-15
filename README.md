@@ -40,14 +40,93 @@ This is the single command that bypasses the frozen cache for a full site build.
 
 ### Presentation (reveal.js slides)
 
-The `agentic_coding_arc_agi` post has a companion slide deck at `posts/agentic_coding_arc_agi/presentation.qmd`. It is a reveal.js presentation derived from the article — one slide per Markdown header. It does **not** execute Python; instead it reuses figures already produced by rendering `index.ipynb` (under `index_files/figure-pdf/`, the post directory, and `figs/`). Render the article first on a fresh checkout:
+The `agentic_coding_arc_agi` post has a companion slide deck at
+`posts/agentic_coding_arc_agi/presentation.qmd`.  
+It **executes Python** cells when rendered — the cells generate interactive Plotly
+sidecar files and static preview PNGs on the fly. Always pass `--execute`:
 
 ```bash
-quarto render posts/agentic_coding_arc_agi/index.ipynb --execute
-quarto render posts/agentic_coding_arc_agi/presentation.qmd --to revealjs
+quarto render posts/agentic_coding_arc_agi/presentation.qmd --execute --to revealjs
+# or for live reload during editing:
+quarto preview posts/agentic_coding_arc_agi/presentation.qmd --execute --to revealjs
 ```
 
-Output is written next to the source as `posts/agentic_coding_arc_agi/presentation.html` (with a sibling `presentation_files/` for the reveal.js runtime). Both are git-ignored. Open the HTML in any browser; press `?` to see reveal.js shortcuts.
+All rendered artifacts land in **`posts/agentic_coding_arc_agi/presentation-html/`**
+(configured via `posts/agentic_coding_arc_agi/_quarto.yml`, `project.output-dir`):
+
+| Artifact | Description |
+|---|---|
+| `presentation.html` | The slide deck — open in any browser |
+| `presentation_files/` | Reveal.js runtime (CSS, JS) copied by Quarto |
+| `*-interactive.html` | Standalone Plotly HTML files (one per interactive figure) |
+| `plotly.min.js` | Local Plotly bundle (served next to sidecar files) |
+| `img/*-preview.png` | Static preview thumbnails (click-target on slides) |
+
+Everything in `presentation-html/` is git-ignored. Press `?` in the browser to see
+Reveal.js keyboard shortcuts.
+
+#### Interactive figures — GLightbox + Plotly sidecar pattern
+
+Interactive Plotly figures are surfaced via **GLightbox** (bundled by Quarto): a
+static preview PNG sits on the slide and, when clicked, opens a GLightbox overlay
+containing a full-viewport iframe with the interactive HTML figure.
+
+**How it works end-to-end:**
+
+1. **Python cell** calls `write_plotly_for_glightbox()` from `src/plotting.py`.  
+   This writes two files into `presentation-html/`:
+   - `<name>-interactive.html` — self-contained Plotly page (uses a local
+     `plotly.min.js` instead of CDN to avoid integrity-check failures inside iframes).
+     A `window.Reveal` stub is injected into `<head>` so that Quarto's hot-reload
+     script (`quarto-preview.js`) does not crash inside the iframe context.
+   - `img/<name>-preview.png` — static thumbnail exported via Kaleido.
+
+2. **`{=html}` raw block** in the slide creates the clickable link:
+
+   ```html
+   <a href="<name>-interactive.html"
+      class="lightbox"
+      data-type="external"
+      data-width="90vw"
+      data-height="85vh"
+      data-description="Optional caption shown below the iframe">
+     <img src="img/<name>-preview.png" class="r-stretch" />
+   </a>
+   ```
+
+   `class="lightbox"` activates GLightbox. `data-type="external"` tells GLightbox
+   to render the target URL in an iframe rather than as an image.
+
+3. **SCSS fix** in `presentation-theme.scss` corrects a GLightbox layout bug: when
+   `data-description` is present, GLightbox's own CSS gives `.gslide-description`
+   `flex: 1 0 100%` (basis 100%, no shrink), which collapses the iframe to zero
+   height. The fix sets `flex: 0 0 auto !important` on the description and
+   `flex: 1 1 0% !important` on `.gslide-media` so the iframe fills the remaining
+   space.
+
+**Adding a new interactive figure to the presentation:**
+
+```python
+from src.plotting import write_plotly_for_glightbox
+
+_out = blog_root / "posts/agentic_coding_arc_agi/presentation-html"
+write_plotly_for_glightbox(
+    my_fig,                                     # any go.Figure
+    _out / "my-figure-interactive.html",
+    fig_key="my_figure",                        # key in style/style.yml (or any string)
+    preview_png_path=_out / "img" / "my-figure-preview.png",
+    caption="Optional caption",                 # shown in lightbox; omit if not needed
+)
+```
+
+Then add a `{=html}` block on the slide (copy the anchor pattern above, substituting
+`my-figure` for `<name>`).
+
+**Dependencies:**
+- `plotly` — figure creation and HTML export.
+- `kaleido` — static PNG export (`pip install kaleido`). Required for preview thumbnails.
+- GLightbox CSS/JS are bundled by Quarto automatically when any element has
+  `class="lightbox"`.
 
 ## Preventing committed notebook output
 
