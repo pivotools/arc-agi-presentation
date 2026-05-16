@@ -373,13 +373,17 @@ foreignObject > div {
   display: inline-block;
   vertical-align: middle;
 }
+/* Mini-nodes inside cardLabel `.boxBody.horizontal`. Visual target:
+   look identical to standalone Mermaid `[ ]` nodes elsewhere on the deck
+   (CoT / Tool call / Tool response on the interleaved-thinking slide), which
+   Quarto themes with `--mermaid-node-bg-color: rgba(42,118,221,.1)`,
+   `--mermaid-node-fg-color: #333`, and `--mermaid-label-fg-color: #2a76dd`. */
 .nodeLabel .subBox {
   margin: 0 4px;
-  border: $border-width solid $border-color;
-  border-radius: $border-radius;
-  padding: 5px 12px;
-  background: rgba(0, 0, 0, 0.04);
-  font-size: 0.85em;
+  border: $border-width solid $body-color;
+  padding: 6px 14px;
+  background: rgba(42, 118, 221, 0.1);
+  color: $link-color;
 }
 .nodeLabel .arrow {
   margin: 0 4px;

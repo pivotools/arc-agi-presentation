@@ -428,13 +428,13 @@ From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms*
 %%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80, "padding": 0}} }%%
 flowchart LR
     Prompt["<div class='cardLabel'><div class='boxHeader'>Prompt</div><div class='boxBody'><div>Puzzle</div><div>tools</div><div>Goal</div></div></div>"]
-    Analyze["<div class='cardLabel'><div class='boxHeader'>Analyze grid</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+    Analyze["<div class='cardLabel'><div class='boxHeader'>Analyze grid</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>Tool call</span><span class='arrow'>→</span><span class='subBox'>Tool response</span></div></div>"]
     Solution["<div class='cardLabel'><div class='boxHeader'>Solution</div><div class='boxBody'><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code></div></div>"]
 
     subgraph Loop[" "]
         direction TB
-        FormHypo["<div class='cardLabel'><div class='boxHeader'>Form hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
-        Validate["<div class='cardLabel'><div class='boxHeader'>Validate hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+        FormHypo["<div class='cardLabel'><div class='boxHeader'>Form hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>Tool call</span><span class='arrow'>→</span><span class='subBox'>Tool response</span></div></div>"]
+        Validate["<div class='cardLabel'><div class='boxHeader'>Validate hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>Tool call</span><span class='arrow'>→</span><span class='subBox'>Tool response</span></div></div>"]
         FormHypo -->|propose| Validate
         Validate ---->|refine| FormHypo
     end
