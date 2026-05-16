@@ -90,12 +90,15 @@ containing a full-viewport iframe with the interactive HTML figure.
       data-width="90vw"
       data-height="85vh"
       data-description="Optional caption shown below the iframe">
-     <img src="img/<name>-preview.png" class="r-stretch" />
+     <img src="img/<name>-preview.png" class="r-stretch plotly-glightbox-preview" />
    </a>
    ```
 
    `class="lightbox"` activates GLightbox. `data-type="external"` tells GLightbox
-   to render the target URL in an iframe rather than as an image.
+   to render the target URL in an iframe rather than as an image. The
+   `plotly-glightbox-preview` class caps the preview image at **80% of the slide
+   width** and **68vh** tall (`max-width` / `max-height` with `object-fit: contain`)
+   so Kaleido exports do not overflow narrow or portrait viewports.
 
 3. **SCSS fix** in `presentation-theme.scss` corrects a GLightbox layout bug: when
    `data-description` is present, GLightbox's own CSS gives `.gslide-description`

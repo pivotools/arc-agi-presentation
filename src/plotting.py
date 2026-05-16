@@ -1043,7 +1043,7 @@ def write_plotly_for_glightbox(
     img_tag = (
         f'<img src="img/{Path(preview_png_path).name}" '
         f'alt="Interactive chart — click to open" '
-        f'class="r-stretch" style="max-height:68vh;cursor:pointer" />'
+        f'class="r-stretch plotly-glightbox-preview" />'
         if preview_png_path
         else f'<span style="padding:2em;border:2px dashed #aaa;cursor:pointer">'
              f'Click to open interactive chart</span>'

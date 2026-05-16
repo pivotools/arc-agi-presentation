@@ -5,6 +5,7 @@ author: "Dibya Chakravorty, Debsankha Manik & Bernhard Altaner"
 date: "2026-05-22"
 # Shown between subtitle and authors via `title-slide.html` partial.
 title-banner-image: ./image.png
+conference-title: "TNG Big Techday 26" # below authors on title slide
 # Match _quarto.yml: run from repo root so `src` imports resolve (same as index.ipynb).
 execute:
   execute-dir: project
@@ -98,7 +99,7 @@ format:
 #| output: false
 #| execute: true
 
-# Same as index.ipynb: Jupyter/Quarto may not put the blog root on sys.path.
+# Setting up folder structure (will properly refactor later)
 import sys
 from pathlib import Path
 
@@ -119,7 +120,7 @@ if str(blog_root) not in sys.path:
 
 
 
-
+# Intro
 
 ## About us
 ### From an AGI meetup in Munich to a small AI lab
@@ -239,6 +240,20 @@ display_figure(fig, "puzzle")
 ::::
 
 
+## Fluid intelligence
+### Why are these puzzles interesting as an intelligence benchmark?
+
+- LLM weights only change during training. Weights are frozen during inference.
+- How well can LLMs adapt to novel situations not present in training data? This is called In-Context-Learning (ICL).
+- ARC AGI tests for that:
+    - models are tested on completely novel puzzles that are kept private (not on the internet).
+    - Pure memorization from training data ("stochastic parrot") will not help.
+    - For each puzzle, the model needs to deduce a novel transformation rule from just a **few** shown examples. The model needs to **efficient** in rule induction.
+- The benchmark tests what Chollet calls **skill acquisition efficiency** or **fluid intelligence**.
+- Fluid intelligence is not just about **knowledge**, and also very much about **adaptation**.
+
+
+
 
 ## ARC-AGI as a benchmark 
 ### Blast from the past before "vibe coding" became mainstream
@@ -267,12 +282,12 @@ display_figure(fig, "puzzle")
   - And so the story begins...
 
 
+# Main part
 
-## Main part
-### Our ARC-AGI 2 journey
+## Our story...
+### ...including the gory details
 
-
-## What is interleaved thinking
+- [Dibyas slides...](https://hedgedoc.beralt.com/nUlPDyU_QRKvX0BWZXas0Q?view#Main-part)
 
 
 ## The agentic loop
@@ -304,6 +319,170 @@ flowchart LR
 ```
 
 
+
+
+
+
+## Lessons learned
+### A recap from the trenches
+
+- **Tool use + reasoning look like fluid intelligence**
+  - Python (or similar) grounds the model — filter bad hypotheses and replan.
+  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
+- **Small / open-weight models punch above their reputation**
+  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
+- **Synthetic data isn’t magic**
+  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
+
+
+
+## At the bleeding edge
+### Timeline: us vs the field
+
+- **Format idea:** timeline with *our milestones* above and *community / papers* below.
+  - Abstract-representation angle — e.g. Markovian thinker thread (August 2025).
+  - Tool calling + iterative refinement trajectory.
+  - Agentica / Confluence — fast convergence to a similar regime in the broader field.
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+# Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
+#   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
+
+from src.plotting import create_horizontal_timeline, write_plotly_for_glightbox
+
+_post = blog_root / "posts/agentic_coding_arc_agi"
+_out = _post / "presentation-html"
+write_plotly_for_glightbox(
+    create_horizontal_timeline(),
+    _out / "timeline-interactive.html",
+    fig_key="timeline",
+    preview_png_path=_out / "img" / "timeline-preview.png",
+    caption="Team milestones vs broader AI context (example data)",
+)
+```
+
+```{=html}
+<div style="text-align:center;margin-top:0.75em">
+  <a href="timeline-interactive.html"
+     class="lightbox"
+     data-type="external"
+     data-width="90vw"
+     data-height="85vh"
+     data-description="Team milestones vs broader AI context (example data)"
+     style="display:inline-block;cursor:pointer">
+    <img src="img/timeline-preview.png"
+         alt="Timeline preview — click to open interactive chart"
+         class="r-stretch plotly-glightbox-preview" />
+  </a>
+</div>
+```
+
+
+
+## Practical take-home messages
+### Working better with modern AI
+
+- **Don’t overengineer harnesses** (same failure mode as mega-prompts).
+  - Most harnesses are either too complex or don’t transfer 100% task-to-tasks.
+  - Like coaching a human on math — specify goals and checks, not every micro-step at fixed depth.
+- **Simplicity + verification**
+  - Say what correctness means; don’t prescribe every “thought” motion (partly why models struggle at open-ended art briefs).
+- **Non-lab research still matters**
+  - Harnesses must continuously evolve to keep pace with models expanding innate capabilities.
+- **Few big ideas recur:** reasoning, agentic/tool use, context efficiency.
+
+
+
+# Epilogue
+
+
+## So… did ARC solvers crack the teaser puzzle?
+### Paying off the intro example (`28a6681f`)
+
+::: {.notes}
+Confirm which puzzle ended up being the flagship story vs the second intro example (`28a6681f`).
+:::
+
+- Fact-check internally: whether *our* run solved this specific grid vs a comparable case study.
+- Even if not back then — many setups solve it cleanly *now*.
+- Tell the concrete story of what the modern stack did (tools, retries, verifier).
+
+
+
+## Do LLMs have fluid intelligence?
+### Closing thoughts (not the bumper sticker)
+
+- LLMs absorb rich human-abstraction vocabulary — pairing that with puzzles shows real capability jumps *when harnessed*.
+- **Fluid intelligence, in practice:** couple conceptual chops to external, well-defined substrates (code, interpreters, specs).
+- **Compression + tools + agentic loops ⇒ emergent, reliable-ish behaviour**
+
+## Lightbox test
+### Figure direct
+
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+from src.plotting import create_dummy_scatter
+
+fig=create_dummy_scatter()
+fig.show()
+```
+
+## Lightbox test — Strategy A (GLightbox iframe)
+### Click the preview to open the interactive figure in a modal
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+#| fig-cap: "hasdfasfas"
+
+from src.plotting import create_dummy_scatter, write_plotly_for_glightbox
+
+_post = blog_root / "posts/agentic_coding_arc_agi"
+_out = _post / "presentation-html"
+write_plotly_for_glightbox(
+    create_dummy_scatter(),
+    _out / "dummy-glightbox-interactive.html",
+    fig_key="dummy",
+    preview_png_path=_out / "img" / "dummy-glightbox-preview.png",
+    caption="Demo scatter — hover to inspect points, scroll to zoom, drag to pan.",
+)
+```
+
+```{=html}
+<div style="text-align:center;margin-top:0.75em">
+  <a href="dummy-glightbox-interactive.html"
+     class="lightbox"
+     data-type="external"
+     data-width="90vw"
+     data-height="85vh"
+     data-description="Demo scatter — hover to inspect points, scroll to zoom, drag to pan."
+     style="display:inline-block;cursor:pointer">
+    <img src="img/dummy-glightbox-preview.png"
+         alt="Interactive chart — click to open"
+         class="r-stretch plotly-glightbox-preview" />
+  </a>
+</div>
+```
+
+
+# Appendix (backup)
+
+## To RL or not to RL?
+### That was the question...
+
+- Built intuition for RL *with tool calling* (e.g. the `verl` stack — very new territory).
+  - Rollouts — many candidate solutions per puzzle — are expensive.
+  - Keeping learner vs inference tokenizer / template details aligned was fiddly.
+
+
+
+# Old main part slides
 
 ## Finetuning requires data
 ### Synthetic data or bust
@@ -422,11 +601,6 @@ Side note from notes: frontier models lacked traces; we ultimately did not pursu
 - Tool calling + interleaved thinking ≫ our overwrought harness complexity.
 - *Example slide idea:* contrast a simplified trace with the older pipeline.safsdf
 
-## test timeline
-```{python}
-
-
-```
 
 ## State of the art scores
 ### First non-trivial results for open-weight models
@@ -459,191 +633,7 @@ write_plotly_for_glightbox(
      style="display:inline-block;cursor:pointer">
     <img src="img/scores-scatter-preview.png"
          alt="Score jumps scatter — click to open interactive chart"
-         class="r-stretch"
-         style="max-height:68vh" />
+         class="r-stretch plotly-glightbox-preview" />
   </a>
 </div>
-```
-
-
-
-## Lessons learned
-### A recap from the trenches
-
-- **Tool use + reasoning look like fluid intelligence**
-  - Python (or similar) grounds the model — filter bad hypotheses and replan.
-  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
-- **Small / open-weight models punch above their reputation**
-  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
-- **Synthetic data isn’t magic**
-  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
-
-
-
-## At the bleeding edge
-### Timeline: us vs the field
-
-- **Format idea:** timeline with *our milestones* above and *community / papers* below.
-  - Abstract-representation angle — e.g. Markovian thinker thread (August 2025).
-  - Tool calling + iterative refinement trajectory.
-  - Agentica / Confluence — fast convergence to a similar regime in the broader field.
-
-```{python}
-#| echo: false
-#| output: false
-#| execute: true
-# Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
-#   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
-
-from src.plotting import create_horizontal_timeline, write_plotly_for_glightbox
-
-_post = blog_root / "posts/agentic_coding_arc_agi"
-_out = _post / "presentation-html"
-write_plotly_for_glightbox(
-    create_horizontal_timeline(),
-    _out / "timeline-interactive.html",
-    fig_key="timeline",
-    preview_png_path=_out / "img" / "timeline-preview.png",
-    caption="Team milestones vs broader AI context (example data)",
-)
-```
-
-```{=html}
-<div style="text-align:center;margin-top:0.75em">
-  <a href="timeline-interactive.html"
-     class="lightbox"
-     data-type="external"
-     data-width="90vw"
-     data-height="85vh"
-     data-description="Team milestones vs broader AI context (example data)"
-     style="display:inline-block;cursor:pointer">
-    <img src="img/timeline-preview.png"
-         alt="Timeline preview — click to open interactive chart"
-         class="r-stretch"
-         style="max-height:68vh" />
-  </a>
-</div>
-```
-
-::: {.notes}
-Ask Dibya for concrete timeline dates.d
-:::
-
-
-
-## Practical take-home messages
-### Working better with modern AI
-
-- **Don’t overengineer harnesses** (same failure mode as mega-prompts).
-  - Most harnesses are either too complex or don’t transfer 100% task-to-tasks.
-  - Like coaching a human on math — specify goals and checks, not every micro-step at fixed depth.
-- **Simplicity + verification**
-  - Say what correctness means; don’t prescribe every “thought” motion (partly why models struggle at open-ended art briefs).
-- **Non-lab research still matters**
-  - Harnesses must continuously evolve to keep pace with models expanding innate capabilities.
-- **Few big ideas recur:** reasoning, agentic/tool use, context efficiency.
-
-
-
-# Epilogue
-
-
-## So… did ARC solvers crack the teaser puzzle?
-### Paying off the intro example (`28a6681f`)
-
-::: {.notes}
-Confirm which puzzle ended up being the flagship story vs the second intro example (`28a6681f`).
-:::
-
-- Fact-check internally: whether *our* run solved this specific grid vs a comparable case study.
-- Even if not back then — many setups solve it cleanly *now*.
-- Tell the concrete story of what the modern stack did (tools, retries, verifier).
-
-
-
-## Do LLMs have fluid intelligence?
-### Closing thoughts (not the bumper sticker)
-
-- LLMs absorb rich human-abstraction vocabulary — pairing that with puzzles shows real capability jumps *when harnessed*.
-- **Fluid intelligence, in practice:** couple conceptual chops to external, well-defined substrates (code, interpreters, specs).
-- **Compression + tools + agentic loops ⇒ emergent, reliable-ish behaviour**
-
-## Lightbox test
-### Figure direct
-
-```{python}
-#| echo: false
-#| output: true
-#| execute: true
-from src.plotting import create_dummy_scatter
-
-fig=create_dummy_scatter()
-fig.show()
-```
-
-## Lightbox test — Strategy A (GLightbox iframe)
-### Click the preview to open the interactive figure in a modal
-
-```{python}
-#| echo: false
-#| output: false
-#| execute: true
-#| fig-cap: "hasdfasfas"
-
-from src.plotting import create_dummy_scatter, write_plotly_for_glightbox
-
-_post = blog_root / "posts/agentic_coding_arc_agi"
-_out = _post / "presentation-html"
-write_plotly_for_glightbox(
-    create_dummy_scatter(),
-    _out / "dummy-glightbox-interactive.html",
-    fig_key="dummy",
-    preview_png_path=_out / "img" / "dummy-glightbox-preview.png",
-    caption="Demo scatter — hover to inspect points, scroll to zoom, drag to pan.",
-)
-```
-
-```{=html}
-<div style="text-align:center;margin-top:0.75em">
-  <a href="dummy-glightbox-interactive.html"
-     class="lightbox"
-     data-type="external"
-     data-width="90vw"
-     data-height="85vh"
-     data-description="Demo scatter — hover to inspect points, scroll to zoom, drag to pan."
-     style="display:inline-block;cursor:pointer">
-    <img src="img/dummy-glightbox-preview.png"
-         alt="Interactive chart — click to open"
-         class="r-stretch"
-         style="max-height:68vh;cursor:pointer" />
-  </a>
-</div>
-```
-
-
-# Appendix (backup)
-
-## To RL or not to RL?
-### That was the question...
-
-- Built intuition for RL *with tool calling* (e.g. the `verl` stack — very new territory).
-  - Rollouts — many candidate solutions per puzzle — are expensive.
-  - Keeping learner vs inference tokenizer / template details aligned was fiddly.
-
-
-## test
-
-```{python}
-#| echo: false
-#| output: false
-#| execute: true
-# Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
-#   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
-
-from pathlib import Path
-
-from src.plotting import create_horizontal_timeline
-
-fig = create_horizontal_timeline()
-fig.show()
 ```
