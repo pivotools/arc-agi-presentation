@@ -405,8 +405,8 @@ flowchart LR
         ToolCall["Tool call"]
         ToolResult["Tool response"]
         CoT -->|chooses| ToolCall
-        ToolCall -->|are executed| ToolResult
-        ToolResult -.->|fed back| CoT
+        ToolCall -->|yields| ToolResult
+        ToolResult -.->|informs next| CoT
     end
     Output["Output"]
 
