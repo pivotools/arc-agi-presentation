@@ -284,14 +284,104 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   line-height: 1.25;
 }
 
+/* Reveal ``Reveal.showPreview`` iframe overlay
+   --------------------------------------------------
+   Light background instead of the default dark scrim, with the iframe
+   viewport centered both horizontally and vertically. */
+.reveal > .overlay.overlay-preview {
+  background: rgba(230, 230, 230, 0.97) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
 
-/* Mermaid diagrams: padding + Python syntax highlighting (mirrors GitHub colours) */
-.reveal .nodeLabel {
-  padding: 16px 16px 16px 16px;
+.reveal > .overlay.overlay-preview .viewport {
+  /* Reveal absolutely-positions .viewport, so flex on the parent has no
+     effect. Use the classic absolute-center trick instead. */
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 90vw !important;
+  height: 90vh !important;
+}
+
+.reveal > .overlay.overlay-preview .viewport iframe {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative !important;
+  z-index: 1;
+  border: none;
+}
+
+/* Hide the "Unable to load iframe" fallback once loaded (same-origin Plotly
+   sidecars are not X-Frame blocked; the message is a false positive that
+   would otherwise paint over the chart). */
+.reveal > .overlay.overlay-preview.loaded .x-frame-error {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none;
+}
+
+/* Mermaid diagrams: cardLabel structure with filled title bar + content area.
+   Selectors are UN-prefixed (no `.reveal` ancestor) because Mermaid measures the
+   foreignObject inside a temporary `<div>` appended to `<body>` — outside the reveal
+   scope — so scoped selectors would fail at measurement time and Mermaid would size
+   the `<rect>` too narrow, causing the styled content to overflow at view time. */
+.nodeLabel .py-kw { color: #cf222e; }
+.nodeLabel .py-fn { color: #8250df; }
+.nodeLabel:has(.cardLabel) { padding: 0; }
+/* Mermaid wraps each label in an unclassed
+   `<div style="display:table-cell; max-width:200px; white-space:nowrap; ...">` to
+   vertically centre the foreignObject content. CSS alone (even with !important)
+   doesn't reliably influence Mermaid's measurement pass — the SVG `<foreignObject>`
+   width attribute ends up baked in too small, clipping our horizontal sub-box row.
+   A post-render script in presentation.qmd's include-after-body inspects each
+   `.cardLabel`'s real intrinsic width and resizes the foreignObject + rect to match.
+   This rule still nulls max-width so the rendered HTML expands cleanly. */
+foreignObject > div {
+  max-width: none !important;
+}
+.nodeLabel .cardLabel {
+  display: inline-block;
+}
+.nodeLabel .boxHeader {
+  padding: 8px 20px;
+  background: darken($link-color, 10%);
+  color: $body-bg;
+  font-weight: 600;
   text-align: center;
 }
-.reveal .nodeLabel code {
+.nodeLabel .boxBody {
+  padding: 12px 22px;
+  text-align: center;
+}
+/* Vertical body (Prompt, Solution): stack children on their own lines. */
+.nodeLabel .boxBody > div,
+.nodeLabel .boxBody > code {
+  display: block;
+}
+/* Horizontal body (Step nodes): inline-block flow with explicit margins. */
+.nodeLabel .boxBody.horizontal {
   white-space: nowrap;
 }
-.reveal .nodeLabel .py-kw { color: #cf222e; }
-.reveal .nodeLabel .py-fn { color: #8250df; }
+.nodeLabel .boxBody.horizontal > * {
+  display: inline-block;
+  vertical-align: middle;
+}
+.nodeLabel .subBox {
+  margin: 0 4px;
+  border: $border-width solid $border-color;
+  border-radius: $border-radius;
+  padding: 5px 12px;
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 0.85em;
+}
+.nodeLabel .arrow {
+  margin: 0 4px;
+  font-size: 1.1em;
+  color: $text-muted;
+}
+.nodeLabel code {
+  white-space: nowrap;
+}
