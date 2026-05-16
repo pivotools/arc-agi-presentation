@@ -76,6 +76,10 @@ $lightbox-description-bg: #161a22;
 
 // Title-slide banner: set max height; image keeps aspect ratio (see `title-banner-image` in presentation.qmd).
 $title-banner-height: 22rem;
+// Title slide `<h1 class="title">` — smaller than default h1 (tune in theme rules below).
+$presentation-title-slide-title-font-size: 2.5em;
+// Optional YAML `conference-title:` below authors on the title slide (`title-slide.html`).
+$presentation-conference-title-font-size: 1.25rem;
 
 // --- Callouts (common tunables) ---
 $callout-border-width: 0.3rem;
@@ -89,6 +93,17 @@ $callout-margin-bottom: 1rem;
 /* Base copy: avoid pure #000 from bundled theme rules */
 .reveal .slides section {
   color: $body-color;
+}
+
+/* Main title on the deck's first slide.
+ * Quarto Reveal output uses `<section class="quarto-title-block">` without `id="title-slide"`,
+ * so `#title-slide...` selectors never match; target `section.quarto-title-block` instead. */
+.reveal .slides > section.quarto-title-block > h1.title {
+  font-size: $presentation-title-slide-title-font-size;
+  line-height: 1.12;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* Subtitle on first slide — change $presentation-subtitle-font-size in defaults */
@@ -113,6 +128,19 @@ div.reveal div.slides section.quarto-title-block .subtitle {
   width: auto;
   height: auto;
   border-radius: $border-radius;
+}
+
+.reveal .slides section.quarto-title-block .quarto-title-author-name {
+  font-weight: 700;
+}
+
+/* Optional YAML `conference-title:` — below authors, above date */
+.reveal .slides section.quarto-title-block .conference-title {
+  font-size: $presentation-conference-title-font-size;
+  color: $text-muted;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0.45em 0 0.35em;
 }
 
 /* GLightbox external/iframe + caption fix.
@@ -220,6 +248,21 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   box-sizing: border-box;
 }
 
+/* Plotly GLightbox preview PNGs ({=html} raw blocks): high-res exports have a large
+   intrinsic width — `max-height` alone does not cap width, so images overflow on
+   narrow / portrait viewports. Constrain both dimensions (≤80% slide width, ≤68vh). */
+.reveal .slides section img.plotly-glightbox-preview {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 80%;
+  max-height: 68vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  box-sizing: border-box;
+}
+
 /* Block images: center by default (`fig-align: center` in presentation.qmd; slide body stays left-aligned) */
 .reveal .slides section img.quarto-figure-center,
 .reveal .slides section img.r-stretch.quarto-figure-center,
@@ -240,98 +283,15 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   margin-top: 0.35em;
   line-height: 1.25;
 }
-/*
- Reveal ``Reveal.showPreview`` iframe overlay
-   --------------------------------------------------
-   Light background instead of the default dark scrim, with the iframe
-   viewport centered both horizontally and vertically. 
-.reveal > .overlay.overlay-preview {
-  background: rgba(230, 230, 230, 0.97) !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-}
-
-.reveal > .overlay.overlay-preview .viewport {
-   Reveal absolutely-positions .viewport, so flex on the parent has no
-     effect. Use the classic absolute-center trick instead. 
-  position: absolute !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  width: 90vw !important;
-  height: 90vh !important;
-}
-
-.reveal > .overlay.overlay-preview .viewport iframe {
-  width: 100% !important;
-  height: 100% !important;
-  position: relative !important;
-  z-index: 1;
-  border: none;
-}
-*/
 
 
-/* Mermaid diagrams: cardLabel structure with filled title bar + content area.
-   Selectors are UN-prefixed (no `.reveal` ancestor) because Mermaid measures the
-   foreignObject inside a temporary `<div>` appended to `<body>` — outside the reveal
-   scope — so scoped selectors would fail at measurement time and Mermaid would size
-   the `<rect>` too narrow, causing the styled content to overflow at view time. */
-.nodeLabel .py-kw { color: #cf222e; }
-.nodeLabel .py-fn { color: #8250df; }
-.nodeLabel:has(.cardLabel) { padding: 0; }
-/* Mermaid wraps each label in an unclassed
-   `<div style="display:table-cell; max-width:200px; white-space:nowrap; ...">` to
-   vertically centre the foreignObject content. CSS alone (even with !important)
-   doesn't reliably influence Mermaid's measurement pass — the SVG `<foreignObject>`
-   width attribute ends up baked in too small, clipping our horizontal sub-box row.
-   A post-render script in presentation.qmd's include-after-body inspects each
-   `.cardLabel`'s real intrinsic width and resizes the foreignObject + rect to match.
-   This rule still nulls max-width so the rendered HTML expands cleanly. */
-foreignObject > div {
-  max-width: none !important;
-}
-.nodeLabel .cardLabel {
-  display: inline-block;
-}
-.nodeLabel .boxHeader {
-  padding: 8px 20px;
-  background: darken($link-color, 10%);
-  color: $body-bg;
-  font-weight: 600;
+/* Mermaid diagrams: padding + Python syntax highlighting (mirrors GitHub colours) */
+.reveal .nodeLabel {
+  padding: 16px 16px 16px 16px;
   text-align: center;
 }
-.nodeLabel .boxBody {
-  padding: 12px 22px;
-  text-align: center;
-}
-/* Vertical body (Prompt, Solution): stack children on their own lines. */
-.nodeLabel .boxBody > div,
-.nodeLabel .boxBody > code {
-  display: block;
-}
-/* Horizontal body (Step nodes): inline-block flow with explicit margins. */
-.nodeLabel .boxBody.horizontal {
+.reveal .nodeLabel code {
   white-space: nowrap;
 }
-.nodeLabel .boxBody.horizontal > * {
-  display: inline-block;
-  vertical-align: middle;
-}
-.nodeLabel .subBox {
-  margin: 0 4px;
-  border: $border-width solid $border-color;
-  border-radius: $border-radius;
-  padding: 5px 12px;
-  background: rgba(0, 0, 0, 0.04);
-  font-size: 0.85em;
-}
-.nodeLabel .arrow {
-  margin: 0 4px;
-  font-size: 1.1em;
-  color: $text-muted;
-}
-.nodeLabel code {
-  white-space: nowrap;
-}
+.reveal .nodeLabel .py-kw { color: #cf222e; }
+.reveal .nodeLabel .py-fn { color: #8250df; }
