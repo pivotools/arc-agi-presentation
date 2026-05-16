@@ -324,16 +324,16 @@ flowchart LR
 
     subgraph Loop[" "]
         direction TB
-        subgraph FormHypo["Form hypothesis"]
-            direction LR
-            F_CoT["CoT"] --> F_TC["Tool call"] --> F_TR["Tool response"]
-        end
         subgraph Validate["Validate hypothesis"]
             direction LR
             V_CoT["CoT"] --> V_TC["Tool call"] --> V_TR["Tool response"]
         end
-        FormHypo ---->|propose| Validate
-        Validate -->|refine| FormHypo
+        subgraph FormHypo["Form hypothesis"]
+            direction LR
+            F_CoT["CoT"] --> F_TC["Tool call"] --> F_TR["Tool response"]
+        end
+        FormHypo -->|propose| Validate
+        Validate ---->|refine| FormHypo
     end
 
     subgraph Solution["Solution"]
@@ -364,6 +364,16 @@ flowchart LR
   - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
 - **Synthetic data isn’t magic**
   - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
+
+
+
+::: {.notes}
+- Pretrained LLMs were ablw to detect patterns and reason about transformations.
+- But each ARC puzzle were novel: required combining multiple learnt concepts in ways that were unique to each puzzle.
+- Chain of thought allowed LLMs to perform that adaptation within each task.
+- LLMs can do math within CoT, but it's error prone. Tool calling overcomes that hindrance.
+
+:::
 
 
 
