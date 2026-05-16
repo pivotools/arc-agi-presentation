@@ -290,6 +290,34 @@ display_figure(fig, "puzzle")
 - [Dibyas slides...](https://hedgedoc.beralt.com/nUlPDyU_QRKvX0BWZXas0Q?view#Main-part)
 
 
+## Speaker view...
+### ... and speaker notes are cool!
+
+- For speaker notes, press `s` on your keyboard.
+![Speaker notes](./img/speakerview.png){fig-align="center" width="50%"}
+- notes with:
+
+```
+::: {.notes}
+
+- what one could say :) 
+
+- we can use speaker notes from separating spoken content from what is on the slides
+:::
+```
+- quarto with reveal.js is cool: [https://quarto.org/docs/presentations/revealjs/presenting.html](https://quarto.org/docs/presentations/revealjs/presenting.html)
+
+
+::: {.notes}
+
+- what one could say :) 
+
+- we can use speaker notes from separating spoken content from what is on the slides
+:::
+
+
+
+
 ## The agentic loop
 
 From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms** a hypothesis, then **validates** it by running code &mdash; refining until every training pair passes.
