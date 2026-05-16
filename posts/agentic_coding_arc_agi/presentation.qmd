@@ -47,61 +47,55 @@ format:
             bindRevealPlotlyPreviews();
           })();
 
-          // Mermaid card-node resize: Mermaid bakes the foreignObject width AND
-          // height from a measurement taken with its own inline `max-width:200px`
-          // active. After SCSS removes that cap, our cardLabel's real intrinsic
-          // size (both axes) is larger than the rect Mermaid drew. Resize the
-          // foreignObject + rect + label transform on both axes. Idempotent.
+          // Mermaid card-node alignment: Mermaid sizes the `<rect>` with intrinsic
+          // padding around the foreignObject, leaving a visible gap between the
+          // boxHeader fill and the rect border. Grow the foreignObject to match
+          // the rect exactly so SCSS can stretch the cardLabel + boxHeader
+          // edge-to-edge. The rect itself is left alone, which keeps Mermaid's
+          // edge endpoints landing precisely on the visible border (no arrow
+          // tips protruding into the card). Idempotent.
           (function () {
-            function resizeMermaidCards() {
+            function alignCardsToRect() {
               document.querySelectorAll("svg .cardLabel").forEach(function (card) {
                 var fo = card.closest("foreignObject");
                 if (!fo) return;
-                var natW = card.offsetWidth;
-                var natH = card.offsetHeight;
-                if (!natW || !natH) return;
-                var foW = parseFloat(fo.getAttribute("width"));
-                var foH = parseFloat(fo.getAttribute("height"));
-                var dW = natW - foW;
-                var dH = natH - foH;
-                if (dW <= 1 && dH <= 1) return; // already fits
-                if (dW > 1) fo.setAttribute("width", natW);
-                if (dH > 1) fo.setAttribute("height", natH);
                 var node = fo.closest("g.node");
                 if (!node) return;
                 var rect = node.querySelector("rect.label-container") || node.querySelector("rect");
-                if (rect) {
-                  if (dW > 1) {
-                    var oldX = parseFloat(rect.getAttribute("x") || "0");
-                    var oldW = parseFloat(rect.getAttribute("width"));
-                    rect.setAttribute("width", oldW + dW);
-                    rect.setAttribute("x", oldX - dW / 2);
-                  }
-                  if (dH > 1) {
-                    var oldY = parseFloat(rect.getAttribute("y") || "0");
-                    var oldH = parseFloat(rect.getAttribute("height"));
-                    rect.setAttribute("height", oldH + dH);
-                    rect.setAttribute("y", oldY - dH / 2);
-                  }
-                }
+                if (!rect) return;
+                var rx = parseFloat(rect.getAttribute("x"));
+                var ry = parseFloat(rect.getAttribute("y"));
+                var rw = parseFloat(rect.getAttribute("width"));
+                var rh = parseFloat(rect.getAttribute("height"));
+                if (!isFinite(rw) || !isFinite(rh)) return;
+                if (parseFloat(fo.getAttribute("width")) === rw &&
+                    parseFloat(fo.getAttribute("height")) === rh) return;
+                fo.setAttribute("width", rw);
+                fo.setAttribute("height", rh);
                 var labelG = fo.closest("g.label");
                 if (labelG) {
-                  var t = labelG.getAttribute("transform") || "";
-                  var m = t.match(/translate\(([-0-9.]+)[, ]+([-0-9.]+)\)/);
-                  if (m) {
-                    var newX = parseFloat(m[1]) - (dW > 1 ? dW / 2 : 0);
-                    var newY = parseFloat(m[2]) - (dH > 1 ? dH / 2 : 0);
-                    labelG.setAttribute("transform", "translate(" + newX + ", " + newY + ")");
-                  }
+                  labelG.setAttribute("transform", "translate(" + rx + ", " + ry + ")");
                 }
+                // Stretch Mermaid's table-cell wrapper + our cardLabel to fill
+                // the now-enlarged foreignObject. Inline styles applied here run
+                // AFTER Mermaid's measurement so they don't blow up the offscreen
+                // layout (which is why this isn't done in SCSS).
+                var wrapper = fo.querySelector(":scope > div");
+                if (wrapper) {
+                  wrapper.style.display = "block";
+                  wrapper.style.width = "100%";
+                  wrapper.style.maxWidth = "none";
+                }
+                card.style.display = "block";
+                card.style.width = "100%";
               });
             }
             // Run after Mermaid finishes (it renders asynchronously after page load).
             var attempts = [100, 400, 1000, 2000];
-            attempts.forEach(function (ms) { setTimeout(resizeMermaidCards, ms); });
+            attempts.forEach(function (ms) { setTimeout(alignCardsToRect, ms); });
             // Also re-run when reveal swaps slides (mermaid sometimes lazy-renders).
             if (typeof Reveal !== "undefined" && Reveal.on) {
-              Reveal.on("slidechanged", function () { setTimeout(resizeMermaidCards, 100); });
+              Reveal.on("slidechanged", function () { setTimeout(alignCardsToRect, 100); });
             }
           })();
           </script>
