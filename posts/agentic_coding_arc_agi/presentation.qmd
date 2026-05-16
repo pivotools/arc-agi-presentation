@@ -529,6 +529,16 @@ write_plotly_for_glightbox(
 
 ## So… did ARC solvers crack the teaser puzzle?
 ### Paying off the intro example (`28a6681f`)
+*Using GPT 5.2 XHigh*
+- Navy blue seems to be moving through black
+- Hypothesis "gap fill": fill black cells between two non-black cells on each row. 
+  - Verification: Does not work on example 3.
+- Hypothesis "settle by sort": push all navy blue cells to the bottom-most cells of each black-connected component.
+  - verification: Wrong.
+- Pivot: **falling water simulation**.
+  - Priority: down -> down-right -> down-left -> lateral left.
+
+
 
 ::: {.notes}
 Confirm which puzzle ended up being the flagship story vs the second intro example (`28a6681f`).
