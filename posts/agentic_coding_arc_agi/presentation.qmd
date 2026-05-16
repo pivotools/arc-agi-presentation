@@ -46,123 +46,6 @@ format:
             }
             bindRevealPlotlyPreviews();
           })();
-
-          // Mermaid card-node tighten: Mermaid sizes the `<rect>` with intrinsic
-          // padding around the label, leaving extra space inside each card.
-          // Shrink each rect/foreignObject to the cardLabel's natural size, then
-          // shift the connected edge endpoints onto the new boundary so arrows
-          // still meet the border (no gap, no protrusion). Idempotent.
-          (function () {
-            function shiftEndpoint(x, y, change) {
-              if (!change) return null;
-              var o = change.oldAbs, n = change.newAbs;
-              var dx = x - o.cx, dy = y - o.cy;
-              var nx = Math.abs(dx) / (o.w / 2);
-              var ny = Math.abs(dy) / (o.h / 2);
-              if (nx >= ny) {
-                return {x: x + -Math.sign(dx) * (o.w - n.w) / 2, y: y};
-              } else {
-                return {x: x, y: y + -Math.sign(dy) * (o.h - n.h) / 2};
-              }
-            }
-            function tightenCards() {
-              // Scope per-SVG so other Mermaid diagrams (e.g. the interleaved
-              // thinking slide, which has its own "Prompt" node) don't pick up
-              // geometry deltas from this slide and end up with kinked edges.
-              document.querySelectorAll("svg.mermaid-js").forEach(function (svg) {
-                var nodeChanges = {};
-                svg.querySelectorAll(".cardLabel").forEach(function (card) {
-                  var fo = card.closest("foreignObject");
-                  if (!fo) return;
-                  var node = fo.closest("g.node");
-                  if (!node) return;
-                  var rect = node.querySelector("rect.label-container") || node.querySelector("rect");
-                  if (!rect) return;
-                  // Reset any prior inline stretching so cardLabel measures naturally.
-                  var wrapper = fo.querySelector(":scope > div");
-                  if (wrapper) {
-                    wrapper.style.width = "";
-                    wrapper.style.display = "";
-                    wrapper.style.maxWidth = "";
-                  }
-                  card.style.width = "";
-                  card.style.display = "";
-                  var natW = card.offsetWidth;
-                  var natH = card.offsetHeight;
-                  if (!natW || !natH) return; // slide hidden / not laid out yet
-                  var oldX = parseFloat(rect.getAttribute("x"));
-                  var oldY = parseFloat(rect.getAttribute("y"));
-                  var oldW = parseFloat(rect.getAttribute("width"));
-                  var oldH = parseFloat(rect.getAttribute("height"));
-                  var cx = oldX + oldW / 2, cy = oldY + oldH / 2;
-                  var changed = Math.abs(natW - oldW) >= 1 || Math.abs(natH - oldH) >= 1;
-                  if (changed) {
-                    var newX = cx - natW / 2, newY = cy - natH / 2;
-                    rect.setAttribute("x", newX);
-                    rect.setAttribute("y", newY);
-                    rect.setAttribute("width", natW);
-                    rect.setAttribute("height", natH);
-                    fo.setAttribute("width", natW);
-                    fo.setAttribute("height", natH);
-                    var labelG = fo.closest("g.label");
-                    if (labelG) {
-                      labelG.setAttribute("transform", "translate(" + newX + ", " + newY + ")");
-                    }
-                    var nm = (node.getAttribute("transform") || "").match(/translate\(([-0-9.]+)[, ]+([-0-9.]+)\)/);
-                    var nx = nm ? parseFloat(nm[1]) : 0, ny = nm ? parseFloat(nm[2]) : 0;
-                    var name = node.id.replace(/^flowchart-/, "").replace(/-\d+$/, "");
-                    nodeChanges[name] = {
-                      oldAbs: {cx: nx + cx, cy: ny + cy, w: oldW, h: oldH},
-                      newAbs: {cx: nx + cx, cy: ny + cy, w: natW, h: natH},
-                    };
-                  }
-                  // Always (re)apply the inline stretch so the boxHeader paints
-                  // edge-to-edge — Mermaid's table-cell wrapper otherwise shrinks
-                  // back to content width and lets background bleed-through show.
-                  if (wrapper) {
-                    wrapper.style.display = "block";
-                    wrapper.style.width = "100%";
-                    wrapper.style.maxWidth = "none";
-                  }
-                  card.style.display = "block";
-                  card.style.width = "100%";
-                });
-                svg.querySelectorAll("path.flowchart-link").forEach(function (path) {
-                  var id = path.id;
-                  if (!id) return;
-                  var m = id.match(/^L_(.+)_([^_]+)_\d+$/);
-                  if (!m) return;
-                  var sourceCh = nodeChanges[m[1]];
-                  var targetCh = nodeChanges[m[2]];
-                  if (!sourceCh && !targetCh) return;
-                  var d = path.getAttribute("d");
-                  if (!d) return;
-                  var startMatch = d.match(/^M\s*(-?\d+\.?\d*)\s*[,\s]\s*(-?\d+\.?\d*)/);
-                  if (!startMatch) return;
-                  var coordRe = /(-?\d+\.?\d*)\s*([,\s])\s*(-?\d+\.?\d*)/g;
-                  var lastMatch = null, mm;
-                  while ((mm = coordRe.exec(d)) !== null) { lastMatch = mm; }
-                  if (!lastMatch) return;
-                  var newStart = shiftEndpoint(parseFloat(startMatch[1]), parseFloat(startMatch[2]), sourceCh);
-                  var newEnd = shiftEndpoint(parseFloat(lastMatch[1]), parseFloat(lastMatch[3]), targetCh);
-                  var newD = d;
-                  if (newEnd) {
-                    var sep = lastMatch[2];
-                    newD = newD.slice(0, lastMatch.index) + newEnd.x + sep + newEnd.y + newD.slice(lastMatch.index + lastMatch[0].length);
-                  }
-                  if (newStart) {
-                    newD = newD.replace(/^M\s*-?\d+\.?\d*\s*[,\s]\s*-?\d+\.?\d*/, "M" + newStart.x + "," + newStart.y);
-                  }
-                  if (newD !== d) path.setAttribute("d", newD);
-                });
-              });
-            }
-            var attempts = [100, 400, 1000, 2000];
-            attempts.forEach(function (ms) { setTimeout(tightenCards, ms); });
-            if (typeof Reveal !== "undefined" && Reveal.on) {
-              Reveal.on("slidechanged", function () { setTimeout(tightenCards, 100); });
-            }
-          })();
           </script>
 ---
 
@@ -425,24 +308,44 @@ From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms*
 
 ```{mermaid}
 %%| fig-align: center
-%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80, "padding": 0}} }%%
+%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 50, "rankSpacing": 60}} }%%
 flowchart LR
-    Prompt["<div class='cardLabel'><div class='boxHeader'>Prompt</div><div class='boxBody'><div>Puzzle</div><div>tools</div><div>Goal</div></div></div>"]
-    Analyze["<div class='cardLabel'><div class='boxHeader'>Analyze grid</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>Tool call</span><span class='arrow'>→</span><span class='subBox'>Tool response</span></div></div>"]
-    Solution["<div class='cardLabel'><div class='boxHeader'>Solution</div><div class='boxBody'><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code></div></div>"]
+    subgraph Prompt["Prompt"]
+        direction TB
+        P_Puzzle["Puzzle"]
+        P_Tools["Tools"]
+        P_Goal["Goal"]
+    end
+
+    subgraph Analyze["Analyze grid"]
+        direction LR
+        A_CoT["CoT"] --> A_TC["Tool call"] --> A_TR["Tool response"]
+    end
 
     subgraph Loop[" "]
         direction TB
-        FormHypo["<div class='cardLabel'><div class='boxHeader'>Form hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>Tool call</span><span class='arrow'>→</span><span class='subBox'>Tool response</span></div></div>"]
-        Validate["<div class='cardLabel'><div class='boxHeader'>Validate hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>Tool call</span><span class='arrow'>→</span><span class='subBox'>Tool response</span></div></div>"]
-        FormHypo -->|propose| Validate
-        Validate ---->|refine| FormHypo
+        subgraph FormHypo["Form hypothesis"]
+            direction LR
+            F_CoT["CoT"] --> F_TC["Tool call"] --> F_TR["Tool response"]
+        end
+        subgraph Validate["Validate hypothesis"]
+            direction LR
+            V_CoT["CoT"] --> V_TC["Tool call"] --> V_TR["Tool response"]
+        end
+        FormHypo ---->|propose| Validate
+        Validate -->|refine| FormHypo
+    end
+
+    subgraph Solution["Solution"]
+        S_Code["def solve(grid): ..."]
     end
 
     Prompt --> Analyze
     Analyze --> Loop
     Loop --> Solution
 
+    classDef cardCluster fill:#ffffff,stroke:#333333,stroke-width:1px;
+    class Prompt,Analyze,FormHypo,Validate,Solution cardCluster;
     classDef loopRegion fill:none,stroke:#9aa,stroke-dasharray:5 4;
     class Loop loopRegion;
 ```

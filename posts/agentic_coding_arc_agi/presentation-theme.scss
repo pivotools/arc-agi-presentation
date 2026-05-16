@@ -323,73 +323,13 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   pointer-events: none;
 }
 
-/* Mermaid diagrams: cardLabel structure with filled title bar + content area.
-   Selectors are UN-prefixed (no `.reveal` ancestor) because Mermaid measures the
-   foreignObject inside a temporary `<div>` appended to `<body>` — outside the reveal
-   scope — so scoped selectors would fail at measurement time and Mermaid would size
-   the `<rect>` too narrow, causing the styled content to overflow at view time. */
-.nodeLabel .py-kw { color: #cf222e; }
-.nodeLabel .py-fn { color: #8250df; }
-.nodeLabel:has(.cardLabel) { padding: 0; }
-/* Mermaid wraps each label in an unclassed
-   `<div style="display:table-cell; max-width:200px; white-space:nowrap; ...">` to
-   vertically centre the foreignObject content. Only the `max-width` cap is
-   safe to override in stylesheet form — Mermaid's measurement runs inside a
-   real (offscreen) foreignObject, so `display`/`width` rules scoped to
-   `foreignObject *` ALSO fire during measurement and grossly inflate the
-   measured size. After Mermaid renders, the post-process script in
-   presentation.qmd's include-after-body grows each node's foreignObject to
-   match the rect (rect untouched → edges still land on the visible border)
-   AND inline-sets wrapper + cardLabel width to fill it, so boxHeader paints
-   edge-to-edge across the card rectangle. */
-foreignObject > div {
-  max-width: none !important;
-}
-.nodeLabel .cardLabel {
-  display: inline-block;
-  box-sizing: border-box;
-}
-.nodeLabel .boxHeader {
-  padding: 8px 20px;
-  background: darken($link-color, 10%);
-  color: $body-bg;
-  font-weight: 600;
-  text-align: center;
-}
-.nodeLabel .boxBody {
-  padding: 12px 22px;
-  text-align: center;
-}
-/* Vertical body (Prompt, Solution): stack children on their own lines. */
-.nodeLabel .boxBody > div,
-.nodeLabel .boxBody > code {
-  display: block;
-}
-/* Horizontal body (Step nodes): inline-block flow with explicit margins. */
-.nodeLabel .boxBody.horizontal {
-  white-space: nowrap;
-}
-.nodeLabel .boxBody.horizontal > * {
-  display: inline-block;
-  vertical-align: middle;
-}
-/* Mini-nodes inside cardLabel `.boxBody.horizontal`. Visual target:
-   look identical to standalone Mermaid `[ ]` nodes elsewhere on the deck
-   (CoT / Tool call / Tool response on the interleaved-thinking slide), which
-   Quarto themes with `--mermaid-node-bg-color: rgba(42,118,221,.1)`,
-   `--mermaid-node-fg-color: #333`, and `--mermaid-label-fg-color: #2a76dd`. */
-.nodeLabel .subBox {
-  margin: 0 4px;
-  border: $border-width solid $body-color;
-  padding: 6px 14px;
-  background: rgba(42, 118, 221, 0.1);
-  color: $link-color;
-}
-.nodeLabel .arrow {
-  margin: 0 4px;
-  font-size: 1.1em;
-  color: $text-muted;
-}
-.nodeLabel code {
-  white-space: nowrap;
+/* Mermaid subgraph titles: rendered inside `.cluster-label` foreignObjects.
+   Bolded to visually distinguish the group title ("Analyze grid", "Form
+   hypothesis", ...) from the regular CoT / Tool call / Tool response node
+   labels nested inside. Selector is UN-prefixed (no `.reveal` ancestor) so
+   Mermaid's offscreen measurement pass picks up the weight and sizes the
+   cluster title's foreignObject accordingly. */
+.cluster-label .nodeLabel,
+.cluster-label .nodeLabel p {
+  font-weight: 700;
 }
