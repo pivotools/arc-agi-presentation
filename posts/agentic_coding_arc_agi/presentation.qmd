@@ -330,6 +330,35 @@ display_figure(fig, "puzzle")
 
 
 
+## What is interleaved thinking?
+### Reasoning, tool call, tool result &mdash; on repeat
+
+Modern reasoning models can **interleave** chain-of-thought with tool calls: every tool result is fed back into the next reasoning step, so the model can refine its plan as evidence comes in.
+
+```{mermaid}
+%%| fig-align: center
+%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 60, "rankSpacing": 70, "padding": 8}} }%%
+flowchart LR
+    Prompt["Prompt"]
+    subgraph Loop["Interleaved thinking loop"]
+        direction LR
+        CoT["CoT"]
+        ToolCall["Tool call"]
+        ToolResult["Tool response"]
+        CoT -->|chooses| ToolCall
+        ToolCall -->|are executed| ToolResult
+        ToolResult -.->|fed back| CoT
+    end
+    Output["Output"]
+
+    Prompt --> CoT
+    ToolResult --> Output
+
+    classDef loopRegion fill:none,stroke:#9aa,stroke-dasharray:5 4;
+    class Loop loopRegion;
+```
+
+
 
 ## The agentic loop
 
@@ -340,25 +369,24 @@ From prompt to verified `solve(grid)`: the model **analyses** the grid, **forms*
 %%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 70, "rankSpacing": 80, "padding": 0}} }%%
 flowchart LR
     Prompt["<div class='cardLabel'><div class='boxHeader'>Prompt</div><div class='boxBody'><div>Puzzle</div><div>tools</div><div>Goal</div></div></div>"]
-    Step1["<div class='cardLabel'><div class='boxHeader'>Analyze grid</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+    Analyze["<div class='cardLabel'><div class='boxHeader'>Analyze grid</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
     Solution["<div class='cardLabel'><div class='boxHeader'>Solution</div><div class='boxBody'><code><span class='py-kw'>def</span>&nbsp;<span class='py-fn'>solve</span>(grid):</code><code>&nbsp;&nbsp;&nbsp;&nbsp;...</code></div></div>"]
 
     subgraph Loop[" "]
         direction TB
-        Step2["<div class='cardLabel'><div class='boxHeader'>Form hypothesis</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
-        Step3["<div class='cardLabel'><div class='boxHeader'>Validate hypothesis</div><div class='boxBody horizontal'><span class='subBox'>Reasoning</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
-        Step2 -->|propose| Step3
-        Step3 ---->|refine| Step2
+        FormHypo["<div class='cardLabel'><div class='boxHeader'>Form hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+        Validate["<div class='cardLabel'><div class='boxHeader'>Validate hypothesis</div><div class='boxBody horizontal'><span class='subBox'>CoT</span><span class='arrow'>→</span><span class='subBox'>tool call</span><span class='arrow'>→</span><span class='subBox'>tool response</span></div></div>"]
+        FormHypo -->|propose| Validate
+        Validate ---->|refine| FormHypo
     end
 
-    Prompt --> Step1
-    Step1 --> Loop
-    Loop -.-> Solution
+    Prompt --> Analyze
+    Analyze --> Loop
+    Loop --> Solution
 
     classDef loopRegion fill:none,stroke:#9aa,stroke-dasharray:5 4;
     class Loop loopRegion;
 ```
-
 
 
 
