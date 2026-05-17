@@ -78,58 +78,84 @@ if str(blog_root) not in sys.path:
 # Intro
 
 ## About us
-### From an AGI meetup in Munich to a small AI lab
+### From AGI Munich meetup to an amateur remote AI lab
 
 ::: {.columns}
-::: {.column width="33%"}
+::: {.column width="32%"}
+:::: {style="text-align: center"}
 **Dibya Chakravorty**
-![](./img/Dibya.png){fig-align="center" width="80%"}
+::::
+![](./img/Dibya.png){fig-align="center" width="70%"}
 
+:::: {style="font-size: 0.85em"}
 
-- Physics major; AGI-curious since *The Emperor's New Mind*.
-
-- Generalist Python developer & cloud architect.
+- Generalist Python developer & cloud architect; AGI enthusiast.
 
 - Organises the [AGI Munich meetup](https://www.meetup.com/de-de/munchen-artificial-general-intelligence-meetup-group/).
 
-:::
-::: {.column width="33%"}
-**Debsankha Manik**
-![](./img/debsankha.jpg){fig-align="center" width="80%"}
+::::
 
-- Theoretical physicist by training.
+:::
+
+::: {.column width="2%"}
+:::
+
+
+::: {.column width="32%"}
+
+:::: {style="text-align: center"}
+**Debsankha Manik**
+::::
+![](./img/debsankha.jpg){fig-align="center" width="70%"}
+
+
+:::: {style="font-size: 0.85em"}
 
 - Dynamical systems, graph theory; data science &times; discrete optimisation.
 
 - Loves teaching.
 
+::::
 
 :::
-::: {.column width="33%"}
 
+::: {.column width="2%"}
+
+:::
+
+
+
+::: {.column width="32%"}
+:::: {style="text-align: center"}
 **Bernhard Altaner**
-![](./img/bernhard.jpg){fig-align="center" width="80%"}
+::::
+![](./img/bernhard.jpg){fig-align="center" width="70%"}
 
-- Physics and maths, academic positions on information processing in complex systems.
+:::: {style="font-size: 0.85em"}
 
-- Interested AI and consciousness.
+- Information processing in complex systems.
 
-- Likes to have GlaDOS managing his smart home.
+- Has local GlaDOS in his smart home.
+
+::::
 
 :::
 :::
 
-*With Nicolas Berg &mdash; co-host of the AGI Munich meetup.*
+*Supported by Nicolas Berg -- co-host of the AGI Munich meetup.*
+
+*Thank you to Somayeh Vojdani & Tariq Baig-Meininghaus for initial discussions and continued encouragement.*
+- **Our journey** into forefront AI research and lessons learned
 
 
 
-## ARC AGI 2
-### What is this talking about?
+## What is this talk about?
+### A journey into forefront AI research
 
 ::: {.incremental}
-- **ARC-AGI:** Abstraction and Reasoning Corpus for Artificial General Intelligence
+- **Our journey** into forefront AI research and lessons learned
+- **ARC-AGI 2:** **A**bstraction and **R**easoning **C**orpus for **A**rtificial **G**eneral **I**ntelligence (**2**nd edition, 2025)
 - **Task:** Transform pixel grids, where transformation rule is inferred from a few input–output pairs
-- **Example:**
 :::
 :::: {.fragment}
 ```{python}
@@ -162,10 +188,8 @@ display_figure(fig, "puzzle")
 ### Easy for humans, hard for AI?
 
 ::: {.incremental}
-- ARC puzzles seem **intuitive** to us humans, but...
-- ... are not well-defined **mathematically**.
-- **Core human preceptive priors**: objects, groups, proximity, numbers, spatial relationships, etc.
-- **World model** needed to reason about the task?
+- ARC puzzles seem **intuitive** to us humans, but are not well-defined **mathematically**.
+- Correct™ solution requires **core human preceptive priors**: objects, groups, proximity, numbers, etc.
 - **Example:** A very intuitive and easy puzzle a 5-year old would solve...
 :::
 :::: {.fragment}
@@ -194,48 +218,89 @@ display_figure(fig, "puzzle")
 ```
 ::::
 
+::: {.incremental}
+- **Question:** Is a prior **world model** needed to even understand the task? And if so, what **else** is needed?
+:::
 
-## Fluid intelligence
-### Why are these puzzles interesting as an intelligence benchmark?
+## ARC-AGI as an intelligence benchmark 
+### From fluid flowing to fluid intelligence?
 
-- LLM weights only change during training. Weights are frozen during inference.
-- How well can LLMs adapt to novel situations not present in training data? This is called In-Context-Learning (ICL).
-- ARC AGI tests for that:
-    - models are tested on completely novel puzzles that are kept private (not on the internet).
-    - Pure memorization from training data ("stochastic parrot") will not help.
-    - For each puzzle, the model needs to deduce a novel transformation rule from just a **few** shown examples. The model needs to **efficient** in rule induction.
-- The benchmark tests what Chollet calls **skill acquisition efficiency** or **fluid intelligence**.
-- Fluid intelligence is not just about **knowledge**, and also very much about **adaptation**.
+::: {.columns}
+::: {.column width="55%"}
+- LLM weights only change during training and are **frozen during inference**.
 
+- **In-Context-Learning (ICL)**: Adaption to novel situations not encountered in training data.
 
+- Related to **fluid intelligence** (in contrast to *crystallized intelligence*.
 
+- Francois Chollet designed ARC AGI competition to test **skill acquisition efficiency**:
+    - solve novel puzzles that are kept private.
+    - Memorization from training data will not sufficient.
+    - **Few** examples require **efficient** rule induction.
 
-## ARC-AGI as a benchmark 
-### Blast from the past before "vibe coding" became mainstream
+:::
 
-- **Two-dimensional challenge:** score *and* cost per puzzle
-- **State of the art April 2025:** *ARC-AGI 1 was not saturated then, ARC-AGI 2 just out*
-    - **ARC-AGI 1:** OpenAI ChatGPT-o1-pro, 50% pass@2, ~ 50$/puzzle
-    - **ARC-AGI 2:** barely any nontrivial scores
-    - **No established meta**: LLM-based and domain-specific language approaches used
+::: {.column width="45%"}
+![Crystallized vs fluid intelligence: priors, world model, and long-term knowledge (top); working memory, adaptation, skills, and creativity (bottom).](./img/crystal-fluid-sketch.png){fig-align="center" width="95%" .lightbox}
+:::
 
-![Wayback snapshot of arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" width="60%" .lightbox}
+:::
+- **Hallmark of general intelligence:** **Knowledge** combined with **adaptation** to solve novel problems.
+
+## State of the challenge in April 2025 
+### On the shoulders of giants
+
+::: {.incremental}
+- **Two-dimensional goal function:** maximize score *and* minimize cost per puzzle
+:::
+
+::: {.fragment}
+![Snapshot of https://www.arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" width="60%" .lightbox}
+:::
+
+::: {.fragment}
+  ⏺  **ARC-AGI 1:** Not saturated; multiple paradigms used; reasoning models give good results, though expensive
+:::
+::: {.fragment}
+  ▲ **ARC-AGI 2:** barely any scores beyond noise (~3%) level
+:::
 
 
 
 
 
 ## Challenge accepted!
-### Leeroy Jenkins, Dunning-Krueger and YOLO
+### Curiosity and YOLO meet Dunning-Krueger
 
-  - **Premises** when we started:
-    + first open weight reasoning model was DeepSeek R1 (Jan 2025)
-    + tool use was thought to be a big topic in 2025.
-  - **Our initial plan:** fine tune a reasoning model with tool use!
-    + Generate synthetic data for this domain.
-    + Finetune open weights models (with reasoning and tool use). 
-  - And so the story begins...
+::: {.columns}
+::: {.column width="55%"}
 
+::: {.incremental}
+
+- Core developments at the beginning of 2025:
+  - Reasoning models were an interesting way to scale compute during test time (and Deepseek R1 has just released)
+  - Program synthesis approaches seemed promising for ARC AGI
+  - Tool use thought to be a big topic in 2025
+
+
+- **Initial plan:**
+    + **Step one:** Generate synthetic data for this domain.
+    + **Step two:** Fine-tune open weights models (with reasoning and tool use). 
+    + **Step three:** Profit!
+
+:::
+
+:::
+
+
+::: {.column width="45%"}
+::: {.fragment}
+
+![Surely this seems quite straightforward, Right?](./img/as0s8n.jpg){fig-align="center" width="95%" .lightbox}
+
+:::
+:::
+:::
 
 # Main part
 
