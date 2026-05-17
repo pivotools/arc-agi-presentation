@@ -145,7 +145,16 @@ if str(blog_root) not in sys.path:
 *Supported by Nicolas Berg -- co-host of the AGI Munich meetup.*
 
 *Thank you to Somayeh Vojdani & Tariq Baig-Meininghaus for initial discussions and continued encouragement.*
-- **Our journey** into forefront AI research and lessons learned
+
+::: {.notes}
+
+- thank you to the organizers for giving us the opportunity to share our story
+- first a couple of words about us
+- idea of paricipation in the ARC-AGI-2 competition originated with Dibya in the Munich AI meetup
+- Dibya and Debsankha know each other from Uni, Bernhard and Dibya have met only once previously at Debsankha's wedding
+- Thank you to Nico for support
+- Honorable mention of Somayeh and Tariq
+:::
 
 
 
@@ -182,6 +191,21 @@ fig = show_puzzle("9aaea919", show_code=False, show_test="only", width=1080,gap=
 display_figure(fig, "puzzle")
 ```
 ::::
+
+::: {.notes}
+- This talk is about our story of how we followed the bleeding edge of AI development for 9 month and what we learned along the way
+- As in title, talk is also about notions of fluid intelligence in Large Language models
+- ARC AGI 2 stands for **A**bstraction and **R**easoning **C**orpus for **A**rtificial **G**eneral **I**ntelligence
+- Understands itself as a test-bed for **creative** solving of task beyond **learned pattern matching**, which arguably one of the core aspects of *general* intelligence
+- Best explained by an example
+  - From training input-output pairs infer a general rule
+  - And apply this to a "test" input
+- Example puzzle shows
+  - Abstraction (pixel grid -> concepts)
+  - Reasoning (rule inference from examples)
+
+:::
+
 
 
 ## ARC AGI 2
@@ -222,6 +246,19 @@ display_figure(fig, "puzzle")
 - **Question:** Is a prior **world model** needed to even understand the task? And if so, what **else** is needed?
 :::
 
+::: {.notes}
+- Why are these kind of puzzles usually intuitive for Humans, but potentially hard for AI?
+- Not well-defined mathematically, like fitting a complicated function $f(x)$ with large amount of parameters to 2-5 data points, and then hoping the function evaluates "correctly" at some $f(x_0)$
+- Still, puzzles designed in such a way that humans would recognize a solution as "correct"
+- So human priors are providing the extra context for a solution to be "unique"
+- Puzzle on the first slide already gives some examples: grouping, counting, causality
+- What does the model need to solve the puzzle? A physical world model? Something else?
+:::
+
+
+
+
+
 ## ARC-AGI as an intelligence benchmark 
 ### From fluid flowing to fluid intelligence?
 
@@ -247,7 +284,30 @@ display_figure(fig, "puzzle")
 :::
 - **Hallmark of general intelligence:** **Knowledge** combined with **adaptation** to solve novel problems.
 
-## State of the challenge in April 2025 
+::: {.notes}
+- Today, arguably, most people agree that human priors and/or a physical world model can exist in LLMs
+
+- **Problem:** LLM weights only change during training. Weights are frozen during inference.
+
+- In-context-learning needed to understand and solve ARC puzzles
+
+- Francois Chollet, inventor of ARC AGI (2019), emphasizes that ARC puzzles test for more **skill acquisition efficiency**
+
+- Concept related to **fluid** intelligence (in contrast to **crystallized** intelligence, Raymond Catell, 1948)
+
+- (How well) can LLMs adapt to novel **situations not present in training data**? 
+- ARC AGI tests for that:
+    - models are tested on completely novel puzzles that are kept private (not on the internet).
+    - Pure memorization from training data will not help.
+    - For each puzzle, the model needs to deduce a novel transformation rule from just a **few** shown examples. The model needs to be **efficient** in rule induction.
+    - High level concepts like "water flowing under gravity" provide this efficiency (even though pixel-based rules might also suceed)
+
+- Fluid intelligence is not just about **knowledge**, and also very much about **adaptation**.
+:::
+
+
+
+## State of the ARC in April 2025 
 ### On the shoulders of giants
 
 ::: {.incremental}
@@ -265,7 +325,26 @@ display_figure(fig, "puzzle")
   ▲ **ARC-AGI 2:** barely any scores beyond noise (~3%) level
 :::
 
+::: {.notes}
+- Today, arguably, most people agree that human priors and/or a physical world model can exist in LLMs
 
+- **Problem:** LLM weights only change during training. Weights are frozen during inference.
+
+- In-context-learning needed to understand and solve ARC puzzles
+
+- Francois Chollet, inventor of ARC AGI (2019), emphasizes that ARC puzzles test for more **skill acquisition efficiency**
+
+- Concept related to **fluid** intelligence (in contrast to **crystallized** intelligence, Raymond Catell, 1948)
+
+- (How well) can LLMs adapt to novel **situations not present in training data**? 
+- ARC AGI tests for that:
+    - models are tested on completely novel puzzles that are kept private (not on the internet).
+    - Pure memorization from training data will not help.
+    - For each puzzle, the model needs to deduce a novel transformation rule from just a **few** shown examples. The model needs to be **efficient** in rule induction.
+    - High level concepts like "water flowing under gravity" provide this efficiency (even though pixel-based rules might also suceed)
+
+- Fluid intelligence is not just about **knowledge**, and also very much about **adaptation**.
+:::
 
 
 
@@ -300,6 +379,24 @@ display_figure(fig, "puzzle")
 
 :::
 :::
+:::
+
+::: {.notes}
+- Now that the context is made clear, let me tell you briefly of our initial idea
+
+- We realized a couple of core developments:
+  - Reasoning models were an interesting way to scale compute during test time (and release of Deepseek R1 in january)
+  - Program synthesis approaches seemed promising
+  - Tool use thought to be a big topic in 2025.
+
+- **Our initial plan:** fine tune a reasoning model with tool use!
+    + Step one: Generate synthetic data for this domain.
+    + Step two: Finetune open weights models (with reasoning and tool use). 
+  
+- Surely, this is quite straightforward, Right?
+
+- I will hand over to Dibya now to tell what actually happened
+
 :::
 
 # Main part
