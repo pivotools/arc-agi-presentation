@@ -29,8 +29,9 @@ $presentation-line-height: 1.3;
 // --- Headings ---
 $presentation-h1-font-size: 2.5em;
 $presentation-h2-font-size: 1.6em;
-$presentation-h3-font-size: 1em;
-$presentation-h4-font-size: .7em;
+$presentation-h3-font-size: .8em;
+
+$presentation-h4-font-size: .6em;
 $presentation-heading-font: $font-family-sans-serif;
 $presentation-heading-color: $body-color;
 $presentation-heading-line-height: 1.2;
@@ -211,13 +212,15 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   background-color: $lightbox-description-bg;
 }
 
+/* Subheadings (`##` title + `###` subtitle on the same slide) */
 .reveal .slides section > h2 + h3 {
   font-weight: 400;
   font-style: italic;
   color: $text-muted;
-  margin-top: -0.35em;
-  margin-bottom: 0.75em;
+  margin-top: -0.40em;
+  margin-bottom: 0.4em;
 }
+
 
 /* Center figures (YAML fig-align: center adds classes; slide body stays text-align: left) */
 .reveal .slides section .quarto-figure,
