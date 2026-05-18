@@ -333,3 +333,20 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
 .cluster-label .nodeLabel p {
   font-weight: 700;
 }
+
+/* Center node labels horizontally inside their containing rect.
+   Mermaid wraps each label in `<div style="display: table-cell; ...">` whose
+   width is fixed to the text's natural width (e.g. 93px for "Tool response").
+   When the surrounding `<rect>` is wider than the foreignObject (as happens
+   for nodes laid out inside a subgraph cluster, where the cluster's column
+   widths force extra horizontal padding) the table-cell wrapper sticks to the
+   LEFT of the foreignObject and drags the text with it, making the label
+   look left-aligned. Centring the foreignObject's inline content fixes this
+   without touching widths, so Mermaid's offscreen measurement (which only
+   cares about `offsetWidth`) is unaffected. */
+foreignObject {
+  text-align: center;
+}
+foreignObject > div {
+  display: inline-block !important;
+}
