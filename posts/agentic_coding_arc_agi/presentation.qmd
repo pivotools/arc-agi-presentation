@@ -438,7 +438,6 @@ display_figure(fig, "puzzle")
 :::
 
 
-
 ## At the bleeding edge
 ### Timeline: us vs the field
 
@@ -484,6 +483,23 @@ write_plotly_for_glightbox(
 ```
 
 
+## (Alternative) At the bleeding edge
+### The frontier may be closer than it appears to be
+- In Jan 2025, DeepSeek R1 was released, showed comparable performance to flagship models from OpenAI: The secret: reasoning and finetuning in verifiable domain.
+  + In March, we decided to leverage reasoning models for ARC.
+- In April, we wre using OpenAI models with tool calling for generating synthetic ARC-like puzzles.
+  + No agentic coding harnesses were available. We orchestrated our own tool calling sandbox.
+- In May, we started our foray into finetuning a Qwen model with tool calling.
+  + Libraries (transformers and unsloth) "technically" supported it, but we had to fix the logic for masking tool call tokens correctly.
+- In August 2025, GPT-OSS was released: capable of interleaved thinking and tool calling.
+  + We started using it in our agentic harness immediately.
+  + No commercial provider supported the maximum reasoning effort: We had to host our own inference engine (with custom patches).
+  + In November 2025, we showed for the first time that open weight models can achieve nonzero scores on ARC-AGI-2.
+- In November 2025, our coding harness was solving significant number of ARC puzzles in a single tool call loop, no human in the loop.
+  + Claude code will be released in December.
+- In Nov-Dec 2025, as Anthropic and OpenAI released their flagship models, they *underreported* their performance on ARC-AGI-2 (because they evals did not use tool calls).
+  + We identified within weeks that tool calls boosts their performance on abstract reasoning.
+  + Poetiq would claim SotA score in Dec 2025, using a similar, but more complicated approach.
 
 ## Practical take-home messages
 ### Working better with modern AI
@@ -505,7 +521,9 @@ write_plotly_for_glightbox(
 ## So… did ARC solvers crack the teaser puzzle?
 ### Paying off the intro example (`28a6681f`)
 *Using GPT 5.5 XHigh*
+
 Summary of the trace:
+
 - *Interprets grids*: 
   + "Water settling down into crevices"
   + "I wonder if it should be treated like gravity"
@@ -529,6 +547,7 @@ Summary of the trace:
 - *Forms hypothesis on how water flows*: Analyzes input/output pairs.
   + "each unit of water will drop straight until it encounters an obstacle"
   + "will slide down the diagonal and fill containers below"
+  + ...
 - *Identifies similarity to Advent of code 2018 Day 17 puzzle*:
   + "I'm planning to create a simulation of fluid dynamics that mimics "falling water" as described in Advent of Code 2018 Day 17."
 
@@ -578,6 +597,87 @@ flowchart LR
 - Same story as the previous slide, in one picture.
 - Blue nodes = model thinking; orange nodes = tool calls.
 - The little loop is where it discovers the oscillation bug and patches it with a hardcoded rule.
+:::
+
+
+
+## Watch the simulation converge
+### Test grid &mdash; 20 steps of water + gravity
+
+```{python}
+#| echo: false
+#| output: asis
+#| execute: true
+
+import base64
+import io
+import sys
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+
+# `simulate` lives in a sibling utility script outside the import path.
+_DEBS = Path("/workspaces/pivotools-quarto-blog/debs_misc")
+if str(_DEBS) not in sys.path:
+    sys.path.insert(0, str(_DEBS))
+
+from show_step import simulate
+from src.data import load_puzzle
+from src.plotting import _get_arc_colors
+
+
+def _hex_to_rgb(h):
+    h = h.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
+
+
+_grid = load_puzzle("28a6681f")["test"][0]["input"]
+_H, _W = len(_grid), len(_grid[0])
+_palette = np.array([_hex_to_rgb(c) for c in _get_arc_colors()], dtype=np.uint8)
+_cell, _gap = 56, 2
+_img_h = _H * _cell + (_H + 1) * _gap
+_img_w = _W * _cell + (_W + 1) * _gap
+
+_frames = []
+for _n in range(1, 21):
+    _arr, _ = simulate(_grid, dirs=("R", "L"), max_steps=_n)
+    _arr = np.asarray(_arr, dtype=np.int64)
+    _canvas = np.full((_img_h, _img_w, 3), 255, dtype=np.uint8)
+    for _r in range(_H):
+        _y0 = _gap + _r * (_cell + _gap)
+        for _c in range(_W):
+            _x0 = _gap + _c * (_cell + _gap)
+            _canvas[_y0:_y0 + _cell, _x0:_x0 + _cell] = _palette[_arr[_r, _c]]
+    _frames.append(Image.fromarray(_canvas, mode="RGB").quantize(colors=16))
+
+_buf = io.BytesIO()
+_frames[0].save(
+    _buf,
+    format="GIF",
+    save_all=True,
+    append_images=_frames[1:],
+    duration=350,
+    loop=0,
+    disposal=2,
+    optimize=False,
+)
+_b64 = base64.b64encode(_buf.getvalue()).decode()
+print(
+    f'<div style="display:flex;justify-content:center;align-items:center;height:65vh;">'
+    f'<img src="data:image/gif;base64,{_b64}" '
+    f'style="max-height:100%;max-width:80%;image-rendering:pixelated;" '
+    f'alt="Water-flow simulation: 20 steps converging to the output grid"/>'
+    f'</div>'
+)
+```
+
+::: {.notes}
+- This is the test input, fed through the model's final `simulate` function (left-over-right rule), one step per frame.
+- The blue cells (water) trickle down through the gaps until everything settles.
+- After ~20 ticks the grid matches the expected output &mdash; that's the moment the agent submitted.
 :::
 
 
