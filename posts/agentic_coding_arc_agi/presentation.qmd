@@ -561,26 +561,87 @@ write_plotly_for_glightbox(
 
 
 
-## The trace at a glance
+## The trace at a glance {.trace-slide}
 ### Intuition &rarr; simulation &rarr; patched fix
+
+```{=html}
+<style>
+.reveal section.trace-slide .cell-output-display svg {
+    max-height: 78vh !important;
+    width: auto !important;
+    display: block;
+    margin: 0 auto;
+}
+</style>
+```
 
 ```{mermaid}
 %%| fig-align: center
-%%| fig-width: 9
-%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 30, "rankSpacing": 45, "padding": 6}, "themeVariables": {"fontSize": "14px"}}}%%
-flowchart LR
-    A["See grid:<br/>'water + gravity'"] --> B(["Grid &rarr; text<br/><i>tool</i>"])
-    B --> C["Hypothesis:<br/>like AoC '18 D17"]
-    C --> D(["Simulate<br/><i>tool</i>"])
-    D --> E{Oscillates?}
-    E -- yes --> F(["Patch:<br/>L &gt; R rule"])
-    F --> D
-    E -- no --> G["Submit &check;<br/><small>(hardcoded LR rule)</small>"]
+%%| fig-width: 7
+%%{init: {"flowchart": {"htmlLabels": true, "nodeSpacing": 8, "rankSpacing": 6, "padding": 2}, "themeVariables": {"fontSize": "11px"}}}%%
+flowchart TB
+    P([Puzzle])
+    subgraph rV [ ]
+        direction LR
+        V[Visual features]
+        VD["<i>water settling into crevices<br/>under gravity</i>"]
+    end
+    subgraph rW [ ]
+        direction LR
+        W["Awareness of walls<br/>and flow dynamics"]
+        WD["<i>water flows around walls<br/>spills over a wall</i>"]
+    end
+    subgraph rT [ ]
+        direction LR
+        T[Text representation]
+        TD["<code>....RG.GWW<br/>.RRRRGGGWW</code>"]
+    end
+    subgraph rF [ ]
+        direction LR
+        F[Flow dynamics]
+        FD["<i>water drops straight until it encounters an obstacle<br/>may slide down the diagonal</i>"]
+    end
+    subgraph rSIM [ ]
+        direction LR
+        SIM["Trial solution<br/>using simulation"]
+        SD["<i>checks which way gravity points<br/>horizontal flow rule bad → oscillations</i>"]
+    end
+    subgraph rB [ ]
+        direction LR
+        B[Oscillation bug found]
+        BD["<i>'Fixes' by left-over-right tie braking</i>"]
+    end
+    subgraph rTE [ ]
+        direction LR
+        TE[Test example]
+        TED["<i>left-over-right tie braking needed<br/>to avoid infinite loop</i>"]
+    end
+    SOL([Solution])
 
-    classDef think fill:#eef4ff,stroke:#3366aa,color:#1a2a55;
-    classDef tool fill:#fff5e6,stroke:#d18000,color:#5c3500;
-    class A,C,G think
-    class B,D,F tool
+    P -- understands --> V
+    V -- develops --> W
+    W -- transforms grid --> T
+    T -- hypothesizes --> F
+    F == Tool call ==> SIM
+    SIM -- adds tracing --> B
+    B -- applies solution on --> TE
+    TE -- submits --> SOL
+
+    style rV fill:none,stroke:none
+    style rW fill:none,stroke:none
+    style rT fill:none,stroke:none
+    style rF fill:none,stroke:none
+    style rSIM fill:none,stroke:none
+    style rB fill:none,stroke:none
+    style rTE fill:none,stroke:none
+
+    classDef main fill:#eef4ff,stroke:#3366aa,color:#1a2a55;
+    classDef detail fill:#fafafa,stroke:#bbb,color:#444;
+    classDef io fill:#e8f5e8,stroke:#3a8a3a,color:#1a4d1a;
+    class V,W,T,F,SIM,B,TE main
+    class VD,WD,TD,FD,SD,BD,TED detail
+    class P,SOL io
+    linkStyle 4 stroke:#cc6600,stroke-width:3.5px,color:#cc6600,font-weight:bold;
 ```
 
 ::: {.notes}
