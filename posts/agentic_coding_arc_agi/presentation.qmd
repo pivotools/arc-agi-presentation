@@ -142,9 +142,11 @@ if str(blog_root) not in sys.path:
 :::
 :::
 
+::: {.fragment style="text-align: center; font-size: 0.85em"}
 *Supported by Nicolas Berg -- co-host of the AGI Munich meetup.*
 
 *Thank you to Somayeh Vojdani & Tariq Baig-Meininghaus for initial discussions and continued encouragement.*
+:::
 
 ::: {.notes}
 
@@ -320,12 +322,8 @@ display_figure(fig, "puzzle")
 ## State of the ARC in April 2025 
 ### On the shoulders of giants
 
-::: {.incremental}
-- **Two-dimensional goal function:** maximize score *and* minimize cost per puzzle
-:::
-
 ::: {.fragment}
-![Snapshot of https://www.arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" style="max-height: 50vh; width: auto; height: auto;" .lightbox}
+![Snapshot of https://www.arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" style="max-height: 58vh; width: auto; height: auto;" .lightbox}
 :::
 
 ::: {.fragment style="text-align: center"}
@@ -609,12 +607,9 @@ Confirm which puzzle ended up being the flagship story vs the second intro examp
 
 
 ## Do LLMs have fluid intelligence?
-### Closing thoughts (not the bumper sticker)
+### Yes.
 
-- LLMs absorb rich human-abstraction vocabulary — pairing that with puzzles shows real capability jumps *when harnessed*.
-- **Fluid intelligence, in practice:** couple conceptual chops to external, well-defined substrates (code, interpreters, specs).
-- **Compression + tools + agentic loops ⇒ emergent, reliable-ish behaviour**
-
+- arc-agi 3
 
 # Appendix (backup)
 
