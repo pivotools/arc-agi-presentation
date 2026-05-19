@@ -521,6 +521,7 @@ write_plotly_for_glightbox(
 ## So… did ARC solvers crack the teaser puzzle?
 ### Paying off the intro example (`28a6681f`)
 *Using GPT 5.5 XHigh*
+
 - *Interprets grids*: 
   + "Water settling down into crevices"
   + "I wonder if it should be treated like gravity"
