@@ -15,4 +15,4 @@ source /workspaces/pivotools-quarto-blog/bin/activate
 quarto render posts/agentic_coding_arc_agi/presentation.qmd --execute --to revealjs
 ```
 ## Tips
-In order to check if the presentation renders correctly and fulfils the requirements of the user, you can render a screenshot of the relevant page of the preentation using google chrome headless.
+In order to check if the presentation renders correctly and fulfils the requirements of the user, you can render a screenshot of the relevant page of the presentation using google chrome headless.

@@ -545,10 +545,39 @@ Summary of the trace:
 - *Submits final solution*: Works, but solution not general due to hardcoded left-over-right flow rule.
 
 ::: {.notes}
-- This puzzle is basically a physics simulation: awesome that our harness solves it.
-- First try with simulation: one water cell *oscillates*
-- Doesn't discover "laws of physics" obviously!
-- "I'm also wondering about whether to prioritize left over right in physical rules"
+- This puzzle is a simple physics simulation: awesome that our harness solves it.
+- Doesn't discover "laws of physics" obviously. But it comes close.
+- Its musings are quite illuminating: "I'm also wondering about whether to prioritize left over right in physical rules"
+:::
+
+
+
+## The trace at a glance
+### Intuition &rarr; simulation &rarr; patched fix
+
+```{mermaid}
+%%| fig-align: center
+%%| fig-width: 9
+%%{init: {"flowchart": {"curve": "basis", "htmlLabels": true, "nodeSpacing": 30, "rankSpacing": 45, "padding": 6}, "themeVariables": {"fontSize": "14px"}}}%%
+flowchart LR
+    A["See grid:<br/>'water + gravity'"] --> B(["Grid &rarr; text<br/><i>tool</i>"])
+    B --> C["Hypothesis:<br/>like AoC '18 D17"]
+    C --> D(["Simulate<br/><i>tool</i>"])
+    D --> E{Oscillates?}
+    E -- yes --> F(["Patch:<br/>L &gt; R rule"])
+    F --> D
+    E -- no --> G["Submit &check;<br/><small>(hardcoded)</small>"]
+
+    classDef think fill:#eef4ff,stroke:#3366aa,color:#1a2a55;
+    classDef tool fill:#fff5e6,stroke:#d18000,color:#5c3500;
+    class A,C,G think
+    class B,D,F tool
+```
+
+::: {.notes}
+- Same story as the previous slide, in one picture.
+- Blue nodes = model thinking; orange nodes = tool calls.
+- The little loop is where it discovers the oscillation bug and patches it with a hardcoded rule.
 :::
 
 
