@@ -414,6 +414,8 @@ display_figure(fig, "puzzle")
 - [Dibyas slides...](https://hedgedoc.beralt.com/nUlPDyU_QRKvX0BWZXas0Q?view#Main-part)
 
 
+# Conclusions
+
 ## Lessons learned
 ### A recap from the trenches
 
@@ -502,24 +504,52 @@ write_plotly_for_glightbox(
 
 ## So… did ARC solvers crack the teaser puzzle?
 ### Paying off the intro example (`28a6681f`)
-*Using GPT 5.2 XHigh*
-- Navy blue seems to be moving through black
-- Hypothesis "gap fill": fill black cells between two non-black cells on each row. 
-  - Verification: Does not work on example 3.
-- Hypothesis "settle by sort": push all navy blue cells to the bottom-most cells of each black-connected component.
-  - verification: Wrong.
-- Pivot: **falling water simulation**.
-  - Priority: down -> down-right -> down-left -> lateral left.
+*Using GPT 5.5 XHigh*
+Summary of the trace:
+- *Interprets grids*: 
+  + "Water settling down into crevices"
+  + "I wonder if it should be treated like gravity"
+- *Understands the terrain and water flow dynamics*:
+  + "I need to analyze the wall placements and how water might flow around them."
+  + "I need to check how water moves vertically and analyze the flow dynamics further."
+  + "I am noticing it spills over a wall at a specific point."
+- *Calls tool*: Transforms the grid to a text representation like
+  ```
+  ........WW
+  ........WW
+  .......GWW
+  .......GWW
+  .......GWW
+  .....G.GWW
+  .....G.GWW
+  ....RG.GWW
+  ....RG.GWW
+  .RRRRGGGWW
+  ```
+- *Forms hypothesis on how water flows*: Analyzes input/output pairs.
+  + "each unit of water will drop straight until it encounters an obstacle"
+  + "will slide down the diagonal and fill containers below"
+- *Identifies similarity to Advent of code 2018 Day 17 puzzle*:
+  + "I'm planning to create a simulation of fluid dynamics that mimics "falling water" as described in Advent of Code 2018 Day 17."
 
-
+- *Calls tool, simulates water flow*:
+  + Checks the direction of gravity is indeed downwards.
+  + Faulty horizontal flow logic: leads to oscillations.
+- *Calls tool, debugs simulation by tracing*:
+  + Figures out horizontal oscillation!
+    - "In one trace, a particle moved left and then right, which indicates oscillation"
+  + "Fixes" by setting "left-over-right" rule for horizontal flow.
+    - "I'm also wondering about whether to prioritize left over right in physical rules"
+- *Calls tool, applies solution on test grid*
+  + Realizes that left-over-right rule is needed to avoid oscillations.
+- *Submits final solution*: Works, but solution not general due to hardcoded left-over-right flow rule.
 
 ::: {.notes}
-Confirm which puzzle ended up being the flagship story vs the second intro example (`28a6681f`).
+- This puzzle is basically a physics simulation: awesome that our harness solves it.
+- First try with simulation: one water cell *oscillates*
+- Doesn't discover "laws of physics" obviously!
+- "I'm also wondering about whether to prioritize left over right in physical rules"
 :::
-
-- Fact-check internally: whether *our* run solved this specific grid vs a comparable case study.
-- Even if not back then — many setups solve it cleanly *now*.
-- Tell the concrete story of what the modern stack did (tools, retries, verifier).
 
 
 
