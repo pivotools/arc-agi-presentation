@@ -133,7 +133,7 @@ if str(blog_root) not in sys.path:
 
 :::: {style="font-size: 0.85em"}
 
-- Information processing in complex systems.
+- Thermodynamics and information processing in complex systems.
 
 - Has local GlaDOS in his smart home.
 
@@ -150,7 +150,7 @@ if str(blog_root) not in sys.path:
 
 - thank you to the organizers for giving us the opportunity to share our story
 - first a couple of words about us
-- idea of paricipation in the ARC-AGI-2 competition originated with Dibya in the Munich AI meetup
+- Idea of paricipation in ARC-AGI-2 challenge originated with Dibya in the Munich AGI meetup
 - Dibya and Debsankha know each other from Uni, Bernhard and Dibya have met only once previously at Debsankha's wedding
 - Thank you to Nico for support
 - Honorable mention of Somayeh and Tariq
@@ -193,10 +193,11 @@ display_figure(fig, "puzzle")
 ::::
 
 ::: {.notes}
-- This talk is about our story of how we followed the bleeding edge of AI development for 9 month and what we learned along the way
-- As in title, talk is also about notions of fluid intelligence in Large Language models
+- This talk: our story of how we followed the bleeding edge of AI development for 9 months
+- And what what we learned about fluid intelligence in LLMs
+- But first things first: what is ARC AGI 2?
 - ARC AGI 2 stands for **A**bstraction and **R**easoning **C**orpus for **A**rtificial **G**eneral **I**ntelligence
-- Understands itself as a test-bed for **creative** solving of task beyond **learned pattern matching**, which arguably one of the core aspects of *general* intelligence
+- Test-bed for **creative** solving of task beyond **learned pattern matching**, arguably one of the core aspects of *general* intelligence
 - Best explained by an example
   - From training input-output pairs infer a general rule
   - And apply this to a "test" input
@@ -247,62 +248,71 @@ display_figure(fig, "puzzle")
 :::
 
 ::: {.notes}
-- Why are these kind of puzzles usually intuitive for Humans, but potentially hard for AI?
-- Not well-defined mathematically, like fitting a complicated function $f(x)$ with large amount of parameters to 2-5 data points, and then hoping the function evaluates "correctly" at some $f(x_0)$
-- Still, puzzles designed in such a way that humans would recognize a solution as "correct"
+- Why are ARC puzzles usually intuitive for Humans, but potentially hard for AI?
+- Task not well-defined mathematically: fit of a many-parameter function to 2-5 data points, hoping the function evaluates "correctly" at fixed other value
+- Still, puzzles designed such that humans recognize "correct" solution
 - So human priors are providing the extra context for a solution to be "unique"
-- Puzzle on the first slide already gives some examples: grouping, counting, causality
-- What does the model need to solve the puzzle? A physical world model? Something else?
+- Concept on first example: grouping, counting, causality
+- Does an AI need a physical world model to succeed?
+- Does it need something else? If yes, what?
 :::
 
 
 
 
 
-## ARC-AGI as an intelligence benchmark 
+## ARC-AGI as a general intelligence benchmark 
 ### From fluid flowing to fluid intelligence?
 
 ::: {.columns}
 ::: {.column width="55%"}
-- LLM weights only change during training and are **frozen during inference**.
 
-- **In-Context-Learning (ICL)**: Adaption to novel situations not encountered in training data.
+- Francois Chollet designed ARC AGI competition to test **skill acquisition efficiency**^[Francois Chollet, "ARC: A Reasoning Challenge Dataset for the Advancement of General Intelligence", arXiv:1911.01547, 2019.]:
+  - Competion puzzles are kept private.
+  - Memorization from training is not sufficient.
+  - Only **few** "training pairs" per puzzle.
 
-- Related to **fluid intelligence** (in contrast to *crystallized intelligence*.
 
-- Francois Chollet designed ARC AGI competition to test **skill acquisition efficiency**:
-    - solve novel puzzles that are kept private.
-    - Memorization from training data will not sufficient.
-    - **Few** examples require **efficient** rule induction.
+:::: {.fragment fragment-index=4}
+- Tests for **fluid intelligence** (in contrast to *crystallized intelligence*).
+::::
+
+:::: {.fragment fragment-index=6}
+- **Problem:** LLM weights only change during training and are **frozen during inference**.
+::::
+
+:::: {.fragment fragment-index=7}
+- Need for **In-Context-Learning (ICL)**: Adaption to novel situations not encountered in training data.
+::::
 
 :::
-
 ::: {.column width="45%"}
-![Crystallized vs fluid intelligence: priors, world model, and long-term knowledge (top); working memory, adaptation, skills, and creativity (bottom).](./img/crystal-fluid-sketch.png){fig-align="center" width="95%" .lightbox}
+:::: {.fragment fragment-index=5}
+
+![Crystallized vs fluid intelligence: world model, priors, domain knowledge, mechanics of language (top); working memory, adaptation, complex skills, creativity (bottom).](./img/crystal-fluid-sketch.png){fig-align="center" width="95%" .lightbox}
+::::
+:::
 :::
 
-:::
-- **Hallmark of general intelligence:** **Knowledge** combined with **adaptation** to solve novel problems.
+:::: {.fragment fragment-index=8 style="text-align: center"}
+**General intelligence** combines **knowledge** with **adaptation**!
+::::
+
 
 ::: {.notes}
-- Today, arguably, most people agree that human priors and/or a physical world model can exist in LLMs
-
+- Answer is explicit in the design of ARC AGI.
+- Francois Chollet designed ARC AGI to test for **skill acquisition efficiency**
+  - Competion puzzles are kept private -> not enter training data of models
+  - Memorization from training is not sufficient -> puzzles are very diverse
+  - Only **few** "training pairs" per puzzle.
+- High level concept "water flowing under gravity" enables this efficiency (even though pixel-based rules might also succeed)
+- This skill acquisition related **fluid** intelligence
+- Contrasted by **crystallized** intelligence, Raymond Catell, 1948
+  - *crystallized*: priors, world model, domain knowledge, mechanics of language -> **knowledge**
+  - *fluid*: working memory, adaptation, complex skills, creativity -> **adaption**  
 - **Problem:** LLM weights only change during training. Weights are frozen during inference.
-
-- In-context-learning needed to understand and solve ARC puzzles
-
-- Francois Chollet, inventor of ARC AGI (2019), emphasizes that ARC puzzles test for more **skill acquisition efficiency**
-
-- Concept related to **fluid** intelligence (in contrast to **crystallized** intelligence, Raymond Catell, 1948)
-
-- (How well) can LLMs adapt to novel **situations not present in training data**? 
-- ARC AGI tests for that:
-    - models are tested on completely novel puzzles that are kept private (not on the internet).
-    - Pure memorization from training data will not help.
-    - For each puzzle, the model needs to deduce a novel transformation rule from just a **few** shown examples. The model needs to be **efficient** in rule induction.
-    - High level concepts like "water flowing under gravity" provide this efficiency (even though pixel-based rules might also suceed)
-
-- Fluid intelligence is not just about **knowledge**, and also very much about **adaptation**.
+- Some form of **in-context-learning** needed to understand and solve ARC puzzles
+- General intelligence combines knowledge with adaptation!
 :::
 
 
@@ -315,65 +325,62 @@ display_figure(fig, "puzzle")
 :::
 
 ::: {.fragment}
-![Snapshot of https://www.arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" width="60%" .lightbox}
+![Snapshot of https://www.arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png){fig-align="center" style="max-height: 50vh; width: auto; height: auto;" .lightbox}
 :::
 
-::: {.fragment}
-  ⏺  **ARC-AGI 1:** Not saturated; multiple paradigms used; reasoning models give good results, though expensive
+::: {.fragment style="text-align: center"}
+  ⏺  **ARC-AGI 1:** Not saturated; multiple paradigms used; reasoning models give good results, but expensive
 :::
-::: {.fragment}
+::: {.fragment style="text-align: center"}
   ▲ **ARC-AGI 2:** barely any scores beyond noise (~3%) level
 :::
 
 ::: {.notes}
-- Today, arguably, most people agree that human priors and/or a physical world model can exist in LLMs
-
-- **Problem:** LLM weights only change during training. Weights are frozen during inference.
-
-- In-context-learning needed to understand and solve ARC puzzles
-
-- Francois Chollet, inventor of ARC AGI (2019), emphasizes that ARC puzzles test for more **skill acquisition efficiency**
-
-- Concept related to **fluid** intelligence (in contrast to **crystallized** intelligence, Raymond Catell, 1948)
-
-- (How well) can LLMs adapt to novel **situations not present in training data**? 
-- ARC AGI tests for that:
-    - models are tested on completely novel puzzles that are kept private (not on the internet).
-    - Pure memorization from training data will not help.
-    - For each puzzle, the model needs to deduce a novel transformation rule from just a **few** shown examples. The model needs to be **efficient** in rule induction.
-    - High level concepts like "water flowing under gravity" provide this efficiency (even though pixel-based rules might also suceed)
-
-- Fluid intelligence is not just about **knowledge**, and also very much about **adaptation**.
+- So, what was the state of this challenge in April 2025 when we started?
+- In contrast to other benchmarks: 2D optimization, score and cost per puzzle
+- Logarithmic-with-compute scaling won't land you in the top left corner ("efficiency" also in terms of compute baked it)
+- details of the leaderboard not important, but some general observations:
+- ARC AGI 1 (circles):
+  - not solved
+  - Test-time finetuning LLM approaches: Minds.ai (not public) and ARChitects, 53.5%,  
+  - Program synthesis: Ryan Greenblatt
+  - newer trends: reasoning models (o3, good but expensive)
+- ARC AGI 2 (triangles):
+  - essentially no results beyond noise level
 :::
 
 
 
 ## Challenge accepted!
-### Curiosity and YOLO meet Dunning-Krueger
+### Curiosity-driven YOLO meets Dunning-Krueger
 
 ::: {.columns}
 ::: {.column width="55%"}
 
-::: {.incremental}
+::: {.fragment fragment-index=1}
 
-- Core developments at the beginning of 2025:
-  - Reasoning models were an interesting way to scale compute during test time (and Deepseek R1 has just released)
-  - Program synthesis approaches seemed promising for ARC AGI
-  - Tool use thought to be a big topic in 2025
+- **Core context** at the beginning of 2025:
+  - Reasoning models were an interesting way to scale compute during test time (Deepseek R1)
+  - Program synthesis approach seemed promising
+  - Tool use thought to be a big topic
+:::
 
-
-- **Initial plan:**
+::: {.fragment fragment-index=2}
+- **Straightforward plan:**
     + **Step one:** Generate synthetic data for this domain.
     + **Step two:** Fine-tune open weights models (with reasoning and tool use). 
     + **Step three:** Profit!
+:::
 
+::: {.fragment fragment-index=3}
+- How hard could it be? 
 :::
 
 :::
 
 
 ::: {.column width="45%"}
-::: {.fragment}
+::: {.fragment fragment-index=3}
 
 ![Surely this seems quite straightforward, Right?](./img/as0s8n.jpg){fig-align="center" width="95%" .lightbox}
 
@@ -382,11 +389,11 @@ display_figure(fig, "puzzle")
 :::
 
 ::: {.notes}
-- Now that the context is made clear, let me tell you briefly of our initial idea
+- Now that you understand what are is about, let me tell you briefly of our initial idea
 
 - We realized a couple of core developments:
   - Reasoning models were an interesting way to scale compute during test time (and release of Deepseek R1 in january)
-  - Program synthesis approaches seemed promising
+  - Program synthesis approaches seemed a promising approach
   - Tool use thought to be a big topic in 2025.
 
 - **Our initial plan:** fine tune a reasoning model with tool use!
@@ -395,7 +402,7 @@ display_figure(fig, "puzzle")
   
 - Surely, this is quite straightforward, Right?
 
-- I will hand over to Dibya now to tell what actually happened
+- I will hand over to Dibya now to tell you what actually happened
 
 :::
 
@@ -407,30 +414,6 @@ display_figure(fig, "puzzle")
 - [Dibyas slides...](https://hedgedoc.beralt.com/nUlPDyU_QRKvX0BWZXas0Q?view#Main-part)
 
 
-## Speaker view...
-### ... and speaker notes are cool!
-
-- For speaker notes, press `s` on your keyboard.
-![Speaker notes](./img/speakerview.png){fig-align="center" width="50%"}
-- notes with:
-
-```
-::: {.notes}
-
-- what one could say :) 
-
-- we can use speaker notes from separating spoken content from what is on the slides
-:::
-```
-- quarto with reveal.js is cool: [https://quarto.org/docs/presentations/revealjs/presenting.html](https://quarto.org/docs/presentations/revealjs/presenting.html)
-
-
-::: {.notes}
-
-- what one could say :) 
-
-- we can use speaker notes from separating spoken content from what is on the slides
-:::
 
 
 
@@ -632,57 +615,6 @@ Confirm which puzzle ended up being the flagship story vs the second intro examp
 - **Fluid intelligence, in practice:** couple conceptual chops to external, well-defined substrates (code, interpreters, specs).
 - **Compression + tools + agentic loops ⇒ emergent, reliable-ish behaviour**
 
-## Lightbox test
-### Figure direct
-
-```{python}
-#| echo: false
-#| output: true
-#| execute: true
-from src.plotting import create_dummy_scatter
-
-fig=create_dummy_scatter()
-fig.show()
-```
-
-## Lightbox test — Strategy A (GLightbox iframe)
-### Click the preview to open the interactive figure in a modal
-
-```{python}
-#| echo: false
-#| output: false
-#| execute: true
-#| fig-cap: "hasdfasfas"
-
-from src.plotting import create_dummy_scatter, write_plotly_for_glightbox
-
-_post = blog_root / "posts/agentic_coding_arc_agi"
-_out = _post / "presentation-html"
-write_plotly_for_glightbox(
-    create_dummy_scatter(),
-    _out / "dummy-glightbox-interactive.html",
-    fig_key="dummy",
-    preview_png_path=_out / "img" / "dummy-glightbox-preview.png",
-    caption="Demo scatter — hover to inspect points, scroll to zoom, drag to pan.",
-)
-```
-
-```{=html}
-<div style="text-align:center;margin-top:0.75em">
-  <a href="dummy-glightbox-interactive.html"
-     class="lightbox"
-     data-type="external"
-     data-width="90vw"
-     data-height="85vh"
-     data-description="Demo scatter — hover to inspect points, scroll to zoom, drag to pan."
-     style="display:inline-block;cursor:pointer">
-    <img src="img/dummy-glightbox-preview.png"
-         alt="Interactive chart — click to open"
-         class="r-stretch plotly-glightbox-preview" />
-  </a>
-</div>
-```
-
 
 # Appendix (backup)
 
@@ -850,3 +782,88 @@ write_plotly_for_glightbox(
   </a>
 </div>
 ```
+
+
+
+# Random
+
+## Speaker view...
+### ... and speaker notes are cool!
+
+- For speaker notes, press `s` on your keyboard.
+![Speaker notes](./img/speakerview.png){fig-align="center" width="50%"}
+- notes with:
+
+```
+::: {.notes}
+
+- what one could say :) 
+
+- note that lightbox overlays need to be triggered from presentation screen html window
+
+- we can use speaker notes from separating spoken content from what is on the slides
+:::
+```
+- quarto with reveal.js is cool: [https://quarto.org/docs/presentations/revealjs/presenting.html](https://quarto.org/docs/presentations/revealjs/presenting.html)
+
+
+::: {.notes}
+
+- what one could say :) 
+
+- we can use speaker notes from separating spoken content from what is on the slides
+:::
+
+
+## Lightbox test
+### Figure direct
+
+```{python}
+#| echo: false
+#| output: true
+#| execute: true
+from src.plotting import create_dummy_scatter
+
+fig=create_dummy_scatter()
+fig.show()
+```
+
+## Lightbox test — Strategy A (GLightbox iframe)
+### Click the preview to open the interactive figure in a modal
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+#| fig-cap: "hasdfasfas"
+
+from src.plotting import create_dummy_scatter, write_plotly_for_glightbox
+
+_post = blog_root / "posts/agentic_coding_arc_agi"
+_out = _post / "presentation-html"
+write_plotly_for_glightbox(
+    create_dummy_scatter(),
+    _out / "dummy-glightbox-interactive.html",
+    fig_key="dummy",
+    preview_png_path=_out / "img" / "dummy-glightbox-preview.png",
+    caption="Demo scatter — hover to inspect points, scroll to zoom, drag to pan.",
+)
+```
+
+```{=html}
+<div style="text-align:center;margin-top:0.75em">
+  <a href="dummy-glightbox-interactive.html"
+     class="lightbox"
+     data-type="external"
+     data-width="90vw"
+     data-height="85vh"
+     data-description="Demo scatter — hover to inspect points, scroll to zoom, drag to pan."
+     style="display:inline-block;cursor:pointer">
+    <img src="img/dummy-glightbox-preview.png"
+         alt="Interactive chart — click to open"
+         class="r-stretch plotly-glightbox-preview" />
+  </a>
+</div>
+```
+
+

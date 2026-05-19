@@ -321,11 +321,14 @@ def _build_puzzle_figure(
     }
     fig.update_layout(**layout_dict)
 
-    # Triangle / "?" markers use paper coords. Triangle height tracks layout cell_size;
-    # "?" font is derived from the test output subplot size ÷ grid so it matches a cell
-    # on screen (layout cell_size can be a few px while the drawn cell is larger).
-    paper_aspect = figure_width / max(1.0, float(figure_height))
-    triangle_height_px = max(10.0, 4.0 * float(cell_size))
+    # Triangle / "?" use paper coords. Primary scale: figure height (stable on the slide).
+    # A cap in terms of cell_size keeps dense grids from growing huge when total figure
+    # height is similar but each ARC cell is much smaller (same width, fewer vs more columns).
+    _fh = float(figure_height)
+    _fw = float(figure_width)
+    _cell = float(cell_size)
+    paper_aspect = _fw / max(1.0, _fh)
+    triangle_height_px = max(12.0, min(0.185 * _fh, 4.5 * _cell))
 
     # Right-pointing triangles between input → output for each pair; "?" on test output cells
     for p, (in_grid, out_grid) in enumerate(pairs):
@@ -357,7 +360,7 @@ def _build_puzzle_figure(
         x_mid = (d_in[1] + d_out[0]) / 2
 
         gap_x = max(1e-6, d_out[0] - d_in[1])
-        triangle_height = triangle_height_px / float(figure_height)
+        triangle_height = triangle_height_px / _fh
         triangle_width = triangle_height / paper_aspect
         if triangle_width > gap_x * 0.88:
             triangle_width = gap_x * 0.88
@@ -379,27 +382,8 @@ def _build_puzzle_figure(
         )
         if out_grid is None:
             output_x_mid = (d_out[0] + d_out[1]) / 2
-            nr = max(len(in_grid) if in_grid else 0, 1)
-            nc = max(len(in_grid[0]) if in_grid and in_grid[0] else 0, 1)
-            out_w_px = (d_out[1] - d_out[0]) * float(figure_width)
-            out_h_px = (dy_out[1] - dy_out[0]) * float(figure_height)
-            cell_px = min(out_w_px / nc, out_h_px / nr)
-            # "?" ~ one cell visually; on dense grids tie to triangle / cell_size.
-            # Size is 4× that baseline (two +100% steps) for slide legibility.
-            _base = max(
-                22,
-                min(
-                    420,
-                    round(
-                        max(
-                            cell_px * 5.5,
-                            float(cell_size) * 5.0,
-                            triangle_height_px * 1.15,
-                        )
-                    ),
-                ),
-            )
-            mark_font = int(min(1680, max(88, round(_base * 4))))
+            # Track triangle size (~5.5× replaces the old _base*4 heuristic).
+            mark_font = int(max(48, min(560, round(5.5 * triangle_height_px))))
             fig.add_annotation(
                 x=output_x_mid,
                 y=y_mid_out,
