@@ -575,7 +575,7 @@ flowchart LR
     D --> E{Oscillates?}
     E -- yes --> F(["Patch:<br/>L &gt; R rule"])
     F --> D
-    E -- no --> G["Submit &check;<br/><small>(hardcoded)</small>"]
+    E -- no --> G["Submit &check;<br/><small>(hardcoded LR rule)</small>"]
 
     classDef think fill:#eef4ff,stroke:#3366aa,color:#1a2a55;
     classDef tool fill:#fff5e6,stroke:#d18000,color:#5c3500;
