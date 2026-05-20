@@ -412,6 +412,8 @@ display_figure(fig, "puzzle")
 - [Dibyas slides...](https://hedgedoc.beralt.com/nUlPDyU_QRKvX0BWZXas0Q?view#Main-part)
 
 
+# Conclusions
+
 ## Lessons learned
 ### A recap from the trenches
 
@@ -432,7 +434,6 @@ display_figure(fig, "puzzle")
 - LLMs can do math within CoT, but it's error prone. Tool calling overcomes that hindrance.
 
 :::
-
 
 
 ## At the bleeding edge
@@ -480,12 +481,29 @@ write_plotly_for_glightbox(
 ```
 
 
+## (Alternative) At the bleeding edge
+### The frontier may be closer than it appears to be
+- In Jan 2025, DeepSeek R1 was released, showed comparable performance to flagship models from OpenAI: The secret: reasoning and finetuning in verifiable domain.
+  + In March, we decided to leverage reasoning models for ARC.
+- In April, we wre using OpenAI models with tool calling for generating synthetic ARC-like puzzles.
+  + No agentic coding harnesses were available. We orchestrated our own tool calling sandbox.
+- In May, we started our foray into finetuning a Qwen model with tool calling.
+  + Libraries (transformers and unsloth) "technically" supported it, but we had to fix the logic for masking tool call tokens correctly.
+- In August 2025, GPT-OSS was released: capable of interleaved thinking and tool calling.
+  + We started using it in our agentic harness immediately.
+  + No commercial provider supported the maximum reasoning effort: We had to host our own inference engine (with custom patches).
+  + In November 2025, we showed for the first time that open weight models can achieve nonzero scores on ARC-AGI-2.
+- In November 2025, our coding harness was solving significant number of ARC puzzles in a single tool call loop, no human in the loop.
+  + Claude code will be released in December.
+- In Nov-Dec 2025, as Anthropic and OpenAI released their flagship models, they *underreported* their performance on ARC-AGI-2 (because they evals did not use tool calls).
+  + We identified within weeks that tool calls boosts their performance on abstract reasoning.
+  + Poetiq would claim SotA score in Dec 2025, using a similar, but more complicated approach.
 
 ## Practical take-home messages
 ### Working better with modern AI
 
-- **Don’t overengineer harnesses** (same failure mode as mega-prompts).
-  - Most harnesses are either too complex or don’t transfer 100% task-to-tasks.
+- **Don’t overengineer agentic harnesses** (same failure mode as mega-prompts).
+  - Most harnesses are either too complex or don't transfer 100% task-to-tasks.
   - Like coaching a human on math — specify goals and checks, not every micro-step at fixed depth.
 - **Simplicity + verification**
   - Say what correctness means; don’t prescribe every “thought” motion (partly why models struggle at open-ended art briefs).
@@ -500,24 +518,367 @@ write_plotly_for_glightbox(
 
 ## So… did ARC solvers crack the teaser puzzle?
 ### Paying off the intro example (`28a6681f`)
-*Using GPT 5.2 XHigh*
-- Navy blue seems to be moving through black
-- Hypothesis "gap fill": fill black cells between two non-black cells on each row. 
-  - Verification: Does not work on example 3.
-- Hypothesis "settle by sort": push all navy blue cells to the bottom-most cells of each black-connected component.
-  - verification: Wrong.
-- Pivot: **falling water simulation**.
-  - Priority: down -> down-right -> down-left -> lateral left.
+*Using GPT 5.5 XHigh*
 
+- *Interprets grids*: 
+  + "Water settling down into crevices"
+  + "I wonder if it should be treated like gravity"
+- *Understands the terrain and water flow dynamics*:
+  + "I need to analyze the wall placements and how water might flow around them."
+  + "I need to check how water moves vertically and analyze the flow dynamics further."
+  + "I am noticing it spills over a wall at a specific point."
+- *Calls tool*: Transforms the grid to a text representation like
+  ```
+  ....RG.GWW
+  .RRRRGGGWW
+  ```
+- *Forms hypothesis on how water flows*: Analyzes input/output pairs.
+  + "each unit of water will drop straight until it encounters an obstacle"
+  + "will slide down the diagonal and fill containers below"
+  + ...
+- *Identifies similarity to Advent of code 2018 Day 17 puzzle*:
+  + "I'm planning to create a simulation of fluid dynamics that mimics "falling water" as described in Advent of Code 2018 Day 17."
 
+- *Calls tool, simulates water flow*:
+  + Checks the direction of gravity is indeed downwards.
+  + Faulty horizontal flow logic: leads to oscillations.
+- *Calls tool, debugs simulation by tracing*:
+  + Figures out horizontal oscillation!
+    - "In one trace, a particle moved left and then right, which indicates oscillation"
+  + "Fixes" by setting "left-over-right" rule for horizontal flow.
+    - "I'm also wondering about whether to prioritize left over right in physical rules"
+- *Calls tool, applies solution on test grid*
+  + Realizes that left-over-right rule is needed to avoid oscillations.
+- *Submits final solution*: Works, but solution not general due to hardcoded left-over-right flow rule.
 
 ::: {.notes}
-Confirm which puzzle ended up being the flagship story vs the second intro example (`28a6681f`).
+- This puzzle is a simple physics simulation: awesome that our harness solves it.
+- Doesn't discover "laws of physics" obviously. But it comes close.
+- Its musings are quite illuminating: "I'm also wondering about whether to prioritize left over right in physical rules"
 :::
 
-- Fact-check internally: whether *our* run solved this specific grid vs a comparable case study.
-- Even if not back then — many setups solve it cleanly *now*.
-- Tell the concrete story of what the modern stack did (tools, retries, verifier).
+
+
+## The trace at a glance {.trace-slide-h}
+### Intuition &rarr; simulation &rarr; patched fix
+
+```{=html}
+<style>
+.reveal section.trace-slide-h {
+    position: relative;
+}
+.reveal section.trace-slide-h .trace-legend-h {
+    display: flex;
+    flex-direction: row;
+    gap: 28px;
+    justify-content: center;
+    align-items: center;
+    margin: 2px auto 8px auto;
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    line-height: 1;
+    width: max-content;
+}
+.reveal section.trace-slide-h .trace-legend-h .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.reveal section.trace-slide-h .trace-legend-h .legend-item svg {
+    width: 50px;
+    height: 12px;
+    display: inline-block;
+}
+.reveal section.trace-slide-h .trace-diagram-snake {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 980px;
+    margin: 0 auto;
+}
+.reveal section.trace-slide-h .snake-row {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+}
+.reveal section.trace-slide-h .snake-pill-cell {
+    width: 100px;
+    flex: 0 0 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10px;
+}
+.reveal section.trace-slide-h .snake-pill {
+    padding: 5px 16px;
+    border: 1.5px solid #3a8a3a;
+    background: #e8f5e8;
+    color: #1a4d1a;
+    border-radius: 14px;
+    font-weight: 500;
+    font-size: 13px;
+    white-space: nowrap;
+}
+.reveal section.trace-slide-h .snake-main-cell {
+    width: 160px;
+    flex: 0 0 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.reveal section.trace-slide-h .snake-main {
+    width: 160px;
+    padding: 5px 8px;
+    border: 1px solid #3366aa;
+    background: #eef4ff;
+    color: #1a2a55;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.2;
+    box-sizing: border-box;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.reveal section.trace-slide-h .snake-vconnector {
+    width: 0;
+    height: 14px;
+    border-left: 1.5px dotted #b8b8b8;
+}
+.reveal section.trace-slide-h .snake-detail {
+    width: 160px;
+    padding: 5px 8px;
+    border: 1px solid #c8c8c8;
+    background: #fafafa;
+    color: #444;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 11px;
+    line-height: 1.2;
+    box-sizing: border-box;
+}
+.reveal section.trace-slide-h .snake-detail code {
+    background: transparent;
+    color: #444;
+    font-family: monospace;
+    font-size: 11px;
+}
+.reveal section.trace-slide-h .snake-edge {
+    width: 60px;
+    flex: 0 0 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 14px;
+}
+.reveal section.trace-slide-h .snake-edge-arrow svg {
+    display: block;
+    width: 50px;
+    height: 14px;
+}
+.reveal section.trace-slide-h .snake-edge-label {
+    margin-top: 2px;
+    color: #6688aa;
+    font-size: 10px;
+    font-style: italic;
+    text-align: center;
+    line-height: 1.15;
+    max-width: 60px;
+}
+.reveal section.trace-slide-h .snake-bend {
+    width: 980px;
+    height: 70px;
+}
+.reveal section.trace-slide-h .snake-bend svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+}
+</style>
+
+<div class="trace-legend-h">
+  <div class="legend-item">
+    <svg viewBox="0 0 50 12">
+      <defs>
+        <marker id="lh-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#cc6600"/>
+        </marker>
+      </defs>
+      <line x1="2" y1="6" x2="40" y2="6" stroke="#cc6600" stroke-width="3" marker-end="url(#lh-orange)"/>
+    </svg>
+    <span>tool call</span>
+  </div>
+  <div class="legend-item">
+    <svg viewBox="0 0 50 12">
+      <defs>
+        <marker id="lh-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
+        </marker>
+      </defs>
+      <line x1="2" y1="6" x2="40" y2="6" stroke="#666" stroke-width="1.5" marker-end="url(#lh-grey)"/>
+    </svg>
+    <span>reasoning</span>
+  </div>
+</div>
+
+<div class="trace-diagram-snake">
+  <div class="snake-row">
+    <div class="snake-pill-cell"><div class="snake-pill">Puzzle</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">understands</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Visual features</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>water settling into crevices, under gravity</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">develops</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Awareness of walls and flow dynamics</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>water flows around walls, spills over a wall</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">transforms grid</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Text representation</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><code>....RG.GWW<br/>.RRRRGGGWW</code></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">hypothesizes</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Flow dynamics</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>drops straight until it hits an obstacle, may slide down the diagonal</i></div>
+    </div>
+  </div>
+
+  <div class="snake-bend">
+    <svg viewBox="0 0 980 70" preserveAspectRatio="none">
+      <defs>
+        <marker id="snake-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#cc6600"/>
+        </marker>
+      </defs>
+      <path d="M 900 0 L 900 30 L 80 30 L 80 60" stroke="#cc6600" stroke-width="3" fill="none" stroke-linejoin="round" marker-end="url(#snake-orange)"/>
+      <text x="490" y="22" text-anchor="middle" fill="#cc6600" font-weight="700" font-size="15" font-family="inherit">Tool call</text>
+    </svg>
+  </div>
+
+  <div class="snake-row">
+    <div class="snake-main-cell">
+      <div class="snake-main">Trial solution using simulation</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>checks gravity direction, horizontal flow rule bad &rarr; oscillations</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">adds tracing</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Oscillation bug found</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie braking</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">applies solution on</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Test example</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>left-over-right tie braking needed to avoid infinite loop</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">submits</div></div>
+    <div class="snake-pill-cell"><div class="snake-pill">Solution</div></div>
+  </div>
+</div>
+```
+
+::: {.notes}
+- Same story as the previous slide, in one picture.
+- Blue = main step; gray = the model's own words; green = input/output. The orange "Tool call" edge marks where the agent reaches for code.
+- Linear left column: intuition (Visual features) &rarr; abstraction (Text representation) &rarr; simulation (Trial solution) &rarr; the hardcoded patch ("'Fixes' by left-over-right") &rarr; Solution.
+:::
+
+
+
+## Watch the simulation converge
+### Test grid &mdash; 20 steps of water + gravity
+
+```{python}
+#| echo: false
+#| output: asis
+#| execute: true
+
+import base64
+import io
+import sys
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+
+# `simulate` lives in a sibling utility script outside the import path.
+_DEBS = Path("/workspaces/pivotools-quarto-blog/debs_misc")
+if str(_DEBS) not in sys.path:
+    sys.path.insert(0, str(_DEBS))
+
+from show_step import simulate
+from src.data import load_puzzle
+from src.plotting import _get_arc_colors
+
+
+def _hex_to_rgb(h):
+    h = h.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
+
+
+_grid = load_puzzle("28a6681f")["test"][0]["input"]
+_H, _W = len(_grid), len(_grid[0])
+_palette = np.array([_hex_to_rgb(c) for c in _get_arc_colors()], dtype=np.uint8)
+_cell, _gap = 56, 2
+_img_h = _H * _cell + (_H + 1) * _gap
+_img_w = _W * _cell + (_W + 1) * _gap
+
+_frames = []
+for _n in range(1, 21):
+    _arr, _ = simulate(_grid, dirs=("R", "L"), max_steps=_n)
+    _arr = np.asarray(_arr, dtype=np.int64)
+    _canvas = np.full((_img_h, _img_w, 3), 255, dtype=np.uint8)
+    for _r in range(_H):
+        _y0 = _gap + _r * (_cell + _gap)
+        for _c in range(_W):
+            _x0 = _gap + _c * (_cell + _gap)
+            _canvas[_y0:_y0 + _cell, _x0:_x0 + _cell] = _palette[_arr[_r, _c]]
+    _frames.append(Image.fromarray(_canvas, mode="RGB").quantize(colors=16))
+
+_buf = io.BytesIO()
+_frames[0].save(
+    _buf,
+    format="GIF",
+    save_all=True,
+    append_images=_frames[1:],
+    duration=350,
+    loop=0,
+    disposal=2,
+    optimize=False,
+)
+_b64 = base64.b64encode(_buf.getvalue()).decode()
+print(
+    f'<div style="display:flex;justify-content:center;align-items:center;height:65vh;">'
+    f'<img src="data:image/gif;base64,{_b64}" '
+    f'style="max-height:100%;max-width:80%;image-rendering:pixelated;" '
+    f'alt="Water-flow simulation: 20 steps converging to the output grid"/>'
+    f'</div>'
+)
+```
+
+::: {.notes}
+- This is the test input, fed through the model's final `simulate` function (left-over-right rule), one step per frame.
+- The blue cells (water) trickle down through the gaps until everything settles.
+- After ~20 ticks the grid matches the expected output &mdash; that's the moment the agent submitted.
+:::
 
 
 
