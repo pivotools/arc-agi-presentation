@@ -319,6 +319,7 @@ Raymond Catell, 1948, defined **two aspects** of general intelligence
 - Requires **In-Context-Learning (ICL)**, i.e. adaption to new situations not encountered in training data. [click]
 - **Essential problem:** AI model weights are **frozen during inference**. [click]
 - So how could LLMs ever exhibit fluid intelligence?
+
 :::
 
 
@@ -338,14 +339,14 @@ Raymond Catell, 1948, defined **two aspects** of general intelligence
 :::
 
 ::: {.notes}
-- So, what was the state of this challenge in April 2025 when we started?
-- In contrast to other benchmarks: 2D optimization, score and cost per puzzle
-- Logarithmic-with-compute scaling won't land you in the top left corner ("efficiency" also in terms of compute baked it)
-- details of the leaderboard not important, but some general observations:
+- Postpone the answer to the question for now, and let us look at the state of the ARC in April 2025 when we started. [click]
+- What you see here is a snapshot of the leaderboard of the ARC-AGI challenge when we started.
+- While there is a lot of information here, some general observations:
+  - 2D optimization, score and cost per puzzle
+  - goal is to reach the top left corner of the plot, i.e. high score and low cost per puzzle
 - ARC AGI 1 (circles):
   - not solved
-  - Test-time finetuning LLM approaches: Minds.ai (not public) and ARChitects, 53.5%,  
-  - Program synthesis: Ryan Greenblatt
+  - winner of ARC AGI 1 kaggle comp: ARChitects, 53.5%, test-time finetuning LLM 
   - newer trends: reasoning models (o3, good but expensive)
 - ARC AGI 2 (triangles):
   - essentially no results beyond noise level
