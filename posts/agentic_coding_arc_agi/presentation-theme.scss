@@ -399,7 +399,12 @@ foreignObject > div {
   }
 
   /* Diagram fills the slide content area; each box is content-width
-     (no fixed widths), edge cells flex-grow to absorb the slack. */
+     (no fixed widths), edge cells flex-grow to absorb the slack. To keep
+     all "node" centers (pills, mains, arrows) on a single horizontal line
+     per row, mains are given a uniform `min-height: 60px`; pill cells get
+     padding-top so the pill's center matches; the arrow sits at the cell's
+     vertical center via flex centering. Details are top-aligned at a
+     shared y by always sitting after main(60) + connector(14). */
   .trace-diagram-snake {
     display: flex;
     flex-direction: column;
@@ -423,8 +428,10 @@ foreignObject > div {
     align-items: center;
   }
 
+  /* 15px = (main min-height 60 − pill height ~30) / 2, so pill center
+     lands on the same y as main center. */
   .snake-pill-cell {
-    padding-top: 12px;
+    padding-top: 15px;
   }
 
   .snake-pill {
@@ -439,6 +446,7 @@ foreignObject > div {
   }
 
   .snake-main {
+    min-height: 60px;
     padding: 8px 14px;
     border: 1px solid #3366aa;
     background: #eef4ff;
@@ -450,6 +458,9 @@ foreignObject > div {
     line-height: 1.2;
     max-width: 240px;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .snake-vconnector {
@@ -460,6 +471,7 @@ foreignObject > div {
   }
 
   .snake-detail {
+    align-self: center;
     padding: 5px 10px;
     border: 1px solid #c8c8c8;
     background: #fafafa;
@@ -481,31 +493,49 @@ foreignObject > div {
     }
   }
 
-  /* Edge cells absorb the extra horizontal space between nodes. */
+  /* Edge cells absorb the extra horizontal space; the arrow line is a
+     flex item that grows, so arrows stretch to fill the column. The
+     23px padding-top places the arrow's vertical center at y=30 in the
+     row (matching the centers of mains/pills, which have min-height 60). */
   .snake-edge {
     flex: 1 1 auto;
-    min-width: 40px;
+    min-width: 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
-    padding-top: 18px;
+    padding-top: 23px;
   }
 
-  .snake-edge-arrow svg {
-    display: block;
-    width: 55px;
+  .snake-edge-arrow {
+    width: 100%;
     height: 14px;
+    display: flex;
+    align-items: center;
+  }
+
+  .snake-edge-arrow-line {
+    flex: 1 1 auto;
+    height: 0;
+    border-top: 1.5px solid #666;
+  }
+
+  .snake-edge-arrow-head {
+    flex: 0 0 auto;
+    width: 0;
+    height: 0;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 8px solid #666;
   }
 
   .snake-edge-label {
-    margin-top: 3px;
+    font-size: 16px;
+    line-height: 1.2;
     color: #6688aa;
-    font-size: 12px;
     font-style: italic;
     text-align: center;
-    line-height: 1.2;
-    max-width: 110px;
+    white-space: nowrap;
+    margin-top: 4px;
   }
 
   .snake-bend {

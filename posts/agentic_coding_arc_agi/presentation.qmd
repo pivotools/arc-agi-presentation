@@ -500,18 +500,18 @@ write_plotly_for_glightbox(
   + Poetiq would claim SotA score in Dec 2025, using a similar, but more complicated approach.
 
 ## Practical take-home messages
-### Working better with modern AI
+### For working effectively with modern LLMs
 
 ::: {.incremental}
 - **Don't over engineer agentic harnesses** (same failure mode as mega-prompts).
-  - Complex harnesses generalize poorly to tasks with **different difficulty levels**.
-  - LLMs armed with reasoning+tool use can *dynamically adapt* to the task: micromanaging each step hamstrings them.
+  - Complex harnesses generalize poorly, especially if tasks **differ in difficulty**.
+  - LLMs armed with reasoning+tool use can **dynamically adapt compute** to the task: micromanaging each step hamstrings them.
 - **Simplicity + verification**
   - Tell the model how to **deterministically evaluate** its output against the goal (partly why models struggle at open-ended art tasks).
-  - But careful: LLMs will *hack the evaluator function* if they can.
+  - But careful: LLMs will **hack the evaluator function** if they can.
 - **There's plenty of room for innovation outside frontier labs**
-  - Harnesses must continuously evolve as models gain more innate capabilities.
-  - There will always be a ceiling to innate performance of flagship models: That's where things are exciting!
+  - Models internalize more and more abilities → harnesses must continuously evolve.
+  - There will always be a ceiling to internal abilities of models: That's where things are exciting!
   - Open weight models often catch up to frontier models after a while.
 :::
 
@@ -520,6 +520,9 @@ write_plotly_for_glightbox(
 - Tell it *exactly* what you want it to do: otherwise it will hack the reward function.
 - LLMs are fantastic at following instructions such as output format by now: use it.
 :::
+
+
+
 
 # Epilogue
 
@@ -557,25 +560,25 @@ write_plotly_for_glightbox(
 <div class="trace-diagram-snake">
   <div class="snake-row">
     <div class="snake-pill-cell"><div class="snake-pill">Puzzle</div></div>
-    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">understands</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">understands</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Visual features</div>
       <div class="snake-vconnector"></div>
       <div class="snake-detail"><i>"water settling into crevices..." <br/> "...under gravity"</i></div>
     </div>
-    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">develops</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">develops</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Awareness of walls and flow dynamics</div>
       <div class="snake-vconnector"></div>
       <div class="snake-detail"><i>"flows around walls..." <br/> "...spills over a wall"</i></div>
     </div>
-    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">transforms grid</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">transforms grid</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Text representation</div>
       <div class="snake-vconnector"></div>
       <div class="snake-detail"><code>........WW</br>........WW</br>.......GWW</br>.......GWW</br>.......GWW</br>.....G.GWW</br>.....G.GWW</br>....RG.GWW</br>....RG.GWW</br>.RRRRGGGWW</code></div>
     </div>
-    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">hypothesizes</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">hypothesizes</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Flow dynamics</div>
       <div class="snake-vconnector"></div>
@@ -601,19 +604,19 @@ write_plotly_for_glightbox(
       <div class="snake-vconnector"></div>
       <div class="snake-detail"><i>checks gravity direction, horizontal flow rule bad &rarr; oscillations</i></div>
     </div>
-    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">adds tracing</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">adds tracing</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Oscillation bug found</div>
       <div class="snake-vconnector"></div>
       <div class="snake-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie breaking</i></div>
     </div>
-    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">applies solution on</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">applies solution on</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Test example</div>
       <div class="snake-vconnector"></div>
       <div class="snake-detail"><i>left-over-right tie breaking needed to avoid infinite loop</i></div>
     </div>
-    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">submits</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">submits</div></div>
     <div class="snake-pill-cell"><div class="snake-pill">Solution</div></div>
   </div>
 </div>
