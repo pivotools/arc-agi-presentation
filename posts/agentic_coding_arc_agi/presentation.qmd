@@ -511,7 +511,7 @@ write_plotly_for_glightbox(
   - But careful: LLMs will **hack the evaluator function** if they can.
 - **There's plenty of room for innovation outside frontier labs**
   - Models internalize more and more abilities → **harnesses must continuously evolve**.
-  - **Boundary to innate abilities** of models → **exciting things are there!**
+  - **Limits of innate abilities** of models → **exciting things are there!**
   - **Open weight models** catch up to frontier models after a while.
 :::
 
