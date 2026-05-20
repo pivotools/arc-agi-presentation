@@ -506,205 +506,30 @@ write_plotly_for_glightbox(
 ## Practical take-home messages
 ### Working better with modern AI
 
-- **Don’t overengineer agentic harnesses** (same failure mode as mega-prompts).
-  - Most harnesses are either too complex or don't transfer 100% task-to-tasks.
-  - Like coaching a human on math — specify goals and checks, not every micro-step at fixed depth.
+- **Don't over engineer agentic harnesses** (same failure mode as mega-prompts).
+  - Complex harnesses generalize poorly to tasks with **different difficulty levels**.
+  - LLMs armed with reasoning+tool use can *dynamically adapt* to the task: micromanaging each step hamstrings them.
 - **Simplicity + verification**
-  - Say what correctness means; don’t prescribe every “thought” motion (partly why models struggle at open-ended art briefs).
-- **Non-lab research still matters**
-  - Harnesses must continuously evolve to keep pace with models expanding innate capabilities.
-- **Few big ideas recur:** reasoning, agentic/tool use, context efficiency.
-
-
-
-
-
-## So… did ARC solvers crack the teaser puzzle?
-### Paying off the intro example (`28a6681f`)
-*Using GPT 5.5 XHigh*
-
-- *Interprets grids*: 
-  + "Water settling down into crevices"
-  + "I wonder if it should be treated like gravity"
-- *Understands the terrain and water flow dynamics*:
-  + "I need to analyze the wall placements and how water might flow around them."
-  + "I need to check how water moves vertically and analyze the flow dynamics further."
-  + "I am noticing it spills over a wall at a specific point."
-- *Calls tool*: Transforms the grid to a text representation like
-  ```
-  ....RG.GWW
-  .RRRRGGGWW
-  ```
-- *Forms hypothesis on how water flows*: Analyzes input/output pairs.
-  + "each unit of water will drop straight until it encounters an obstacle"
-  + "will slide down the diagonal and fill containers below"
-  + ...
-- *Identifies similarity to Advent of code 2018 Day 17 puzzle*:
-  + "I'm planning to create a simulation of fluid dynamics that mimics "falling water" as described in Advent of Code 2018 Day 17."
-
-- *Calls tool, simulates water flow*:
-  + Checks the direction of gravity is indeed downwards.
-  + Faulty horizontal flow logic: leads to oscillations.
-- *Calls tool, debugs simulation by tracing*:
-  + Figures out horizontal oscillation!
-    - "In one trace, a particle moved left and then right, which indicates oscillation"
-  + "Fixes" by setting "left-over-right" rule for horizontal flow.
-    - "I'm also wondering about whether to prioritize left over right in physical rules"
-- *Calls tool, applies solution on test grid*
-  + Realizes that left-over-right rule is needed to avoid oscillations.
-- *Submits final solution*: Works, but solution not general due to hardcoded left-over-right flow rule.
+  - Tell the model how to **deterministically evaluate** its output against the goal (partly why models struggle at open-ended art tasks).
+  - But careful: LLMs will *hack the evaluator function* if they can.
+- **There's plenty of room for innovation outside frontier labs**
+  - Harnesses must continuously evolve as models gain more innate capabilities.
+  - There will always be a ceiling to innate performance of flagship models: That's where things are exciting!
+  - Open weight models often catch up to frontier models after a while.
 
 ::: {.notes}
-- This puzzle is a simple physics simulation: awesome that our harness solves it.
-- Doesn't discover "laws of physics" obviously. But it comes close.
-- Its musings are quite illuminating: "I'm also wondering about whether to prioritize left over right in physical rules"
+- LLMs are good at performing fuzzy search in a large space of actions: Let it do its job!
+- Tell it *exactly* what you want it to do: otherwise it will hack the reward function.
+- LLMs are fantastic at following instructions such as output format by now: use it.
+
 :::
 
 
 
-## The trace at a glance {.trace-slide-h}
-### Intuition &rarr; simulation &rarr; patched fix
-
+## So… did ARC solvers crack the teaser puzzle? {.trace-slide-h}
+### Paying off the intro example (`28a6681f`)
+*Using GPT 5.5 XHigh*
 ```{=html}
-<style>
-.reveal section.trace-slide-h {
-    position: relative;
-}
-.reveal section.trace-slide-h .trace-legend-h {
-    display: flex;
-    flex-direction: row;
-    gap: 28px;
-    justify-content: center;
-    align-items: center;
-    margin: 2px auto 8px auto;
-    padding: 4px 12px;
-    background: rgba(255,255,255,0.95);
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 14px;
-    line-height: 1;
-    width: max-content;
-}
-.reveal section.trace-slide-h .trace-legend-h .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.reveal section.trace-slide-h .trace-legend-h .legend-item svg {
-    width: 50px;
-    height: 12px;
-    display: inline-block;
-}
-.reveal section.trace-slide-h .trace-diagram-snake {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 980px;
-    margin: 0 auto;
-}
-.reveal section.trace-slide-h .snake-row {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-}
-.reveal section.trace-slide-h .snake-pill-cell {
-    width: 100px;
-    flex: 0 0 100px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding-top: 10px;
-}
-.reveal section.trace-slide-h .snake-pill {
-    padding: 5px 16px;
-    border: 1.5px solid #3a8a3a;
-    background: #e8f5e8;
-    color: #1a4d1a;
-    border-radius: 14px;
-    font-weight: 500;
-    font-size: 13px;
-    white-space: nowrap;
-}
-.reveal section.trace-slide-h .snake-main-cell {
-    width: 160px;
-    flex: 0 0 160px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-.reveal section.trace-slide-h .snake-main {
-    width: 160px;
-    padding: 5px 8px;
-    border: 1px solid #3366aa;
-    background: #eef4ff;
-    color: #1a2a55;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 12px;
-    line-height: 1.2;
-    box-sizing: border-box;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.reveal section.trace-slide-h .snake-vconnector {
-    width: 0;
-    height: 14px;
-    border-left: 1.5px dotted #b8b8b8;
-}
-.reveal section.trace-slide-h .snake-detail {
-    width: 160px;
-    padding: 5px 8px;
-    border: 1px solid #c8c8c8;
-    background: #fafafa;
-    color: #444;
-    border-radius: 4px;
-    text-align: left;
-    font-size: 11px;
-    line-height: 1.2;
-    box-sizing: border-box;
-}
-.reveal section.trace-slide-h .snake-detail code {
-    background: transparent;
-    color: #444;
-    font-family: monospace;
-    font-size: 11px;
-}
-.reveal section.trace-slide-h .snake-edge {
-    width: 60px;
-    flex: 0 0 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding-top: 14px;
-}
-.reveal section.trace-slide-h .snake-edge-arrow svg {
-    display: block;
-    width: 50px;
-    height: 14px;
-}
-.reveal section.trace-slide-h .snake-edge-label {
-    margin-top: 2px;
-    color: #6688aa;
-    font-size: 10px;
-    font-style: italic;
-    text-align: center;
-    line-height: 1.15;
-    max-width: 60px;
-}
-.reveal section.trace-slide-h .snake-bend {
-    width: 980px;
-    height: 70px;
-}
-.reveal section.trace-slide-h .snake-bend svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-    overflow: visible;
-}
-</style>
 
 <div class="trace-legend-h">
   <div class="legend-item">
@@ -782,13 +607,13 @@ write_plotly_for_glightbox(
     <div class="snake-main-cell">
       <div class="snake-main">Oscillation bug found</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie braking</i></div>
+      <div class="snake-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie breaking</i></div>
     </div>
     <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">applies solution on</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Test example</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><i>left-over-right tie braking needed to avoid infinite loop</i></div>
+      <div class="snake-detail"><i>left-over-right tie breaking needed to avoid infinite loop</i></div>
     </div>
     <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">submits</div></div>
     <div class="snake-pill-cell"><div class="snake-pill">Solution</div></div>
@@ -800,12 +625,15 @@ write_plotly_for_glightbox(
 - Same story as the previous slide, in one picture.
 - Blue = main step; gray = the model's own words; green = input/output. The orange "Tool call" edge marks where the agent reaches for code.
 - Linear left column: intuition (Visual features) &rarr; abstraction (Text representation) &rarr; simulation (Trial solution) &rarr; the hardcoded patch ("'Fixes' by left-over-right") &rarr; Solution.
+- This puzzle is a simple physics simulation: awesome that our harness solves it.
+- Doesn't discover "laws of physics" obviously. But it comes close.
+- Its musings are quite illuminating: "I'm also wondering about whether to prioritize left over right in physical rules"
 :::
 
 
 
-## Watch the simulation converge
-### Test grid &mdash; 20 steps of water + gravity
+## Look: an almost physics simulator
+### The LLM implemented that without any prompting
 
 ```{python}
 #| echo: false
@@ -822,37 +650,8 @@ import numpy as np
 from PIL import Image
 
 
-def _debs_misc_dir() -> Path:
-    """Resolve `debs_misc/` — kernel cwd is not always the Quarto project root."""
-    roots: list[Path] = []
-    qpd = os.environ.get("QUARTO_PROJECT_DIR")
-    if qpd:
-        roots.append(Path(qpd).resolve())
-    here = Path.cwd().resolve()
-    roots.append(here)
-    roots.extend(here.parents)
-    roots.append(Path("/workspaces/pivotools-quarto-blog"))  # legacy Codespaces layout
-    seen: set[Path] = set()
-    for r in roots:
-        if r in seen:
-            continue
-        seen.add(r)
-        d = r / "debs_misc"
-        if (d / "show_step.py").is_file():
-            return d
-    raise FileNotFoundError(
-        "Could not find debs_misc/show_step.py "
-        f"(cwd={here!s}, QUARTO_PROJECT_DIR={qpd!r})."
-    )
-
-
-_DEBS = _debs_misc_dir()
-_spec = importlib.util.spec_from_file_location("show_step", _DEBS / "show_step.py")
-if _spec is None or _spec.loader is None:
-    raise ImportError(f"Cannot load {_DEBS / 'show_step.py'}")
-_show_step = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_show_step)
-simulate = _show_step.simulate
+N_STEPS = 25
+from src.show_step import simulate
 from src.data import load_puzzle
 from src.plotting import _get_arc_colors
 
@@ -872,8 +671,8 @@ _img_h = _H * _cell + (_H + 1) * _gap
 _img_w = _W * _cell + (_W + 1) * _gap
 
 _frames = []
-for _n in range(1, 21):
-    _arr, _ = simulate(_grid, dirs=("R", "L"), max_steps=_n)
+for _n in range(1, N_STEPS):
+    _arr, _ = simulate(_grid, dirs=("L", "R"), max_steps=_n)
     _arr = np.asarray(_arr, dtype=np.int64)
     _canvas = np.full((_img_h, _img_w, 3), 255, dtype=np.uint8)
     for _r in range(_H):
@@ -904,11 +703,79 @@ print(
 )
 ```
 
-::: {.notes}
-- This is the test input, fed through the model's final `simulate` function (left-over-right rule), one step per frame.
-- The blue cells (water) trickle down through the gaps until everything settles.
-- After ~20 ticks the grid matches the expected output &mdash; that's the moment the agent submitted.
-:::
+
+## The simulator is imperfect
+### because it doesn't generalize to certain wall placements
+
+```{python}
+#| echo: false
+#| output: asis
+#| execute: true
+
+import base64
+import io
+import sys
+from pathlib import Path
+
+import numpy as np
+from PIL import Image
+
+N_STEPS = 25
+from src.show_step import simulate
+from src.data import load_puzzle
+from src.plotting import _get_arc_colors
+
+
+def _hex_to_rgb(h):
+    h = h.lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    return (int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16))
+
+
+_grid = load_puzzle("28a6681f")["test"][0]["input"]
+_grid = [row[-1::-1] for row in _grid]
+
+_H, _W = len(_grid), len(_grid[0])
+_palette = np.array([_hex_to_rgb(c) for c in _get_arc_colors()], dtype=np.uint8)
+_cell, _gap = 56, 2
+_img_h = _H * _cell + (_H + 1) * _gap
+_img_w = _W * _cell + (_W + 1) * _gap
+
+_frames = []
+for _n in range(1, N_STEPS):
+    _arr, _ = simulate(_grid, dirs=("L", "R"), max_steps=_n)
+    _arr = np.asarray(_arr, dtype=np.int64)
+    _canvas = np.full((_img_h, _img_w, 3), 255, dtype=np.uint8)
+    for _r in range(_H):
+        _y0 = _gap + _r * (_cell + _gap)
+        for _c in range(_W):
+            _x0 = _gap + _c * (_cell + _gap)
+            _canvas[_y0:_y0 + _cell, _x0:_x0 + _cell] = _palette[_arr[_r, _c]]
+    _frames.append(Image.fromarray(_canvas, mode="RGB").quantize(colors=16))
+
+_buf = io.BytesIO()
+_frames[0].save(
+    _buf,
+    format="GIF",
+    save_all=True,
+    append_images=_frames[1:],
+    duration=350,
+    loop=0,
+    disposal=2,
+    optimize=False,
+)
+_b64 = base64.b64encode(_buf.getvalue()).decode()
+print(
+    f'<div style="display:flex;justify-content:center;align-items:center;height:65vh;">'
+    f'<img src="data:image/gif;base64,{_b64}" '
+    f'style="max-height:100%;max-width:80%;image-rendering:pixelated;" '
+    f'alt="Water-flow simulation: 20 steps converging to the output grid"/>'
+    f'</div>'
+)
+```
+
+
 
 
 
