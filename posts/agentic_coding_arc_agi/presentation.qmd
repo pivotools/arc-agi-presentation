@@ -78,7 +78,7 @@ if str(blog_root) not in sys.path:
 # Intro
 
 ## About us
-### From AGI Munich meetup to an amateur remote AI lab
+### and many thanks to everyone involved!
 
 ::: {.columns}
 ::: {.column width="32%"}
@@ -150,171 +150,175 @@ if str(blog_root) not in sys.path:
 
 ::: {.notes}
 
-- thank you to the organizers for giving us the opportunity to share our story
-- first a couple of words about us
-- Idea of paricipation in ARC-AGI-2 challenge originated with Dibya in the Munich AGI meetup
-- Dibya and Debsankha know each other from Uni, Bernhard and Dibya have met only once previously at Debsankha's wedding
-- Thank you to Nico for support
-- Honorable mention of Somayeh and Tariq
+- Good morning everyone
+- Thanks Timo for the introduction
+- Thanks to the organizers for giving us the opportunity to tell our story [click]
+- Thank you Nico Berg
+- Thanks Somayeh and Tariq
 :::
 
 
 
 ## What is this talk about?
-### A journey into forefront AI research
+### ARC-AGI 2 and our journey into forefront AI research
 
 ::: {.incremental}
-- **Our journey** into forefront AI research and lessons learned
 - **ARC-AGI 2:** **A**bstraction and **R**easoning **C**orpus for **A**rtificial **G**eneral **I**ntelligence (**2**nd edition, 2025)
-- **Task:** Transform pixel grids, where transformation rule is inferred from a few input–output pairs
+- **Task:** Transform 2D `input` pixel grids into corresponding `output` grids
 :::
-:::: {.fragment}
+
+
+::: {.fragment}
+
 ```{python}
 #| echo: false
 #| output: true
 #| execute: true
-#| fig-cap: "From the 'training pairs'..."
+#| fig-cap: "From a few `train` grid pairs, infer a general transformation rule..."
 
 from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("9aaea919", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-::::
+::: 
+::: {.fragment}
 
-:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
 #| execute: true
-#| fig-cap: "...infer the transformation rule!"
+#| fig-cap: "...and apply it to a `test` grid!"
 
 from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("9aaea919", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-::::
+
+:::
 
 ::: {.notes}
-- This talk: our story of how we followed the bleeding edge of AI development for 9 months
-- And what what we learned about fluid intelligence in LLMs
-- But first things first: what is ARC AGI 2?
-- ARC AGI 2 stands for **A**bstraction and **R**easoning **C**orpus for **A**rtificial **G**eneral **I**ntelligence
-- Test-bed for **creative** solving of task beyond **learned pattern matching**, arguably one of the core aspects of *general* intelligence
-- Best explained by an example
-  - From training input-output pairs infer a general rule
-  - And apply this to a "test" input
-- Example puzzle shows
-  - Abstraction (pixel grid -> concepts)
-  - Reasoning (rule inference from examples)
-
+- So what is this talk about? [click]
+- A story about our journey how we, as a small amateur team, competed in a challenge to solve an AI benchmark know as ARC-AGI 2 [click]
+- ARC-AGI 2 stands for **A**bstraction and **R**easoning **C**orpus for **A**rtificial **G**eneral **I**ntelligence (**2**nd edition, 2025) [click]
+- More practically, ARC-AGI is a set of pixel puzzles, where an `input` needs to be transformed into an output grid, like in this example [click]
+- Each puzzle consists of a set of few `training` pairs [click]
+- and a test input grid without the corresponding output.
+- Let us briefly look at this example:
+	- Input grid consists of four stacks of objects
+	- In each train input, two stacks are underlined by a green or red marker
+	- In the output, the stack above the red marker becomes grey,
+	- while the stack above the green markers "grows" by the height of greyed out stack
+	- notice that in the test grid, unlike in the training examples, we have two red underlined stacks
 :::
 
 
 
-## ARC AGI 2
-### Easy for humans, hard for AI?
+## Easy for humans, hard for AI?
+### What gives human an edge?
 
 ::: {.incremental}
-- ARC puzzles seem **intuitive** to us humans, but are not well-defined **mathematically**.
-- Correct™ solution requires **core human preceptive priors**: objects, groups, proximity, numbers, etc.
-- **Example:** A very intuitive and easy puzzle a 5-year old would solve...
+- ARC AGI puzzles are not well-defined **mathematically**.
+- Humans still agree on a correct™ solution
+- **Core human perceptive priors**: objects, groups, proximity, numbers, etc.
+- **Another example:** What happens when you think about this puzzle?
 :::
 :::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
 #| execute: true
-#| fig-cap: "...should surely be easy for AI as well, right?"
 
 from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("28a6681f", show_code=False, show_test=False, width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
-::::
-
-:::: {.fragment}
 ```{python}
 #| echo: false
 #| output: true
 #| execute: true
-#| fig-cap: "Right?!"
-
 from src.plotting import show_puzzle, display_figure
 fig = show_puzzle("28a6681f", show_code=False, show_test="only", width=1080,gap=0.33,pairs_per_row=3)
 display_figure(fig, "puzzle")
 ```
 ::::
 
-::: {.incremental}
-- **Question:** Is a prior **world model** needed to even understand the task? And if so, what **else** is needed?
-:::
+:::: {.incremental}
+- A child with sandbox **experience** might solve it, but AI has never played in the mud...
+- ... and neither had you at some point in your life.
+
+::::
 
 ::: {.notes}
-- Why are ARC puzzles usually intuitive for Humans, but potentially hard for AI?
-- Task not well-defined mathematically: fit of a many-parameter function to 2-5 data points, hoping the function evaluates "correctly" at fixed other value
-- Still, puzzles designed such that humans recognize "correct" solution
-- So human priors are providing the extra context for a solution to be "unique"
-- Concept on first example: grouping, counting, causality
-- Does an AI need a physical world model to succeed?
-- Does it need something else? If yes, what?
+- What makes these puzzles hard for AI? [click]
+- Notice that these puzzles are not well-defined mathematically:
+	- fitting of a complicated function to 2-5 data points ( (x,y) tuples or input-label pairs. )
+	- expect that it evaluates "correctly" for some fixed input (the test input grid)
+	- mathematically under-determined system [click]
+- However, humans tend to agree on the correct solution, how can this be?
+- Note that in describing the transformation rule for the last puzzle we used words like "stacks", "markers", "growing" and so on.
+- These are high level concepts that are related to core human perceptive priors
+- So already in the previous puzzle, some human intuition enters.
+- In order to make this even more explicit, let's look at another example, and pay attention to your own thought process. [click]
+  - You might remember your experiences of building castles and dams in the sandbox,
+  - But AI has never played in the mud...[click]
+- At some point you had to learn the concept of gravity and fluid flow and acquire the skill to build beautiful castles and dams, even if it was through play.
+
 :::
-
-
-
 
 
 ## ARC-AGI as a general intelligence benchmark 
-### From fluid flowing to fluid intelligence?
+### What constitutes general intelligence?
+
+::: {.fragment}
+
+Raymond Catell, 1948, defined **two aspects** of general intelligence
+:::
 
 ::: {.columns}
-::: {.column width="55%"}
+::: {.column width="49%"}
+::: {.fragment}
 
-- Francois Chollet designed ARC AGI competition to test **skill acquisition efficiency**^[Francois Chollet, "ARC: A Reasoning Challenge Dataset for the Advancement of General Intelligence", arXiv:1911.01547, 2019.]:
-  - Competion puzzles are kept private.
-  - Memorization from training is not sufficient.
-  - Only **few** "training pairs" per puzzle.
+![](./img/crystal-sketch.png){fig-align="center" width="95%" .lightbox}
 
-
-:::: {.fragment fragment-index=4}
-- Tests for **fluid intelligence** (in contrast to *crystallized intelligence*).
-::::
-
-:::: {.fragment fragment-index=6}
-- **Problem:** LLM weights only change during training and are **frozen during inference**.
-::::
-
-:::: {.fragment fragment-index=7}
-- Need for **In-Context-Learning (ICL)**: Adaption to novel situations not encountered in training data.
-::::
-
-:::
-::: {.column width="45%"}
-:::: {.fragment fragment-index=5}
-
-![Crystallized vs fluid intelligence: world model, priors, domain knowledge, mechanics of language (top); working memory, adaptation, complex skills, creativity (bottom).](./img/crystal-fluid-sketch.png){fig-align="center" width="95%" .lightbox}
-::::
 :::
 :::
 
-:::: {.fragment fragment-index=8 style="text-align: center"}
+::: {.column width="49%"}
+::: {.fragment}
+![](./img/fluid-sketch.png){fig-align="center" width="95%" .lightbox}
+
+:::
+:::  
+:::
+::: {.fragment style="text-align: center"}
 **General intelligence** combines **knowledge** with **adaptation**!
-::::
+:::
+
+::: {.incremental}
+- ARC AGI designed to test **skill acquisition efficiency**^[Francois Chollet, "ARC: A Reasoning Challenge Dataset for the Advancement of General Intelligence", arXiv:1911.01547, 2019.], a hallmark of fluid intelligence.
+- Requires **In-Context-Learning (ICL)**, i.e. adaption to new situations not encountered in training data.
+- **Essential problem:** AI model weights are **frozen during inference**.
+- So how could LLMs ever exhibit fluid intelligence?
+:::
+
+
+
 
 
 ::: {.notes}
-- Answer is explicit in the design of ARC AGI.
-- Francois Chollet designed ARC AGI to test for **skill acquisition efficiency**
-  - Competion puzzles are kept private -> not enter training data of models
-  - Memorization from training is not sufficient -> puzzles are very diverse
-  - Only **few** "training pairs" per puzzle.
-- High level concept "water flowing under gravity" enables this efficiency (even though pixel-based rules might also succeed)
-- This skill acquisition related **fluid** intelligence
-- Contrasted by **crystallized** intelligence, Raymond Catell, 1948
-  - *crystallized*: priors, world model, domain knowledge, mechanics of language -> **knowledge**
-  - *fluid*: working memory, adaptation, complex skills, creativity -> **adaption**  
-- **Problem:** LLM weights only change during training. Weights are frozen during inference.
-- Some form of **in-context-learning** needed to understand and solve ARC puzzles
-- General intelligence combines knowledge with adaptation!
+
+- Thinking about how we solve the the water-flow puzzle, already touches on notion of **general* intelligence [click]
+- The questions of what constitutes general intelligence is a big topic of research in psychology and neuroscience
+- Raymond Catell, 1948, defined **two aspects** of general intelligence [click]
+- *crystallized*: priors, world model, domain knowledge, mechanics of language -> **knowledge, experience**
+  - this is a strong aspect about how you solved probably just solved the puzzle [click]
+- *fluid*: working memory, adaptation, complex skills, creativity -> **adaption**
+  - this is probably more how you sharpened your sandcastle skills all those many years ago  [click]
+- General intelligence combines knowledge with adaptation! [click]
+- ARC AGI designed to test **skill acquisition efficiency**, a hallmark of fluid intelligence. [click]
+- Requires **In-Context-Learning (ICL)**, i.e. adaption to new situations not encountered in training data. [click]
+- **Essential problem:** AI model weights are **frozen during inference**. [click]
+- So how could LLMs ever exhibit fluid intelligence?
 :::
 
 
@@ -513,7 +517,6 @@ write_plotly_for_glightbox(
 
 
 
-# Epilogue
 
 
 ## So… did ARC solvers crack the teaser puzzle?
