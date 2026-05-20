@@ -367,37 +367,6 @@ foreignObject > div {
   display: flex !important;
   flex-direction: column;
 
-  .trace-legend-h {
-    position: absolute;
-    bottom: 5%;
-    left: 3%;
-    display: flex;
-    flex-direction: row;
-    gap: 28px;
-    align-items: center;
-    margin: 0;
-    padding: 5px 12px;
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid #e0e0e0;
-    border-radius: 6px;
-    font-size: 14px;
-    line-height: 1;
-    width: max-content;
-    z-index: 5;
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      svg {
-        width: 50px;
-        height: 12px;
-        display: inline-block;
-      }
-    }
-  }
-
   /* Diagram fills the slide content area; each box is content-width
      (no fixed widths), edge cells flex-grow to absorb the slack. To keep
      all "node" centers (pills, mains, arrows) on a single horizontal line
@@ -506,11 +475,15 @@ foreignObject > div {
     padding-top: 23px;
   }
 
+  /* 5px horizontal padding so the line + arrowhead leave a ~5px gap on
+     both ends (source box on the left, target box on the right). */
   .snake-edge-arrow {
     width: 100%;
     height: 14px;
     display: flex;
     align-items: center;
+    padding: 0 5px;
+    box-sizing: border-box;
   }
 
   .snake-edge-arrow-line {

@@ -510,9 +510,9 @@ write_plotly_for_glightbox(
   - Tell the model how to **deterministically evaluate** its output against the goal (partly why models struggle at open-ended art tasks).
   - But careful: LLMs will **hack the evaluator function** if they can.
 - **There's plenty of room for innovation outside frontier labs**
-  - Models internalize more and more abilities → harnesses must continuously evolve.
-  - There will always be a ceiling to internal abilities of models: That's where things are exciting!
-  - Open weight models often catch up to frontier models after a while.
+  - Models internalize more and more abilities → **harnesses must continuously evolve**.
+  - **Boundary to innate abilities** of models → **exciting things are there!**
+  - **Open weight models** catch up to frontier models after a while.
 :::
 
 ::: {.notes}
@@ -531,31 +531,6 @@ write_plotly_for_glightbox(
 ### Paying off the intro example (`28a6681f`)
 *Using GPT 5.5 XHigh*
 ```{=html}
-
-<div class="trace-legend-h">
-  <div class="legend-item">
-    <svg viewBox="0 0 50 12">
-      <defs>
-        <marker id="lh-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#cc6600"/>
-        </marker>
-      </defs>
-      <line x1="2" y1="6" x2="40" y2="6" stroke="#cc6600" stroke-width="3" marker-end="url(#lh-orange)"/>
-    </svg>
-    <span>tool call</span>
-  </div>
-  <div class="legend-item">
-    <svg viewBox="0 0 50 12">
-      <defs>
-        <marker id="lh-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
-        </marker>
-      </defs>
-      <line x1="2" y1="6" x2="40" y2="6" stroke="#666" stroke-width="1.5" marker-end="url(#lh-grey)"/>
-    </svg>
-    <span>reasoning</span>
-  </div>
-</div>
 
 <div class="trace-diagram-snake">
   <div class="snake-row">
@@ -589,12 +564,12 @@ write_plotly_for_glightbox(
   <div class="snake-bend">
     <svg viewBox="0 0 1075 70" preserveAspectRatio="none">
       <defs>
-        <marker id="snake-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
-          <path d="M0,0 L10,5 L0,10 z" fill="#cc6600"/>
+        <marker id="snake-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
         </marker>
       </defs>
-      <path d="M 1003 0 L 1003 30 L 120 30 L 120 60" stroke="#cc6600" stroke-width="3" fill="none" stroke-linejoin="round" marker-end="url(#snake-orange)"/>
-      <text x="560" y="20" text-anchor="middle" fill="#cc6600" font-weight="700" font-size="20" font-family="inherit">Tool call</text>
+      <path d="M 1003 -90 L 1003 30 L 120 30 L 120 65" stroke="#666" stroke-width="1.5" fill="none" stroke-linejoin="round" marker-end="url(#snake-arrow)"/>
+      <text x="560" y="22" text-anchor="middle" fill="#6688aa" font-style="italic" font-size="16" font-family="inherit">Tool call</text>
     </svg>
   </div>
 
@@ -633,8 +608,8 @@ write_plotly_for_glightbox(
 
 
 
-## Look: an almost physics simulator
-### The LLM implemented that without any prompting
+## The solution is (almost) a physics simulator
+### The LLM implemented that without any prompting!
 
 ```{python}
 #| echo: false
@@ -703,10 +678,14 @@ print(
     f'</div>'
 )
 ```
+::: {.notes}
+- Cellular automata like, no notion of forces/acceleration.
+- We will see how that leads to a spectacular failure.
+:::
 
 
-## The simulator is imperfect
-### because it doesn't generalize to certain wall placements
+## The simulator is rudimentary
+### Mirror the puzzle → infinite loop
 
 ```{python}
 #| echo: false
