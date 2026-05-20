@@ -567,8 +567,10 @@ write_plotly_for_glightbox(
 ```{=html}
 <style>
 .reveal section.trace-slide .cell-output-display svg {
+    height: 78vh !important;
     max-height: 78vh !important;
     width: auto !important;
+    max-width: 92vw !important;
     display: block;
     margin: 0 auto;
 }
@@ -599,7 +601,7 @@ flowchart TB
     subgraph rF [ ]
         direction LR
         F[Flow dynamics]
-        FD["<i>water drops straight until it encounters an obstacle<br/>may slide down the diagonal</i>"]
+        FD["<i>drops straight until it hits an obstacle<br/>may slide down the diagonal</i>"]
     end
     subgraph rSIM [ ]
         direction LR
@@ -646,8 +648,8 @@ flowchart TB
 
 ::: {.notes}
 - Same story as the previous slide, in one picture.
-- Blue nodes = model thinking; orange nodes = tool calls.
-- The little loop is where it discovers the oscillation bug and patches it with a hardcoded rule.
+- Blue = main step; gray = the model's own words; green = input/output. The orange "Tool call" edge marks where the agent reaches for code.
+- Linear left column: intuition (Visual features) &rarr; abstraction (Text representation) &rarr; simulation (Trial solution) &rarr; the hardcoded patch ("'Fixes' by left-over-right") &rarr; Solution.
 :::
 
 
