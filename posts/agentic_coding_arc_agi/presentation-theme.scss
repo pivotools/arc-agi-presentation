@@ -402,7 +402,7 @@ foreignObject > div {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 980px;
+    width: 1040px;
     margin: auto;
   }
 
@@ -413,45 +413,46 @@ foreignObject > div {
   }
 
   .snake-pill-cell {
-    width: 100px;
-    flex: 0 0 100px;
+    width: 80px;
+    flex: 0 0 80px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding-top: 10px;
+    padding-top: 12px;
   }
 
   .snake-pill {
-    padding: 5px 16px;
+    padding: 6px 18px;
     border: 1.5px solid #3a8a3a;
     background: #e8f5e8;
     color: #1a4d1a;
-    border-radius: 14px;
+    border-radius: 16px;
     font-weight: 500;
-    font-size: 13px;
+    font-size: 17px;
     white-space: nowrap;
   }
 
   .snake-main-cell {
-    width: 160px;
-    flex: 0 0 160px;
+    width: 175px;
+    flex: 0 0 175px;
     display: flex;
     flex-direction: column;
     align-items: center;
   }
 
   .snake-main {
-    width: 160px;
-    padding: 5px 8px;
+    width: 175px;
+    padding: 7px 9px;
     border: 1px solid #3366aa;
     background: #eef4ff;
     color: #1a2a55;
     border-radius: 4px;
     text-align: center;
-    font-size: 12px;
+    font-size: 16px;
+    font-weight: 500;
     line-height: 1.2;
     box-sizing: border-box;
-    min-height: 44px;
+    min-height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -464,14 +465,14 @@ foreignObject > div {
   }
 
   .snake-detail {
-    width: 160px;
+    width: 175px;
     padding: 5px 8px;
     border: 1px solid #c8c8c8;
     background: #fafafa;
     color: #444;
     border-radius: 4px;
     text-align: left;
-    font-size: 11px;
+    font-size: 10px;
     line-height: 1.2;
     box-sizing: border-box;
     font-style: italic;
@@ -480,38 +481,39 @@ foreignObject > div {
       background: transparent;
       color: #444;
       font-family: monospace;
-      font-size: 11px;
+      font-size: 10px;
+      font-style: normal;
     }
   }
 
   .snake-edge {
-    width: 60px;
-    flex: 0 0 60px;
+    width: 65px;
+    flex: 0 0 65px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding-top: 14px;
+    padding-top: 18px;
   }
 
   .snake-edge-arrow svg {
     display: block;
-    width: 50px;
+    width: 55px;
     height: 14px;
   }
 
   .snake-edge-label {
-    margin-top: 2px;
+    margin-top: 3px;
     color: #6688aa;
-    font-size: 10px;
+    font-size: 12px;
     font-style: italic;
     text-align: center;
-    line-height: 1.15;
-    max-width: 60px;
+    line-height: 1.2;
+    max-width: 65px;
   }
 
   .snake-bend {
-    width: 980px;
+    width: 1040px;
     height: 70px;
 
     svg {

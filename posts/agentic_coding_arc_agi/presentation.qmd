@@ -502,6 +502,7 @@ write_plotly_for_glightbox(
 ## Practical take-home messages
 ### Working better with modern AI
 
+::: {.incremental}
 - **Don't over engineer agentic harnesses** (same failure mode as mega-prompts).
   - Complex harnesses generalize poorly to tasks with **different difficulty levels**.
   - LLMs armed with reasoning+tool use can *dynamically adapt* to the task: micromanaging each step hamstrings them.
@@ -512,12 +513,12 @@ write_plotly_for_glightbox(
   - Harnesses must continuously evolve as models gain more innate capabilities.
   - There will always be a ceiling to innate performance of flagship models: That's where things are exciting!
   - Open weight models often catch up to frontier models after a while.
+:::
 
 ::: {.notes}
 - LLMs are good at performing fuzzy search in a large space of actions: Let it do its job!
 - Tell it *exactly* what you want it to do: otherwise it will hack the reward function.
 - LLMs are fantastic at following instructions such as output format by now: use it.
-
 :::
 
 # Epilogue
@@ -583,14 +584,14 @@ write_plotly_for_glightbox(
   </div>
 
   <div class="snake-bend">
-    <svg viewBox="0 0 980 70" preserveAspectRatio="none">
+    <svg viewBox="0 0 1040 70" preserveAspectRatio="none">
       <defs>
         <marker id="snake-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
           <path d="M0,0 L10,5 L0,10 z" fill="#cc6600"/>
         </marker>
       </defs>
-      <path d="M 900 0 L 900 30 L 80 30 L 80 60" stroke="#cc6600" stroke-width="3" fill="none" stroke-linejoin="round" marker-end="url(#snake-orange)"/>
-      <text x="490" y="22" text-anchor="middle" fill="#cc6600" font-weight="700" font-size="15" font-family="inherit">Tool call</text>
+      <path d="M 952 0 L 952 30 L 88 30 L 88 60" stroke="#cc6600" stroke-width="3" fill="none" stroke-linejoin="round" marker-end="url(#snake-orange)"/>
+      <text x="520" y="20" text-anchor="middle" fill="#cc6600" font-weight="700" font-size="20" font-family="inherit">Tool call</text>
     </svg>
   </div>
 
