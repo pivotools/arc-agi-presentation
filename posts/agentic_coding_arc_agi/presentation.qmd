@@ -504,14 +504,14 @@ write_plotly_for_glightbox(
 
 ::: {.incremental}
 - **Don't over engineer agentic harnesses** (just like prompts).
-  - Complex harnesses generalize poorly, especially across tasks **differing in difficulty** levels.
-  - LLMs armed with reasoning+tool use can **dynamically adapt compute** to the task: imposing a rigid structure hamstrings them.
+  - Complex harnesses generalize poorly, especially across **tasks with varying difficulty** levels.
+  - LLMs armed with reasoning+tool use can **dynamically adapt compute** to the task: _imposing a rigid structure hamstrings them_.
 - **Simplicity + verification**
-  - Tell the model how to **deterministically evaluate** its output against the goal (partly why models struggle at open-ended art tasks).
+  - Tell the model how to **deterministically evaluate** its output against the goal (partly why models struggle at open-ended creative tasks).
   - But careful: LLMs will **hack the evaluator function** if they can.
 - **There's plenty of room for innovation outside frontier labs**
   - Models internalize more and more abilities → **harnesses must continuously evolve**.
-  - **Limits of innate abilities** of models → **exciting things are there!**
+  - **Limits of innate abilities** of models → exactly where **things get exciting**!
   - **Open weight models** catch up to frontier models after a while.
 :::
 
@@ -930,77 +930,79 @@ write_plotly_for_glightbox(
 ```
 
 # How did GPT-OSS solve the waterfall puzzle?
-## A meticulous and gruelling process
-  
-1. A waterfall harness around the model, not just the model. Unlike GPT-5.5 (one open-ended prompt), GPT-OSS-120B runs inside a
-multi-stage pipeline that forces structured artifacts at every step.
-  - Stage 1 — describe: per-example grid description as (row, col) tuples per colour.
-  - Stage 2 — hypothesise: per-example transformation guesses → universal claims with explicit testing guidelines.
-  - Stage 3 — verify: each claim is programmatically tested; overconfident ones are killed before they reach the solver (e.g. the
-model's "blue forms one border-touching component" claim — falsified by Ex. 1).
-2. Coordinate-first, never visual. GPT-OSS catalogues integers, not gestalts.
-  - Ex. 0 inventory, verbatim: "1 (blue) vertical 2-column stripe cols 8-9 rows 0-9; 3 L-shape rows 2-9 cols 5-7; 2 a 2×4 block rows
- 7-9 cols 1-4".
-  - Not a single physical, causal, or anthropomorphic metaphor appears in the entire trace.
-3. First verified invariant — only colour 1 mutates. Diffing input vs. output proves every changed cell has colour 1 on at least one
- side.
-  - Verified across all three training examples by Stage 3.
-  - Every non-blue colour preserves shape, position, and count exactly.
-4. First hypothesis — the X 0 X rule. Wherever a row contains X 0 X with X ∈ {2,…,9}, the middle zero becomes blue.
-  - Clean fit on Ex. 0 (3 0 3 in rows 5-8) and Ex. 2 (4 0 4, 2 0 2 in rows 7-8).
-  - Claimed by the upstream stages to be the complete rule.
-5. Falsification on Example 1. The model writes a Python detector and finds zero X 0 X patterns in Ex. 1 — yet 7 new blue cells
-appear at rows 4-6, cols 3-5.
-  - Verbatim from CoT: "Example 1 shows no horizontal or vertical X 0 X patterns, yet we have new 1s indeed".
-  - The simple rule is dead within one tool call.
-6. The dead-end gallery. Each extension is proposed, tested, killed by code — never by intuition:
-  - "Vertical X 0 X" — doesn't explain Ex. 1 row 4 cols 3-4.
-  - "Hole-filling / bounding-box fill" — over-predicts (Ex. 2 rows 1-4 would all turn blue but don't).
-  - "Fill any zero with non-zero on both row-sides" — same over-prediction problem.
-7. The algebraic insight — blue conservation. Brute-counting reveals a numerical invariant the visual mind would never reach for.
-  - Per example: |removed blues| = |added blues|. Exactly 4 = 4, 7 = 7, 3 = 3.
-  - The CoT's own framing: "each example removed exactly as many blues as added" → "blues were redistributed across rows but 
-maintaining total count".
-8. Final rule (iteration 0, with ugly conditionals). Scan each row for a non-blue cell C, walk over the following zeros to the next
-non-zero R:
-  - If R is blue → fill the entire 0-run with blue.
-  - Else (R is non-blue) → fill the run only if C appears exactly twice in that row.
-  - To conserve the blue count, delete the lexicographically smallest original blues until deletions match additions.
-9. Iteration 1 — rule compression. A separate refinement pass realises the right-anchor / count-of-two branch is redundant and drops
-7. The algebraic insight — blue conservation. Brute-counting reveals a numerical invariant the visual mind would never reach for.
-  - Per example: |removed blues| = |added blues|. Exactly 4 = 4, 7 = 7, 3 = 3.
-  - The CoT's own framing: "each example removed exactly as many blues as added" → "blues were redistributed across rows but
-maintaining total count".
-8. Final rule (iteration 0, with ugly conditionals). Scan each row for a non-blue cell C, walk over the following zeros to the next
-non-zero R:
-  - If R is blue → fill the entire 0-run with blue.
-  - Else (R is non-blue) → fill the run only if C appears exactly twice in that row.
-  - To conserve the blue count, delete the lexicographically smallest original blues until deletions match additions.
-9. Iteration 1 — rule compression. A separate refinement pass realises the right-anchor / count-of-two branch is redundant and drops
- it.
-  - Final chosen rule: "fill any 0-run sandwiched between two non-zero cells in a row; then delete the lex-smallest blues until
-total count matches".
-  - Three lines of code shorter; still passes all training pairs and the test grid.
-10. Same answer as GPT-5.5, completely different reasons. The rule encodes no physics — no gravity, no walls, no flow. Just counts
-and positions.
-  - The min(blues) deletion is a syntactic tie-breaker, exactly analogous to GPT-5.5's left-over-right oscillation patch.
-  - Two cognitive idioms, one shared survival strategy: hack a tie-breaker until the residuals on training pairs go to zero.
+
+## A meticulous and gruelling process — setup
+### Harness, observations, first hypothesis
+
+1. **A waterfall harness around the model, not just the model.** Unlike GPT-5.5 (one open-ended prompt), GPT-OSS-120B runs inside a multi-stage pipeline that forces structured artifacts at every step.
+   - **Stage 1 — describe:** per-example grid description as `(row, col)` tuples per colour.
+   - **Stage 2 — hypothesise:** per-example transformation guesses → universal claims with explicit testing guidelines.
+   - **Stage 3 — verify:** each claim is programmatically tested; overconfident ones are killed before they reach the solver (e.g. *"blue forms one border-touching component"* — falsified by Ex. 1).
+
+2. **Coordinate-first, never visual.** GPT-OSS catalogues integers, not gestalts.
+   - Ex. 0 inventory, verbatim: *"1 (blue) vertical 2-column stripe cols 8-9 rows 0-9; 3 L-shape rows 2-9 cols 5-7; 2 a 2×4 block rows 7-9 cols 1-4"*.
+   - Not a single physical, causal, or anthropomorphic metaphor appears anywhere in the trace.
+
+3. **First verified invariant — only colour 1 mutates.** Diffing input vs. output proves every changed cell has colour 1 on at least one side.
+   - Verified across all three training examples by Stage 3.
+   - Every non-blue colour preserves shape, position, and count exactly.
+
+4. **First hypothesis — the `X 0 X` rule.** Wherever a row contains `X 0 X` with X ∈ {2,…,9}, the middle zero becomes blue.
+   - Clean fit on Ex. 0 (`3 0 3` in rows 5-8) and Ex. 2 (`4 0 4`, `2 0 2` in rows 7-8).
+   - Claimed by the upstream stages to be the *complete* rule.
 
 ::: {.notes}
-- Same puzzle, a totally different cognitive path. GPT‑OSS never reaches for a physical metaphor; no "water", no "gravity", no "walls".
-- It operates in coordinate space from the start: lists of (row, col) tuples per colour, not visual gestalts.
-- **Top row** — pure abstract analysis, before any code:
-  - Object inventory: enumerates colours and their bounding shapes by coordinates.
-  - Mutable colour: diffs input vs output and notices only colour 1 ever changes — every other colour is frozen.
-  - Local `X 0 X` rule: spots that wherever a row contains `X 0 X` with X a non‑blue colour, the gap turns blue.
-  - Generalises to: "fill every immediate horizontal gap between two identical non‑blue cells."
-- **Tool call** (the orange bend): this is where GPT‑OSS lives — it tests every hypothesis in Python.
-- **Bottom row** — refinement via code, not intuition:
-  - Falsification: the `X 0 X` rule predicts the wrong cells for Example 1 (row 4 has new blues with no immediate gap).
-  - Conservation invariant: brute counting reveals `|removed blues| = |added blues|` in every example — an *algebraic* observation, not a physical one. The model treats blue cells as something to be conserved, like a token count.
-  - Final rule: fill any 0‑run sandwiched by non‑zero cells, then enforce conservation by deleting the lexicographically smallest blues until the count matches. Brutally ad‑hoc — but it works on all three training pairs and the test grid.
-- **Contrast with GPT‑5.5**: where GPT‑5.5 saw water and built a physics simulator (that broke on a mirrored test), GPT‑OSS saw a string‑rewriting rule and patched it with a tie‑breaker (`min(blues)`) until the residuals went to zero.
-- Two very different cognitive styles, same puzzle solved. Crystallised intelligence cashed out in two very different idioms.
+- The contrast with GPT-5.5 starts here. GPT-5.5 gets one open-ended prompt; GPT-OSS is constrained into a structured pipeline that forces every step to be externalised.
+- The verification stage is the secret sauce — it kills overconfident claims (e.g. "blue forms one border-touching component") before they ever reach the solver.
+- Coordinate-first description from the very start. No "water settling" metaphor anywhere in the trace.
+:::
+
+
+
+## A meticulous and gruelling process — search
+### Falsification, dead ends, and the algebraic breakthrough
+
+5. **Falsification on Example 1.** The model writes a Python detector and finds **zero** `X 0 X` patterns in Ex. 1 — yet 7 new blue cells appear at rows 4-6, cols 3-5.
+   - Verbatim from CoT: *"Example 1 shows no horizontal or vertical X 0 X patterns, yet we have new 1s indeed"*.
+   - The simple rule is dead within one tool call.
+
+6. **The dead-end gallery.** Each extension is proposed, tested, and killed by code — never by intuition:
+   - *"Vertical X 0 X"* — doesn't explain Ex. 1 row 4 cols 3-4.
+   - *"Hole-filling / bounding-box fill"* — over-predicts (Ex. 2 rows 1-4 would all turn blue, but don't).
+   - *"Fill any zero with non-zero on both row-sides"* — same over-prediction problem.
+
+7. **The algebraic insight — blue conservation.** Brute-counting reveals a numerical invariant the visual mind would never reach for.
+   - Per example: `|removed blues| = |added blues|`. Exactly **4 = 4, 7 = 7, 3 = 3**.
+   - The CoT's own framing: *"each example removed exactly as many blues as added"* → *"blues were redistributed across rows but maintaining total count"*.
+
+::: {.notes}
+- The model never reasons in prose about *why* a rule fails — it writes a detector and runs it.
+- Conservation is a *numerical* observation, not a *physical* one. GPT-5.5 would never look at this puzzle and think "the number of blue cells must be conserved" — that's an insight you only reach by treating the cells as tokens, not as fluid.
+- Most of the trace's tokens are spent on hypotheses that didn't pan out. The dead-end gallery is honest about this.
+:::
+
+
+
+## A meticulous and gruelling process — verdict
+### Final rule, simplification, and the contrast with GPT-5.5
+
+8. **Final rule (iteration 0, with ugly conditionals).** Scan each row for a non-blue cell `C`, walk over the following zeros to the next non-zero `R`:
+   - If `R` is blue → fill the entire 0-run with blue.
+   - Else (`R` is non-blue) → fill the run *only* if `C` appears exactly twice in that row.
+   - To conserve the blue count, delete the **lexicographically smallest** original blues until deletions match additions.
+
+9. **Iteration 1 — rule compression.** A separate refinement pass realises the right-anchor / count-of-two branch is redundant and drops it.
+   - Final chosen rule: *"fill any 0-run sandwiched between two non-zero cells; delete lex-smallest blues to conserve count"*.
+   - Three lines of code shorter; still passes all training pairs and the test grid.
+
+10. **Same answer as GPT-5.5, completely different reasons.** The rule encodes no physics — no gravity, no walls, no flow. Just counts and positions.
+    - The `min(blues)` deletion is a syntactic tie-breaker, exactly analogous to GPT-5.5's left-over-right oscillation patch.
+    - Two cognitive idioms, one shared survival strategy: hack a tie-breaker until the residuals on training pairs go to zero.
+
+::: {.notes}
+- Iteration 1's compression is genuinely impressive: the model notices its own ugly conditional logic is redundant and prunes the branch.
+- The punchline: both models hack a tie-breaker (left-over-right for GPT-5.5, lex-smallest for GPT-OSS), but they're patching around completely different failure modes — one in a physics simulator, the other in a syntactic pattern matcher.
+- Same answer on this puzzle. Crystallised intelligence cashed out in very different idioms.
 :::
 
 
