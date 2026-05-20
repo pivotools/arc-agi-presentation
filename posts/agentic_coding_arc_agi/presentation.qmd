@@ -575,8 +575,8 @@ write_plotly_for_glightbox(
     gap: 28px;
     justify-content: center;
     align-items: center;
-    margin: 4px auto 12px auto;
-    padding: 5px 14px;
+    margin: 2px auto 8px auto;
+    padding: 4px 12px;
     background: rgba(255,255,255,0.95);
     border: 1px solid #e0e0e0;
     border-radius: 6px;
@@ -594,116 +594,114 @@ write_plotly_for_glightbox(
     height: 12px;
     display: inline-block;
 }
-.reveal section.trace-slide-h .trace-diagram-h {
+.reveal section.trace-slide-h .trace-diagram-snake {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 980px;
+    margin: 0 auto;
+}
+.reveal section.trace-slide-h .snake-row {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
-    justify-content: center;
-    margin: 0 auto;
 }
-.reveal section.trace-slide-h .th-col {
+.reveal section.trace-slide-h .snake-pill-cell {
+    width: 100px;
+    flex: 0 0 100px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 92px;
-    flex: 0 0 92px;
+    padding-top: 10px;
 }
-.reveal section.trace-slide-h .th-col .th-main {
-    width: 92px;
-    padding: 5px 5px;
-    border: 1px solid #3366aa;
-    background: #eef4ff;
-    color: #1a2a55;
-    border-radius: 4px;
-    text-align: center;
-    font-size: 11px;
-    line-height: 1.15;
-    box-sizing: border-box;
-    min-height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.reveal section.trace-slide-h .th-col .th-vconnector {
-    width: 0;
-    height: 14px;
-    border-left: 1.5px dotted #b8b8b8;
-}
-.reveal section.trace-slide-h .th-col .th-detail {
-    width: 92px;
-    padding: 4px 5px;
-    border: 1px solid #c8c8c8;
-    background: #fafafa;
-    color: #444;
-    border-radius: 4px;
-    text-align: left;
-    font-size: 9.5px;
-    line-height: 1.2;
-    box-sizing: border-box;
-}
-.reveal section.trace-slide-h .th-col .th-detail code {
-    background: transparent;
-    color: #444;
-    font-family: monospace;
-    font-size: 10px;
-}
-.reveal section.trace-slide-h .th-pill-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    width: 70px;
-    flex: 0 0 70px;
-    padding-top: 8px;
-}
-.reveal section.trace-slide-h .th-pill {
-    padding: 4px 14px;
+.reveal section.trace-slide-h .snake-pill {
+    padding: 5px 16px;
     border: 1.5px solid #3a8a3a;
     background: #e8f5e8;
     color: #1a4d1a;
     border-radius: 14px;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 13px;
     white-space: nowrap;
 }
-.reveal section.trace-slide-h .th-edge {
+.reveal section.trace-slide-h .snake-main-cell {
+    width: 160px;
+    flex: 0 0 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.reveal section.trace-slide-h .snake-main {
+    width: 160px;
+    padding: 5px 8px;
+    border: 1px solid #3366aa;
+    background: #eef4ff;
+    color: #1a2a55;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 12px;
+    line-height: 1.2;
+    box-sizing: border-box;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.reveal section.trace-slide-h .snake-vconnector {
+    width: 0;
+    height: 14px;
+    border-left: 1.5px dotted #b8b8b8;
+}
+.reveal section.trace-slide-h .snake-detail {
+    width: 160px;
+    padding: 5px 8px;
+    border: 1px solid #c8c8c8;
+    background: #fafafa;
+    color: #444;
+    border-radius: 4px;
+    text-align: left;
+    font-size: 11px;
+    line-height: 1.2;
+    box-sizing: border-box;
+}
+.reveal section.trace-slide-h .snake-detail code {
+    background: transparent;
+    color: #444;
+    font-family: monospace;
+    font-size: 11px;
+}
+.reveal section.trace-slide-h .snake-edge {
+    width: 60px;
+    flex: 0 0 60px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    width: 38px;
-    flex: 0 0 38px;
-    padding-top: 12px;
+    padding-top: 14px;
 }
-.reveal section.trace-slide-h .th-edge .th-arrow svg {
+.reveal section.trace-slide-h .snake-edge-arrow svg {
     display: block;
-    width: 32px;
-    height: 10px;
+    width: 50px;
+    height: 14px;
 }
-.reveal section.trace-slide-h .th-edge .th-label {
+.reveal section.trace-slide-h .snake-edge-label {
     margin-top: 2px;
     color: #6688aa;
-    font-size: 9px;
+    font-size: 10px;
     font-style: italic;
     text-align: center;
     line-height: 1.15;
-    width: 38px;
+    max-width: 60px;
 }
-.reveal section.trace-slide-h .th-edge.th-edge-tool {
-    padding-top: 9px;
-    width: 44px;
-    flex: 0 0 44px;
+.reveal section.trace-slide-h .snake-bend {
+    width: 980px;
+    height: 70px;
 }
-.reveal section.trace-slide-h .th-edge.th-edge-tool .th-arrow svg {
-    width: 40px;
-    height: 14px;
-}
-.reveal section.trace-slide-h .th-edge.th-edge-tool .th-label {
-    color: #cc6600;
-    font-weight: 700;
-    font-style: normal;
-    font-size: 11px;
-    width: 44px;
+.reveal section.trace-slide-h .snake-bend svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
 }
 </style>
 
@@ -732,24 +730,68 @@ write_plotly_for_glightbox(
   </div>
 </div>
 
-<div class="trace-diagram-h">
-  <div class="th-pill-col"><div class="th-pill">Puzzle</div></div>
-  <div class="th-edge"><div class="th-arrow"><svg viewBox="0 0 32 10"><line x1="0" y1="5" x2="25" y2="5" stroke="#666" stroke-width="1.5"/><polygon points="24,2 24,8 31,5" fill="#666"/></svg></div><div class="th-label">understands</div></div>
-  <div class="th-col"><div class="th-main">Visual features</div><div class="th-vconnector"></div><div class="th-detail"><i>water settling into crevices, under gravity</i></div></div>
-  <div class="th-edge"><div class="th-arrow"><svg viewBox="0 0 32 10"><line x1="0" y1="5" x2="25" y2="5" stroke="#666" stroke-width="1.5"/><polygon points="24,2 24,8 31,5" fill="#666"/></svg></div><div class="th-label">develops</div></div>
-  <div class="th-col"><div class="th-main">Awareness of walls and flow dynamics</div><div class="th-vconnector"></div><div class="th-detail"><i>water flows around walls, spills over a wall</i></div></div>
-  <div class="th-edge"><div class="th-arrow"><svg viewBox="0 0 32 10"><line x1="0" y1="5" x2="25" y2="5" stroke="#666" stroke-width="1.5"/><polygon points="24,2 24,8 31,5" fill="#666"/></svg></div><div class="th-label">transforms grid</div></div>
-  <div class="th-col"><div class="th-main">Text representation</div><div class="th-vconnector"></div><div class="th-detail"><code>....RG.GWW<br/>.RRRRGGGWW</code></div></div>
-  <div class="th-edge"><div class="th-arrow"><svg viewBox="0 0 32 10"><line x1="0" y1="5" x2="25" y2="5" stroke="#666" stroke-width="1.5"/><polygon points="24,2 24,8 31,5" fill="#666"/></svg></div><div class="th-label">hypothesizes</div></div>
-  <div class="th-col"><div class="th-main">Flow dynamics</div><div class="th-vconnector"></div><div class="th-detail"><i>drops straight until it hits an obstacle, may slide down the diagonal</i></div></div>
-  <div class="th-edge th-edge-tool"><div class="th-arrow"><svg viewBox="0 0 40 14"><line x1="0" y1="7" x2="30" y2="7" stroke="#cc6600" stroke-width="3"/><polygon points="29,2 29,12 39,7" fill="#cc6600"/></svg></div><div class="th-label">Tool call</div></div>
-  <div class="th-col"><div class="th-main">Trial solution using simulation</div><div class="th-vconnector"></div><div class="th-detail"><i>checks gravity direction, horizontal flow rule bad &rarr; oscillations</i></div></div>
-  <div class="th-edge"><div class="th-arrow"><svg viewBox="0 0 32 10"><line x1="0" y1="5" x2="25" y2="5" stroke="#666" stroke-width="1.5"/><polygon points="24,2 24,8 31,5" fill="#666"/></svg></div><div class="th-label">adds tracing</div></div>
-  <div class="th-col"><div class="th-main">Oscillation bug found</div><div class="th-vconnector"></div><div class="th-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie braking</i></div></div>
-  <div class="th-edge"><div class="th-arrow"><svg viewBox="0 0 32 10"><line x1="0" y1="5" x2="25" y2="5" stroke="#666" stroke-width="1.5"/><polygon points="24,2 24,8 31,5" fill="#666"/></svg></div><div class="th-label">applies solution on</div></div>
-  <div class="th-col"><div class="th-main">Test example</div><div class="th-vconnector"></div><div class="th-detail"><i>left-over-right tie braking needed to avoid infinite loop</i></div></div>
-  <div class="th-edge"><div class="th-arrow"><svg viewBox="0 0 32 10"><line x1="0" y1="5" x2="25" y2="5" stroke="#666" stroke-width="1.5"/><polygon points="24,2 24,8 31,5" fill="#666"/></svg></div><div class="th-label">submits</div></div>
-  <div class="th-pill-col"><div class="th-pill">Solution</div></div>
+<div class="trace-diagram-snake">
+  <div class="snake-row">
+    <div class="snake-pill-cell"><div class="snake-pill">Puzzle</div></div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">understands</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Visual features</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>water settling into crevices, under gravity</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">develops</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Awareness of walls and flow dynamics</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>water flows around walls, spills over a wall</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">transforms grid</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Text representation</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><code>....RG.GWW<br/>.RRRRGGGWW</code></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">hypothesizes</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Flow dynamics</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>drops straight until it hits an obstacle, may slide down the diagonal</i></div>
+    </div>
+  </div>
+
+  <div class="snake-bend">
+    <svg viewBox="0 0 980 70" preserveAspectRatio="none">
+      <defs>
+        <marker id="snake-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#cc6600"/>
+        </marker>
+      </defs>
+      <path d="M 900 0 L 900 30 L 80 30 L 80 60" stroke="#cc6600" stroke-width="3" fill="none" stroke-linejoin="round" marker-end="url(#snake-orange)"/>
+      <text x="490" y="22" text-anchor="middle" fill="#cc6600" font-weight="700" font-size="15" font-family="inherit">Tool call</text>
+    </svg>
+  </div>
+
+  <div class="snake-row">
+    <div class="snake-main-cell">
+      <div class="snake-main">Trial solution using simulation</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>checks gravity direction, horizontal flow rule bad &rarr; oscillations</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">adds tracing</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Oscillation bug found</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie braking</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">applies solution on</div></div>
+    <div class="snake-main-cell">
+      <div class="snake-main">Test example</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>left-over-right tie braking needed to avoid infinite loop</i></div>
+    </div>
+    <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">submits</div></div>
+    <div class="snake-pill-cell"><div class="snake-pill">Solution</div></div>
+  </div>
 </div>
 ```
 
