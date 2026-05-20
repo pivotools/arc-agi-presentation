@@ -560,25 +560,25 @@ write_plotly_for_glightbox(
     <div class="snake-main-cell">
       <div class="snake-main">Visual features</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><i>water settling into crevices, under gravity</i></div>
+      <div class="snake-detail"><i>"water settling into crevices..." <br/> "...under gravity"</i></div>
     </div>
     <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">develops</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Awareness of walls and flow dynamics</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><i>water flows around walls, spills over a wall</i></div>
+      <div class="snake-detail"><i>"flows around walls..." <br/> "...spills over a wall"</i></div>
     </div>
     <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">transforms grid</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Text representation</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><code>....RG.GWW<br/>.RRRRGGGWW</code></div>
+      <div class="snake-detail"><code>........WW</br>........WW</br>.......GWW</br>.......GWW</br>.......GWW</br>.....G.GWW</br>.....G.GWW</br>....RG.GWW</br>....RG.GWW</br>.RRRRGGGWW</code></div>
     </div>
     <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">hypothesizes</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Flow dynamics</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><i>drops straight until it hits an obstacle, may slide down the diagonal</i></div>
+      <div class="snake-detail"><i>"drops straight until it hits an obstacle" <br/> "...may slide down the diagonal"</i></div>
     </div>
   </div>
 
