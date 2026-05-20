@@ -759,6 +759,93 @@ print(
 
 
 
+## Same puzzle, a smaller open‑weight mind {.trace-slide-h}
+### How GPT‑OSS‑120B cracks `28a6681f` — without ever invoking physics
+*Using GPT‑OSS‑120B (high reasoning)*
+```{=html}
+
+<div class="trace-diagram-snake">
+  <div class="snake-row">
+    <div class="snake-pill-cell"><div class="snake-pill">Puzzle</div></div>
+    <div class="snake-edge fragment" data-fragment-index="1"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">enumerates</div></div>
+    <div class="snake-main-cell fragment" data-fragment-index="1">
+      <div class="snake-main">Object inventory</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>"three non‑zero colours: 1 (blue) cols 8‑9; <br/>3 L‑shape rows 2‑9; 2 block rows 7‑9"</i></div>
+    </div>
+    <div class="snake-edge fragment" data-fragment-index="2"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">compares I/O</div></div>
+    <div class="snake-main-cell fragment" data-fragment-index="2">
+      <div class="snake-main">Mutable colour</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>"only colour 1 changes..." <br/> "...non‑blue colours stay in exactly the same cells"</i></div>
+    </div>
+    <div class="snake-edge fragment" data-fragment-index="3"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">spots a local pattern</div></div>
+    <div class="snake-main-cell fragment" data-fragment-index="3">
+      <div class="snake-main">Local <code>X 0 X</code> rule</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>"row pattern X 0 X with X &isin; {2,…,9}" <br/> "...empty cell becomes blue"</i></div>
+    </div>
+    <div class="snake-edge fragment" data-fragment-index="4"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">hypothesizes</div></div>
+    <div class="snake-main-cell fragment" data-fragment-index="4">
+      <div class="snake-main">Initial rule: gap‑fill</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>"fill every immediate horizontal gap <br/> between two identical non‑blue cells"</i></div>
+    </div>
+  </div>
+
+  <div class="snake-bend fragment" data-fragment-index="5">
+    <svg viewBox="0 0 1075 70" preserveAspectRatio="none">
+      <defs>
+        <marker id="snake-arrow-oss" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#666"/>
+        </marker>
+      </defs>
+      <path d="M 1003 -90 L 1003 30 L 120 30 L 120 65" stroke="#666" stroke-width="1.5" fill="none" stroke-linejoin="round" marker-end="url(#snake-arrow-oss)"/>
+      <text x="560" y="22" text-anchor="middle" fill="#6688aa" font-style="italic" font-size="16" font-family="inherit">Tool call</text>
+    </svg>
+  </div>
+
+  <div class="snake-row">
+    <div class="snake-main-cell fragment" data-fragment-index="5">
+      <div class="snake-main">Rule falsified on Ex. 1</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>"Example 1 shows no X 0 X pattern, yet new blues appear at row 4‑6 cols 3‑5" &rarr; rule is incomplete</i></div>
+    </div>
+    <div class="snake-edge fragment" data-fragment-index="6"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">counts blues</div></div>
+    <div class="snake-main-cell fragment" data-fragment-index="6">
+      <div class="snake-main">Conservation invariant</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>"each example removed exactly as many blues as added: 4=4, 7=7, 3=3"</i></div>
+    </div>
+    <div class="snake-edge fragment" data-fragment-index="7"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">refines &amp; patches</div></div>
+    <div class="snake-main-cell fragment" data-fragment-index="7">
+      <div class="snake-main">Run‑fill + lex deletion</div>
+      <div class="snake-vconnector"></div>
+      <div class="snake-detail"><i>fill any 0‑run between two non‑zero cells; <br/> delete lex‑smallest blues to conserve count</i></div>
+    </div>
+    <div class="snake-edge fragment" data-fragment-index="8"><div class="snake-edge-arrow"><div class="snake-edge-arrow-line"></div><div class="snake-edge-arrow-head"></div></div><div class="snake-edge-label">submits</div></div>
+    <div class="snake-pill-cell"><div class="snake-pill">Solution</div></div>
+  </div>
+</div>
+```
+
+::: {.notes}
+- Same puzzle, a totally different cognitive path. GPT‑OSS never reaches for a physical metaphor; no "water", no "gravity", no "walls".
+- It operates in coordinate space from the start: lists of (row, col) tuples per colour, not visual gestalts.
+- **Top row** — pure abstract analysis, before any code:
+  - Object inventory: enumerates colours and their bounding shapes by coordinates.
+  - Mutable colour: diffs input vs output and notices only colour 1 ever changes — every other colour is frozen.
+  - Local `X 0 X` rule: spots that wherever a row contains `X 0 X` with X a non‑blue colour, the gap turns blue.
+  - Generalises to: "fill every immediate horizontal gap between two identical non‑blue cells."
+- **Tool call** (the orange bend): this is where GPT‑OSS lives — it tests every hypothesis in Python.
+- **Bottom row** — refinement via code, not intuition:
+  - Falsification: the `X 0 X` rule predicts the wrong cells for Example 1 (row 4 has new blues with no immediate gap).
+  - Conservation invariant: brute counting reveals `|removed blues| = |added blues|` in every example — an *algebraic* observation, not a physical one. The model treats blue cells as something to be conserved, like a token count.
+  - Final rule: fill any 0‑run sandwiched by non‑zero cells, then enforce conservation by deleting the lexicographically smallest blues until the count matches. Brutally ad‑hoc — but it works on all three training pairs and the test grid.
+- **Contrast with GPT‑5.5**: where GPT‑5.5 saw water and built a physics simulator (that broke on a mirrored test), GPT‑OSS saw a string‑rewriting rule and patched it with a tie‑breaker (`min(blues)`) until the residuals went to zero.
+- Two very different cognitive styles, same puzzle solved. Crystallised intelligence cashed out in two very different idioms.
+:::
+
 ## Do LLMs have fluid intelligence?
 ### Yes.
 
@@ -930,6 +1017,65 @@ write_plotly_for_glightbox(
   </a>
 </div>
 ```
+
+# How did GPT-OSS solve the waterfall puzzle?
+## A meticulous and gruelling process
+  
+1. A waterfall harness around the model, not just the model. Unlike GPT-5.5 (one open-ended prompt), GPT-OSS-120B runs inside a
+multi-stage pipeline that forces structured artifacts at every step.
+  - Stage 1 — describe: per-example grid description as (row, col) tuples per colour.
+  - Stage 2 — hypothesise: per-example transformation guesses → universal claims with explicit testing guidelines.
+  - Stage 3 — verify: each claim is programmatically tested; overconfident ones are killed before they reach the solver (e.g. the
+model's "blue forms one border-touching component" claim — falsified by Ex. 1).
+2. Coordinate-first, never visual. GPT-OSS catalogues integers, not gestalts.
+  - Ex. 0 inventory, verbatim: "1 (blue) vertical 2-column stripe cols 8-9 rows 0-9; 3 L-shape rows 2-9 cols 5-7; 2 a 2×4 block rows
+ 7-9 cols 1-4".
+  - Not a single physical, causal, or anthropomorphic metaphor appears in the entire trace.
+3. First verified invariant — only colour 1 mutates. Diffing input vs. output proves every changed cell has colour 1 on at least one
+ side.
+  - Verified across all three training examples by Stage 3.
+  - Every non-blue colour preserves shape, position, and count exactly.
+4. First hypothesis — the X 0 X rule. Wherever a row contains X 0 X with X ∈ {2,…,9}, the middle zero becomes blue.
+  - Clean fit on Ex. 0 (3 0 3 in rows 5-8) and Ex. 2 (4 0 4, 2 0 2 in rows 7-8).
+  - Claimed by the upstream stages to be the complete rule.
+5. Falsification on Example 1. The model writes a Python detector and finds zero X 0 X patterns in Ex. 1 — yet 7 new blue cells
+appear at rows 4-6, cols 3-5.
+  - Verbatim from CoT: "Example 1 shows no horizontal or vertical X 0 X patterns, yet we have new 1s indeed".
+  - The simple rule is dead within one tool call.
+6. The dead-end gallery. Each extension is proposed, tested, killed by code — never by intuition:
+  - "Vertical X 0 X" — doesn't explain Ex. 1 row 4 cols 3-4.
+  - "Hole-filling / bounding-box fill" — over-predicts (Ex. 2 rows 1-4 would all turn blue but don't).
+  - "Fill any zero with non-zero on both row-sides" — same over-prediction problem.
+7. The algebraic insight — blue conservation. Brute-counting reveals a numerical invariant the visual mind would never reach for.
+  - Per example: |removed blues| = |added blues|. Exactly 4 = 4, 7 = 7, 3 = 3.
+  - The CoT's own framing: "each example removed exactly as many blues as added" → "blues were redistributed across rows but 
+maintaining total count".
+8. Final rule (iteration 0, with ugly conditionals). Scan each row for a non-blue cell C, walk over the following zeros to the next
+non-zero R:
+  - If R is blue → fill the entire 0-run with blue.
+  - Else (R is non-blue) → fill the run only if C appears exactly twice in that row.
+  - To conserve the blue count, delete the lexicographically smallest original blues until deletions match additions.
+9. Iteration 1 — rule compression. A separate refinement pass realises the right-anchor / count-of-two branch is redundant and drops
+7. The algebraic insight — blue conservation. Brute-counting reveals a numerical invariant the visual mind would never reach for.
+  - Per example: |removed blues| = |added blues|. Exactly 4 = 4, 7 = 7, 3 = 3.
+  - The CoT's own framing: "each example removed exactly as many blues as added" → "blues were redistributed across rows but
+maintaining total count".
+8. Final rule (iteration 0, with ugly conditionals). Scan each row for a non-blue cell C, walk over the following zeros to the next
+non-zero R:
+  - If R is blue → fill the entire 0-run with blue.
+  - Else (R is non-blue) → fill the run only if C appears exactly twice in that row.
+  - To conserve the blue count, delete the lexicographically smallest original blues until deletions match additions.
+9. Iteration 1 — rule compression. A separate refinement pass realises the right-anchor / count-of-two branch is redundant and drops
+ it.
+  - Final chosen rule: "fill any 0-run sandwiched between two non-zero cells in a row; then delete the lex-smallest blues until
+total count matches".
+  - Three lines of code shorter; still passes all training pairs and the test grid.
+10. Same answer as GPT-5.5, completely different reasons. The rule encodes no physics — no gravity, no walls, no flow. Just counts
+and positions.
+  - The min(blues) deletion is a syntactic tie-breaker, exactly analogous to GPT-5.5's left-over-right oscillation patch.
+  - Two cognitive idioms, one shared survival strategy: hack a tie-breaker until the residuals on training pairs go to zero.
+
+ 
 
 
 
