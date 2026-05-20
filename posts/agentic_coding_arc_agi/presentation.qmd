@@ -810,19 +810,46 @@ write_plotly_for_glightbox(
 #| execute: true
 
 import base64
+import importlib.util
 import io
-import sys
+import os
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
-# `simulate` lives in a sibling utility script outside the import path.
-_DEBS = Path("/workspaces/pivotools-quarto-blog/debs_misc")
-if str(_DEBS) not in sys.path:
-    sys.path.insert(0, str(_DEBS))
 
-from show_step import simulate
+def _debs_misc_dir() -> Path:
+    """Resolve `debs_misc/` — kernel cwd is not always the Quarto project root."""
+    roots: list[Path] = []
+    qpd = os.environ.get("QUARTO_PROJECT_DIR")
+    if qpd:
+        roots.append(Path(qpd).resolve())
+    here = Path.cwd().resolve()
+    roots.append(here)
+    roots.extend(here.parents)
+    roots.append(Path("/workspaces/pivotools-quarto-blog"))  # legacy Codespaces layout
+    seen: set[Path] = set()
+    for r in roots:
+        if r in seen:
+            continue
+        seen.add(r)
+        d = r / "debs_misc"
+        if (d / "show_step.py").is_file():
+            return d
+    raise FileNotFoundError(
+        "Could not find debs_misc/show_step.py "
+        f"(cwd={here!s}, QUARTO_PROJECT_DIR={qpd!r})."
+    )
+
+
+_DEBS = _debs_misc_dir()
+_spec = importlib.util.spec_from_file_location("show_step", _DEBS / "show_step.py")
+if _spec is None or _spec.loader is None:
+    raise ImportError(f"Cannot load {_DEBS / 'show_step.py'}")
+_show_step = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_show_step)
+simulate = _show_step.simulate
 from src.data import load_puzzle
 from src.plotting import _get_arc_colors
 
