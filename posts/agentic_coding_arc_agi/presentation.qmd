@@ -85,13 +85,13 @@ if str(blog_root) not in sys.path:
 :::: {style="text-align: center"}
 **Dibya Chakravorty**
 ::::
-![](./img/Dibya.png){fig-align="center" width="70%"}
+![](./img/dibya_profile_square.png){fig-align="center" width="70%"}
 
 :::: {style="font-size: 0.85em"}
 
-- Generalist Python developer & cloud architect; AGI enthusiast.
+- Generalist software engineer.
 
-- Organises the [AGI Munich meetup](https://www.meetup.com/de-de/munchen-artificial-general-intelligence-meetup-group/).
+- Organises the [AGI Munich meetup](https://www.meetup.com/de-de/munchen-artificial-general-intelligence-meetup-group/) and [PyMunich](https://www.meetup.com/de-de/pymunich/).
 
 ::::
 
@@ -401,11 +401,850 @@ display_figure(fig, "puzzle")
 
 # Main part
 
-## Our story...
-### ...including the gory details
+## Our journey
 
-- [Dibyas slides...](https://hedgedoc.beralt.com/nUlPDyU_QRKvX0BWZXas0Q?view#Main-part)
+![](./img/flipchart/journey/journey_no_labels.png)
 
+## Our journey
+
+![](./img/flipchart/journey/journey_full.png)
+
+## Our journey
+
+![](./img/flipchart/journey/journey_positive.png)
+
+## Our journey
+
+![](./img/flipchart/journey/journey_negative_faded.png)
+
+## Let's begin
+
+![](./img/flipchart/journey/start.png)
+
+## Training data
+
+![](./img/flipchart/training/training_corpus.png)
+
+## Rollouts
+
+![](./img/flipchart/training/training_rollouts.png)
+
+## Rollouts
+
+![](./img/flipchart/training/rollout.png){.nostretch fig-align="center" width="800px"}
+
+![](./img/flipchart/training/sample_puzzle.png)
+
+## Rollouts
+
+![](./img/flipchart/training/rollout.png){.nostretch fig-align="center" width="800px"}
+
+::: {style="font-size: 1.75em"}
+::: {.callout-note appearance="minimal"}
+```
+Given the following training input-output pairs, find the correct output for the given test input.
+
+011    000
+000 -> 000
+000    011
+
+222    000
+020 -> 222
+000    020
+
+500
+500 -> ?
+000
+```
+:::
+:::
+
+. . .
+
+::: {style="font-size: 1.75em"}
+::: {.callout-tip appearance="minimal"}
+```
+Let me think step by step. The first example seems to be a reflection. The second example is not a reflection. It seems that clusters of numbers are actually moving downwards until they hit the last row. By that logic the answer is:
+
+000
+500
+500
+```
+:::
+:::
+
+## Rollouts
+
+![](./img/flipchart/training/training_rollouts.png)
+
+## Rewards
+
+![](./img/flipchart/training/rewards.png)
+
+## DeepSeek-R1 recipe: Reinforcement Learning
+
+![](./img/flipchart/training/rl.png)
+
+## Problem: training data shortage
+
+![](./img/flipchart/data_quantity/deepseek_data.png)
+
+## Problem: training data shortage
+
+![](./img/flipchart/data_quantity/arc_agi_2_data.png)
+
+## Solution: make synthetic puzzles
+
+![](./img/flipchart/journey/synthetic_puzzles.png)
+
+## Situation hopeless: best models score ~ 0%
+
+![Snapshot of https://www.arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png)
+
+## The imagination vs. execution gap
+
+::: {.callout-tip title="Hypothesis" style="font-size: 1.75em"}
+Even though o3 cannot **solve** puzzles with ARC AGI 2 level difficulty, it might be able to **create** difficult puzzles.
+:::
+
+. . .
+
+![](./img/baby_reaching.jpg)
+
+## Closing the gap
+
+![](./img/flipchart/gap/machine.png)
+
+## Closing the gap
+
+![](./img/flipchart/gap/imagine.png)
+
+## Closing the gap
+
+![](./img/flipchart/gap/unreliable.png)
+
+## Closing the gap
+
+![](./img/flipchart/gap/reliable.png)
+
+## 8000 synthetic puzzles, 671 concepts / priors
+### Multi-rule composition example
+
+![](./img/multi_rule_composition.png)
+
+## 8000 synthetic puzzles, 671 concepts / priors
+### Contextual rule application example
+
+![](./img/contextual.png)
+
+## 8000 synthetic puzzles, 671 concepts / priors
+### Multi-step composition example
+
+![](./img/multi_step_composition.png)
+
+## Puzzle generation as program synthesis
+
+::: {style="font-size: 1.75em"}
+```python
+from collections.abc import Iterator
+from typing import Literal
+
+def generate_inputs(
+  type: Literal["train", "test"]
+) -> Iterator[list[list[int]]]:
+   ...
+
+def transform(
+  grid: list[list[int]]
+) -> list[list[int]]:
+   ...
+```
+:::
+
+. . .
+
+::: {style="font-size: 1.75em; margin-top: 1.25em"}
+```python
+train_inputs = list(generate_inputs(type="train"))
+
+train_outputs = [
+  transform(grid) for grid in train_inputs
+] 
+```
+:::
+
+## Puzzle generation pipeline
+
+![](./img/flipchart/pipeline/stages.png)
+
+## Puzzle generation pipeline
+
+![](./img/flipchart/pipeline/ideate.png)
+
+## Puzzle generation pipeline
+
+![](./img/flipchart/pipeline/spec.png)
+
+## Puzzle generation pipeline
+
+![](./img/flipchart/pipeline/implement.png)
+
+## Lessons
+
+:::: {.columns}
+
+::: {.column width="60%"}
+![](./img/flipchart/pipeline/implement.png)
+:::
+
+
+::: {.column width="40%"}
+
+::: {.fragment}
+::: {.callout-note icon="false" title="Lesson 1" style="font-size: 1.75em"}
+Non-reasoning models are necessary for creativity, diversity and naturalness.
+:::
+:::
+
+::: {.fragment}
+::: {.callout-note icon="false" title="Lesson 2" style="font-size: 1.75em"}
+Tool calling (e.g. code execution) makes reasoning models more reliable.
+:::
+:::
+
+:::
+
+::::
+
+## Tool calling before o3 and o4-mini 
+### Non-reasoning models e.g. gpt-4o
+
+![](./img/flipchart/interleaved_thinking/non_reasoning.png)
+
+## Tool calling before o3 and o4-mini
+### Reasoning models e.g. o1, Claude 4
+
+![](./img/flipchart/interleaved_thinking/reasoning.png)
+
+## Tool calling before o3 and o4-mini:
+### Reasoning models e.g. o1, Claude 4 
+
+![](./img/flipchart/interleaved_thinking/bug.png)
+
+## Tool calling with o3 and o4-mini
+### Interleaved thinking
+
+![](./img/flipchart/interleaved_thinking/interleaved_thinking.png)
+
+## Interleaved thinking scales test-time compute
+
+![](./img/token_usage.png){.nostretch width="85%"}
+
+## Instead of DeepSeek-R1 recipe...
+
+![](./img/flipchart/tir/text_only.png)
+
+## Agentic RL
+
+![](./img/flipchart/tir/agentic_rl.png)
+
+## Our journey
+
+![](./img/flipchart/journey/agentic_rl.png)
+
+## Side quest: learning visual priors
+
+![](./img/flipchart/journey/side_quest.png)
+
+## ARC AGI assumes core human priors
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+::: {.fragment}
+![](./img/puzzle_7049714fa/train_1_input.png)
+:::
+:::
+
+
+::: {.column width="50%"}
+
+::: {.incremental style="font-size: 1.5em"}
+- [9 chambers]{.mark} in [3 x 3 formation]{.mark}, [separated by gray walls]{.mark}
+- Each chamber contains a [single shape]{.mark}
+- [5]{.mark} chambers have [blue plus]{.mark} shapes
+- 2 chambers have [red T]{.mark} shapes
+- 2 chambers have [green Z]{.mark} shapes
+:::
+
+:::
+
+::::
+
+## Vision models expected to win, but...
+
+::: {.incremental style="font-size: 1.5em"}
+- Counterintuitively, language models performed better on ARC AGI 1.
+- Do language models have visual priors? 
+- Can we train language models to improve their visual skills?
+
+:::
+
+## Synthetic puzzles $\rightarrow$ synthetic grid descriptions
+
+::: {.fragment}
+::: {.callout-note appearance="minimal" style="font-size: 2em"}
+```
+Given the following natural language puzzle spec, `generate_inputs` and `transform` function, describe the given grid.
+
+{{spec}}
+
+{{generate_inputs}}
+
+{{transform}}
+
+Color mapping: black -> 0, blue -> 1, ...
+
+10001
+01010
+00100
+01010
+10001
+```
+
+:::
+:::
+
+::: {.fragment}
+::: {.callout-tip appearance="minimal" style="font-size: 2em"}
+```
+The grid contains a blue cross in a black background.
+```
+
+:::
+:::
+
+## Grid description dataset
+
+:::: {.columns}
+
+::: {.column width="33%"}
+
+![](./img/puzzle_7049714fa/train_1_input.png){width="90%"}
+:::
+
+
+::: {.column width="33%"}
+
+### Human description
+
+::: {style="font-size: 1.1em"}
+- [9 chambers]{.mark} in [3 x 3 formation]{.mark}, [separated by gray walls]{.mark}
+- Each chamber contains a [single shape]{.mark}
+- [5]{.mark} chambers have [blue plus]{.mark} shapes
+- [2]{.mark} chambers have [red T]{.mark} shapes
+- [2]{.mark} chambers have [green Z]{.mark} shapes
+:::
+
+:::
+
+::: {.column width="33%"}
+
+::: {.fragment}
+### Synthetic description
+
+::: {.callout-warn style="font-size: 1.1em"}
+17×17 grid with [gray border]{.mark} plus [interior walls]{.mark} at rows 6 & 11 and cols 6 & 11, forming [9 black chambers]{.mark}. [Three motif]{.mark} types, [one per chamber]{.mark}:
+
+- [Navy plus]{.mark} (5 cells): chambers (0,0), (1,0), (1,1), (1,2), (2,2)
+- [Red T]{.mark} (4 cells): chambers (0,1), (2,1)
+- [Green Z]{.mark} (4 cells): chambers (0,2), (2,0)
+:::
+:::
+
+:::
+
+::::
+
+## Fine-tuning Qwen3 on 16K descriptions
+
+![](./img/result_score_vs_cost_v3.png)
+
+## Before and after fine-tuning
+
+:::: {.columns}
+
+::: {.column width="33%"}
+
+![](./img/puzzle_d35bdbdc/train_input_1.png){width="90%"}
+:::
+
+
+::: {.column width="33%"}
+
+
+::: {.fragment style="font-size: 1.1em"}
+### Before SFT (summary)
+
+::: {.incremental}
+- Yellow pixels at [(2,2), (2,3)]{.mark-red} ...
+- Navy [cross]{.mark-red} at (5, 3), ...
+- Gray pixels at ...
+- [Pink square]{.mark} at ...
+:::
+
+:::
+
+:::
+
+::: {.column width="33%"}
+
+::: {.fragment style="font-size: 1.1em"}
+### After SFT (summary)
+
+::: {.incremental}
+- [Yellow hollow square]{.mark} spanning row, col (3, 2) to (5, 4) with [red central pixel]{.mark}
+- [Navy hollow square]{.mark} spanning ... with [green central pixel]{.mark}
+- [Green hollow square]{.mark} spanning ... with [yellow central pixel]{.mark}
+- [Pink hollow square]{.mark} spanning ... with [blue central pixel]{.mark}
+- Surrounded by gray walls
+:::
+:::
+
+:::
+
+::::
+
+## Lesson
+
+::: {.callout-note icon="false" title="The power of text" style="font-size: 1.75em"}
+Text is a surprisingly rich medium that can be used to teach about other sensory modes.
+:::
+
+## Our journey
+
+![](./img/flipchart/journey/side_quest_completed.png)
+
+## Our journey
+
+![](./img/flipchart/journey/agentic_rl_roadblock_1.png)
+
+## The plan
+### Reinforce the successes
+
+![](./img/flipchart/tir/agentic_rl.png)
+
+## The reality with Qwen3-14B
+### There's nothing to reinforce
+
+![](./img/flipchart/tir/agentic_rl_0.png)
+
+## Solution: distillation from successful traces
+### Cold-start SFT
+
+![](./img/flipchart/journey/agentic_rl_roadblock_1.png)
+
+## Solution: distillation from successful traces
+### Not all is well in the synthetic world
+
+![](./img/flipchart/journey/synthetic_traces_roadblock.png)
+
+## Solution: distillation from successful traces
+### This time, the real thing
+
+![](./img/flipchart/journey/real_traces.png)
+
+## Example trace {.example-trace}
+
+::: {style="font-size: 1.5em"}
+
+::: {.callout-note appearance="simple" icon="false"}
+Solve this puzzle. The training examples and test inputs are already loaded in the interpreter.
+:::
+
+::: {.callout-reasoning}
+::: {.callout-note icon="false" appearance="minimal"}
+Let me think. The transformation seems to be a reflection. Let me verify with code.
+:::
+:::
+
+::: {.callout-tip appearance="minimal" style="font-size: 1.5em"}
+```
+def transform(grid):
+...
+
+assert transform(train0_inp) == train0_out
+``` 
+:::
+
+::: {.callout-warning appearance="minimal" style="font-size: 1.5em"}
+```
+AssertionError
+```
+:::
+
+::: {.callout-reasoning}
+::: {.callout-note icon="false" appearance="minimal"}
+There is a mismatch. Perhaps the transformation is gravity related? Let me test.
+:::
+:::
+
+::: {.callout-tip appearance="minimal" style="font-size: 1.5em"}
+```
+def transform(grid):
+    ...
+
+assert transform(train0_inp) == train0_out
+```
+:::
+
+::: {.callout-warning appearance="minimal"}
+No output
+:::
+
+::: {.callout-response}
+::: {.callout-note icon="false" appearance="minimal"}
+Here is the `transform` function that solves the puzzle:
+
+```
+def transform(grid):
+    ...
+```
+:::
+:::
+
+:::
+
+## Model requirements for distillation
+
+::: {style="font-size: 1.5em"}
+- Open reasoning
+- Interleaved thinking capable 
+- Intelligent enough to get 10% on ARC AGI 2
+
+::: {.fragment}
+### Reality
+
+::: {.incremental}
+- No model satisfied these requirements
+- Closest match: **GPT OSS 120B**
+  - Expected to get 0% on ARC AGI 2
+:::
+:::
+
+:::
+
+## GPT OSS 120B seemed dumb
+### Something was fundamentally off
+
+::: {.incremental style="font-size: 1.5em"}
+- Invalid tool calls
+- Server errors, most likely originating from the inference engine
+- No interleaved thinking
+::: 
+
+## Inference providers we tried {.slide-figure-only}
+
+![](./img/flipchart/providers/4.png){.nostretch}
+
+## Inference engines we tried {.slide-figure-only}
+### vLLM and SGLang on Lambda AI H100 and GH200 GPUs
+
+![](./img/flipchart/inference_engines/1.png){.nostretch}
+
+## Harmony chat template
+
+::: {.incremental style="font-size: 1.5em"}
+- OpenAI didn't follow existing chat template standards like **ChatML** with GPT OSS
+- They released their own standard: **Harmony**
+:::
+
+## ChatML vs. Harmony
+### System / developer message
+
+:::: {.columns style="font-size: 1.5em"}
+
+::: {.column width="50%"}
+ChatML
+
+```
+<|im_start|>system
+# Tools
+
+<tools>
+{"type": "function", "function": {"name": "get_weather", "description": "Get weather for a city", "parameters": {"type": "object", "properties": {"city": {"type": "string"}, "unit": {"type": "string", "enum": ["celsius", "fahrenheit"]}}, "required": ["city"]}}}
+</tools>
+```
+:::
+
+::: {.column width="50%"}
+Harmony
+
+```
+<|start|>developer<|message|># Tools
+## functions
+namespace functions {
+// Get weather for a city
+type get_weather = (_: {
+  city: string,
+  unit?: "celsius" | "fahrenheit", // default: celsius
+}) => any;
+} // namespace functions<|end|>
+```
+:::
+
+::::
+
+## ChatML vs. Harmony
+### User message
+
+:::: {.columns style="font-size: 1.5em"}
+
+::: {.column width="50%"}
+ChatML
+
+```
+<|im_start|>user
+What's the weather in Tokyo?<|im_end|>
+```
+:::
+
+::: {.column width="50%"}
+Harmony
+
+```
+<|start|>user<|message|>What's the weather in Tokyo?<|end|>
+```
+:::
+
+::::
+
+## ChatML vs. Harmony
+### Reasoning
+
+:::: {.columns style="font-size: 1.5em"}
+
+::: {.column width="50%"}
+ChatML
+
+```
+<|im_start|>assistant
+</think>
+User wants Tokyo weather. Need to call get_weather function.
+</think>
+```
+:::
+
+::: {.column width="50%"}
+Harmony
+
+```
+<|start|>assistant<|channel|>analysis<|message|>User wants Tokyo weather. Need to call get_weather function.<|end|>
+```
+:::
+
+::::
+
+## ChatML vs. Harmony
+### Tool call preamble
+
+:::: {.columns style="font-size: 1.5em"}
+
+::: {.column width="50%"}
+ChatML
+
+```
+I'll check the current weather in Tokyo for you.
+```
+:::
+
+::: {.column width="50%"}
+Harmony
+
+```
+<|start|>assistant<|channel|>commentary<|message|>I'll check the current weather in Tokyo for you.<|end|>
+```
+:::
+
+::::
+
+## ChatML vs. Harmony
+### Tool call
+
+:::: {.columns style="font-size: 1.5em"}
+
+::: {.column width="50%"}
+ChatML
+
+```
+<tool_call>
+{"name": "get_weather", "arguments": {"city": "Tokyo", "unit": "celsius"}}
+</tool_call><|im_end|>
+```
+:::
+
+::: {.column width="50%"}
+Harmony
+
+```
+<|start|>assistant<|channel|>commentary to=functions.get_weather<|constrain|>json<|message|>{"city": "Tokyo", "unit": "celsius"}<|call|>
+```
+:::
+
+::::
+
+## ChatML vs. Harmony
+### Tool response
+
+:::: {.columns style="font-size: 1.5em"}
+
+::: {.column width="50%"}
+ChatML
+
+```
+<|im_start|>user
+<tool_response>
+{"temperature": 22, "condition": "partly cloudy", "humidity": 65}
+</tool_response>
+```
+:::
+
+::: {.column width="50%"}
+Harmony
+
+```
+<|start|>functions.get_weather to=assistant<|channel|>commentary<|message|>{"temperature": 22, "condition": "partly cloudy", "humidity": 65}<|end|>
+```
+:::
+
+::::
+
+## ChatML vs. Harmony
+### Final assistant response
+
+:::: {.columns style="font-size: 1.5em"}
+
+::: {.column width="50%"}
+ChatML
+
+```
+<|im_start|>assistant
+The current weather in Tokyo is 22°C with partly cloudy skies and 65% humidity.<|im_end|>
+```
+:::
+
+::: {.column width="50%"}
+Harmony
+
+```
+<|start|>assistant<|channel|>final<|message|>The current weather in Tokyo is 22°C with partly cloudy skies and 65% humidity.<|return|>
+```
+:::
+
+::::
+
+## Harmony chat template bug
+
+::: {.incremental style="font-size: 1.5em"}
+- Both vLLM and SGLang had wrong implementations of Harmony
+- Inference providers who used these inference engines inherited the bugs
+- We patched vLLM and started using our patched version
+::: 
+
+## GPT OSS after fix
+### An interleaved thinking pro
+
+![](./img/interleaved_thinking_tool_calls_histogram.png)
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+from copy import deepcopy
+
+from src.data import load_baseline_vs_interleaved
+from src.plotting import _load_style_yml, create_baseline_interleaved_bars
+
+_style = deepcopy(_load_style_yml())
+_style.setdefault("figures", {}).setdefault("baseline_vs_interleaved", {}).setdefault("colors", {}).update(
+    {"baseline": "#2b80c8", "interleaved": "#E8945A"}
+)
+_bar_cfg = _style.setdefault("figures", {}).setdefault("bar_baseline_vs_interleaved", {})
+_bar_cfg.setdefault("series_names", {})["interleaved"] = "Interleaved Thinking"
+_bar_cfg.setdefault("axis", {})["y_range"] = [0, 40]
+_bar_cfg.setdefault("layout", {}).update({"width": 440, "height": 400, "margin": {"l": 55, "r": 140, "t": 30, "b": 70}})
+_data = load_baseline_vs_interleaved()
+_gpt_only = {"data": [e for e in _data["data"] if e.get("modelGroup") == "gpt-oss-120b"]}
+_fig = create_baseline_interleaved_bars(experiments_data=_gpt_only, style_config=_style)
+_png = blog_root / "posts/agentic_coding_arc_agi/img/gpt_oss_baseline_vs_interleaved.png"
+_png.parent.mkdir(parents=True, exist_ok=True)
+_fig.write_image(str(_png), scale=2)
+```
+
+## GPT OSS after fix
+### Plain CoT vs interleaved thinking
+
+![](./img/gpt_oss_baseline_vs_interleaved.png)
+
+```{python}
+#| echo: false
+#| output: false
+#| execute: true
+from copy import deepcopy
+
+from src.plotting import _load_style_yml, create_baseline_interleaved_scatter
+
+_sota_style = deepcopy(_load_style_yml())
+_sota_style.setdefault("figures", {}).setdefault("baseline_vs_interleaved", {}).setdefault("colors", {}).update(
+    {"baseline": "#2b80c8", "interleaved": "#E8945A"}
+)
+_sota_style.setdefault("figures", {}).setdefault("scatter_baseline_vs_interleaved", {}).setdefault("series_names", {})[
+    "interleaved"
+] = "Interleaved Thinking"
+_fig = create_baseline_interleaved_scatter(style_config=_sota_style)
+_png = blog_root / "posts/agentic_coding_arc_agi/img/state_of_art_scatter.png"
+_png.parent.mkdir(parents=True, exist_ok=True)
+_fig.write_image(str(_png), scale=2)
+```
+
+## State of the art results
+
+![](./img/state_of_art_scatter.png)
+
+## Our journey
+
+![](./img/flipchart/journey/journey_full.png)
+
+## Lessons recap 
+
+::: {style="font-size: 1.5em"}
+
+::: {.fragment}
+::: {.callout-note icon="false" title="From synthetic puzzle generation"}
+Non-reasoning models are necessary for creativity, diversity and naturalness.
+:::
+:::
+
+::: {.fragment}
+::: {.callout-note icon="false" title="Recurring lesson"}
+Tool calling (e.g. code execution) with interleaved thinking makes reasoning models more powerful and reliable.
+:::
+:::
+
+::: {.fragment}
+::: {.callout-note icon="false" title="From side quest"}
+Text is a surprisingly rich medium that can be used to teach about other sensory modes.
+:::
+:::
+
+::: {.fragment}
+::: {.callout-note icon="false" title="From GPT OSS saga / recurring"}
+Cutting-edge AI packages prioritize speed to correctness. This is where a lot of leverage lies.
+:::
+:::
+
+:::
 
 ## Speaker view...
 ### ... and speaker notes are cool!
@@ -829,7 +1668,7 @@ from src.plotting import create_baseline_interleaved_scatter, write_plotly_for_g
 _post = blog_root / "posts/agentic_coding_arc_agi"
 _out = _post / "presentation-html"
 write_plotly_for_glightbox(
-    create_baseline_interleaved_scatter(),
+    create_baseline_interleaved_scatter(style_config=_sota_style),
     _out / "scores-scatter-interactive.html",
     fig_key="scatter_baseline_vs_interleaved",
     preview_png_path=_out / "img" / "scores-scatter-preview.png",

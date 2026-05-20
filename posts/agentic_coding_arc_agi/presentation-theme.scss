@@ -18,6 +18,9 @@ $light-bg-code-color: #4758ab;
 $dark-bg-text-color: #fff;
 $dark-bg-link-color: #42affa;
 $dark-bg-code-color: #ffa07a;
+// Pandoc `[text]{.mark}` / `[text]{.mark-red}` highlights on slides
+$presentation-mark-bg: #ffe3d1;
+$presentation-mark-red-bg: #ffd4d4;
 
 // --- Fonts ---
 $font-family-sans-serif: "Source Sans Pro", Helvetica, sans-serif;
@@ -45,6 +48,8 @@ $presentation-h1-text-shadow: none;
 $code-block-bg: $body-bg;
 $code-block-border-color: lighten($body-color, 60%);
 $code-block-font-size: 0.55em;
+// Quarto reveal default is 500px; large callout text (e.g. 2em) hits it while the slide still has room
+$code-block-height: none;
 
 // --- Inline code ---
 $code-color: var(--quarto-hl-fu-color);
@@ -94,6 +99,85 @@ $callout-margin-bottom: 1rem;
 /* Base copy: avoid pure #000 from bundled theme rules */
 .reveal .slides section {
   color: $body-color;
+}
+
+/* `[text]{.mark}` spans (Pandoc may emit `<mark>` or `<span class="mark">`) */
+.reveal .slides section mark,
+.reveal .slides section .mark {
+  background-color: $presentation-mark-bg;
+  color: inherit;
+  padding: 0.05em 0.15em;
+  border-radius: 0.15em;
+}
+
+.reveal .slides section mark.mark-red,
+.reveal .slides section .mark-red {
+  background-color: $presentation-mark-red-bg;
+}
+
+/* Colored callout variants: wrapper div + built-in callout (Quarto drops extra classes on .callout-note) */
+.reveal .slides section .callout-reasoning div.callout {
+  border-left-color: #e8e8e8 !important;
+}
+
+.reveal .slides section .callout-response div.callout {
+  border-left-color: #1e3a8a !important;
+}
+
+/* Example trace slide: tight callout stack (not flush — avoids double shared borders) */
+$example-trace-callout-gap: 0.35em;
+
+.reveal .slides section.example-trace {
+  /* gap only between siblings in the font-size wrapper, not inner callouts */
+  > div > div.callout,
+  > div > .callout-reasoning,
+  > div > .callout-response {
+    margin-top: 0 !important;
+    margin-bottom: $example-trace-callout-gap !important;
+  }
+
+  > div > :last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .callout-reasoning div.callout,
+  .callout-response div.callout {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  .callout-content > :first-child {
+    margin-top: 0 !important;
+  }
+
+  .callout-content > :last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .callout-content pre {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
+/* Avoid nested scrollbars: Quarto caps `pre.sourceCode code` at $code-block-height (was 500px) */
+.reveal .slides section pre.sourceCode,
+.reveal .slides section pre.sourceCode code {
+  max-height: none;
+  overflow: visible;
+}
+
+/* Large callouts (`style="font-size: 1.75em"` / `2em`) — same cap bites before the slide fills */
+.reveal .slides section .callout pre,
+.reveal .slides section .callout pre code {
+  max-height: none;
+  overflow: visible;
+}
+
+/* `code-overflow: wrap` in presentation.qmd — Reveal theme still sets white-space: pre */
+.reveal .slides section pre.sourceCode code {
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 /* Main title on the deck's first slide.
@@ -285,6 +369,58 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   font-size: $presentation-figure-caption-font-size;
   margin-top: 0.35em;
   line-height: 1.25;
+}
+
+/* Title (+ optional ### subtitle) + figure: `## Slide {.slide-figure-only}` + `{.nostretch}`.
+   h2/h3 stay at the top; <p>/<figure> flex-grows below and centers the image.
+   The <img> must not flex-grow (that + r-stretch caused distortion). */
+.reveal .slides section.slide-figure-only {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.reveal .slides section.slide-figure-only > h2,
+.reveal .slides section.slide-figure-only > h3 {
+  flex: 0 0 auto;
+}
+
+.reveal .slides section.slide-figure-only > figure,
+.reveal .slides section.slide-figure-only > p {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  min-height: 0;
+  text-align: center;
+}
+
+.reveal .slides section.slide-figure-only img,
+.reveal .slides section.slide-figure-only figcaption {
+  flex: 0 0 auto;
+}
+
+.reveal .slides section.slide-figure-only img {
+  display: block;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100%;
+  max-height: 72vh;
+  margin-left: auto;
+  margin-right: auto;
+  object-fit: contain;
+}
+
+/* Reveal stretch JS may still set max-height on img without .nostretch */
+.reveal .slides section.slide-figure-only img.r-stretch {
+  max-height: 72vh !important;
+  height: auto !important;
+  width: auto !important;
 }
 
 /* Reveal ``Reveal.showPreview`` iframe overlay
