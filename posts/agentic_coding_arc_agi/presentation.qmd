@@ -606,13 +606,13 @@ write_plotly_for_glightbox(
     <div class="snake-main-cell">
       <div class="snake-main">Oscillation bug found</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie braking</i></div>
+      <div class="snake-detail"><i>&lsquo;Fixes&rsquo; by left-over-right tie breaking</i></div>
     </div>
     <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">applies solution on</div></div>
     <div class="snake-main-cell">
       <div class="snake-main">Test example</div>
       <div class="snake-vconnector"></div>
-      <div class="snake-detail"><i>left-over-right tie braking needed to avoid infinite loop</i></div>
+      <div class="snake-detail"><i>left-over-right tie breaking needed to avoid infinite loop</i></div>
     </div>
     <div class="snake-edge"><div class="snake-edge-arrow"><svg viewBox="0 0 50 14"><line x1="0" y1="7" x2="42" y2="7" stroke="#666" stroke-width="1.5"/><polygon points="41,3 41,11 48,7" fill="#666"/></svg></div><div class="snake-edge-label">submits</div></div>
     <div class="snake-pill-cell"><div class="snake-pill">Solution</div></div>
