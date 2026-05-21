@@ -146,6 +146,8 @@ if str(blog_root) not in sys.path:
 *Supported by Nicolas Berg -- co-host of the AGI Munich meetup.*
 
 *Thank you to Somayeh Vojdani & Tariq Baig-Meininghaus for initial discussions and continued encouragement.*
+
+*Thanks to lambda.ai for providing free credits that helped support this research.*
 :::
 
 ::: {.notes}
@@ -296,7 +298,7 @@ Raymond Catell, 1948, defined **two aspects** of general intelligence
 
 ::: {.incremental}
 - ARC AGI designed to test **skill acquisition efficiency**^[Francois Chollet, "ARC: A Reasoning Challenge Dataset for the Advancement of General Intelligence", arXiv:1911.01547, 2019.], a hallmark of fluid intelligence.
-- Requires **In-Context-Learning (ICL)**, i.e. adaption to new situations not encountered in training data.
+- Requires **In-Context-Learning**, i.e. adaption to new situations not encountered in training data.
 - **Essential problem:** AI model weights are **frozen during inference**.
 - So how could LLMs ever exhibit fluid intelligence?
 :::
