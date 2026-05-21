@@ -1231,7 +1231,9 @@ _fig.write_image(str(_png), scale=2)
 - But he has showed you the happy ph.
 - Like all research projects, we took a few turns that later turned out to be bling alleys.
 - For example, we finetuned Qwen models with tool calling.
+- For that, we needed to generate synthetic puzzle solving traces using a model that *knew* the solution.
 - We also created a complex agentic harness, which we wanted to do end-to-end RL on.
+- Through ablations, we determined that such complex agentic loop was no better than a single tool calling loop.
 - Throughout all these endeavours, we often found ourselves at the bleeding edge of things, mostly unexpectedly so.
 - Next slide
 :::
@@ -1244,8 +1246,8 @@ _fig.write_image(str(_png), scale=2)
 - Tool call + interleaved thinking ⟶ orchestrating own code execution sandbox (Q2'25).
 - Finetuning for tool calling, limited VRAM ⟶ YOLO libraries (unsloth) (Q2'25).
   + Manually fixing chat template for Qwen3.
-- (Non redacted) interleaved thinking traces ⟶ Patching and hosting own GPT-OSS model.
-- Solving ARC puzzles ⟶ ~~Vibe coding~~ **Autonomous** task completion with single prompt (with tool calls).
+- (Non redacted) interleaved thinking traces ⟶ Patching and hosting own GPT-OSS model (Q4'25).
+- Solving ARC puzzles ⟶ ~~Vibe coding~~ **Autonomous** task completion with single prompt (with tool calls) (Q4'25).
 :::
 
 :::{.notes}
@@ -1255,7 +1257,7 @@ _fig.write_image(str(_png), scale=2)
   + Libraries (transformers and unsloth) "technically" supported it, but we had to fix the logic for masking tool call tokens correctly.
 - In August 2025, GPT-OSS was released: capable of interleaved thinking and tool calling.
   + We started using it in our agentic harness immediately.
-  + No commercial provider supported the maximum reasoning effort: We had to host our own inference engine (with custom patches).
+  + No commercial provider deployed GPT-OSS in a way that supported interleaved thinking. We had to host our own inference engine (with custom patches).
 :::
 
 
