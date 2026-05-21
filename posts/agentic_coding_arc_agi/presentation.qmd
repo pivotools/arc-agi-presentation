@@ -361,17 +361,14 @@ Raymond Catell, 1948, defined **two aspects** of general intelligence
 ::: {.column width="55%"}
 
 ::: {.fragment fragment-index=1}
-
-- **Core context** at the beginning of 2025:
-  - Reasoning models were an interesting way to scale compute during test time (Deepseek R1)
-  - Program synthesis approach seemed promising
-  - Tool use thought to be a big topic
+ - Reasoning models seemed like an an interesting way to scale compute during test time 
+ - Deepseek R1 and its distillates had just been released
 :::
 
 ::: {.fragment fragment-index=2}
 - **Straightforward plan:**
     + **Step one:** Generate synthetic data for this domain.
-    + **Step two:** Fine-tune open weights models (with reasoning and tool use). 
+    + **Step two:** Fine-tune a small open weights models and introduce reasoning like Deepseek R1 with reenforcement learning.
     + **Step three:** Profit!
 :::
 
