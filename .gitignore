@@ -12,6 +12,7 @@
 .devcontainer/ssh/key.pub
 .devcontainer/ssh/known_hosts
 .devcontainer/.bash_history
+.devcontainer/post-create-commands.sh
 
 # latex specific
 references.bib
