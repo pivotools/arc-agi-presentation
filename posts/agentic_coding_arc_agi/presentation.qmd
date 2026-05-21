@@ -1224,27 +1224,28 @@ _fig.write_image(str(_png), scale=2)
 
 ![](./img/flipchart/journey/journey_full.png)
 
-
-
-
-# Bleeding edge stuff we did
-- Reasoning model
-- Agentic coding, coding sandbox
-- SFT: chat template
-- GPT-OSS + interleaved thinking => Harmony chat template (xhigh reasoning?)
-  + Implemented interleeaved thinking for GPT-OSS
-- We had agentic harneess solving complex tasks: **no** human in the loop
+:::{.notes}
+- Dibya has given you a detailed tour of the journey we took last year, solving ARC puzzles.
+- But he has showed you the happy ph.
+- Like all research projects, we took a few turns that later turned out to be bling alleys.
+- For example, we finetuned Qwen models with tool calling.
+- We also created a complex agentic harness, which we wanted to do end-to-end RL on.
+- Throughout all these endeavours, we often found ourselves at the bleeding edge of things, mostly unexpectedly so.
+- Next slide
+:::
 
 
 ## At the bleeding edge 
 ### The frontier may be closer than it appears to be
-- (Optional) Generating complex synthetic puzzles => using fresh off the oven reasoning models (Q2'25).
+
+::: {.incremental}
 - Tool call + interleaved thinking => orchestrating own code execution sandbox (Q2'25).
 - Finetuning for tool calling, limited VRAM => YOLO libraries (unsloth) (Q2'25).
   + Looking at the other side of the API.
   + Manually fixing chat template for Qwen3.
 - Non redacted interleaved thinking traces  => Patching and hosting own GPT-OSS model.
 - Solving ARC puzzles => ~~Vibe coding~~ one shot prompted autonomous task completion.
+:::
 
 :::{.notes}
 - In Jan 2025, DeepSeek R1 was released, showed comparable performance to flagship models from OpenAI: The secret: reasoning and finetuning in verifiable domain.
@@ -1262,14 +1263,14 @@ _fig.write_image(str(_png), scale=2)
 - In Nov-Dec 2025, as Anthropic and OpenAI released their flagship models, they *underreported* their performance on ARC-AGI-2 (because they evals did not use tool calls).
   + We identified within weeks that tool calls boosts their performance on abstract reasoning.
   + Poetiq would claim SotA score in Dec 2025, using a similar, but more complicated approach.
-
-
 :::
 
 
 ## Lessons learned along the way
 ### Taking the birds eye view
 
+
+::: {.incremental}
 - **Tool use + reasoning** => significant jump in LLM performance in reasoning tasks.
   - Python (or similar tools) **grounds the model** - filter bad hypotheses early and **replan**.
   - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
@@ -1278,7 +1279,7 @@ _fig.write_image(str(_png), scale=2)
 - **Synthetic data isn't magic**
   - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
 - **Text is a surprisingly rich medium that can be used to teach about other sensory modes**.
-
+:::
 
 ::: {.notes}
 - Tool use + reasoning enables LLMs to scale compute
