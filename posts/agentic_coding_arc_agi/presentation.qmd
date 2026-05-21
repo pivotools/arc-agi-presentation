@@ -1314,8 +1314,8 @@ _fig.write_image(str(_png), scale=2)
 - LLMs are fantastic at following instructions such as output format by now: use it.
 :::
 
-## So… did our solver crack the teaser puzzle? {.trace-slide-h}
-### Revisiting the water flow puzzle
+## What about the water filling puzzle? {.trace-slide-h}
+### Back to the (`python`) sandbox
 *Using GPT 5.5 XHigh*
 ```{=html}
 
@@ -1395,9 +1395,9 @@ _fig.write_image(str(_png), scale=2)
 
 
 
-## The solution is a physics simulator
-### LLM did it without any prompting
-
+## Simple sandbox physics solves the puzzle...
+### ...on its own devices
+:::{.fragment}
 ```{python}
 #| echo: false
 #| output: asis
@@ -1465,6 +1465,16 @@ print(
     f'</div>'
 )
 ```
+
+:::
+
+::: {.fragment style="text-align: center; font-size: 1.5em;"}
+
+**What do you think? Do LLMs have fluid intelligence?**
+
+:::
+
+
 ::: {.notes}
 - The physics is very rudimentary
 - Cellular automata like, no notion of forces/acceleration.
@@ -1473,8 +1483,8 @@ print(
 :::
 
 
-## Flip the puzzle => spectacular failure 😂
-### Hardcoded right-over-left tie breaking → infinite loop!
+## Good news for (us) physicists...
+### ...still much to play with and discover (like parity symmetry)
 
 ```{python}
 #| echo: false
@@ -1543,74 +1553,19 @@ print(
     f'</div>'
 )
 ```
+::: {style="text-align: center; font-size: 1.5em;"}
 
+**Thank you for your attention!  **
 
-# Appendix (backup)
-
-## To RL or not to RL?
-### That was the question...
-
-- Built intuition for RL *with tool calling* (e.g. the `verl` stack — very new territory).
-  - Rollouts — many candidate solutions per puzzle — are expensive.
-  - Keeping learner vs inference tokenizer / template details aligned was fiddly.
-
-
-
-# Old main part slides
-
-## Finetuning requires data
-### Synthetic data or bust
-
-- By design, no large ARC-AGI-comparable puzzle datasets: the benchmark targets *inference-time* pattern recognition.
-- We needed thousands of *genuinely distinct* puzzles — mechanical augmentation of existing puzzles was not enough.
-- We needed *interleaved thinking* traces: `puzzle → thinking → tool call → thinking → output grid`, i.e. program synthesis with a Python REPL.
-- *Optional:* add a pipeline diagram when ready.
-
-
-
-## Synthetic data and solution traces
-### New puzzles, teaching traces for free
-
-::: {.notes}
-Sidebar: show an example of a synthetic puzzle on the next slides.
 :::
 
-- Idea: *create* synthetic puzzles programmatically, with “fake” solution traces, using an LLM plus Python.
-- **Lessons**
-  - Powerful models were required — for puzzles that are not useless, and for explanations that are actually useful.
-  - **Cost:** expensive in practice (opportunistic “free tier” tokens).
-  - *Line plot idea:* time vs number of puzzles (OpenAI, DeepSeek).
+::: {style="text-align: center; font-size: 1.5em;"}
 
-::: {.notes}
-Hopefully no one from OpenAI in the audience.
+**Any Questions?  **
+
 :::
 
-
-
-## Example synthetic puzzle and solution trace
-### Part 1 — build & prompts
-
-- Build the puzzle programmatically (trace / prompt example).
-- Set up the generation loop so traces match the tool-call format you want for SFT.
-
-
-
-## Example synthetic puzzle and solution trace
-### Part 2 — puzzle & trace
-
-- Show a representative synthetic puzzle.
-- Show a schematic of the solution trace (thinking + tools + final grid).
-
-
-
-## Move fast and break things
-### SFT + reasoning + tool calling = bleeding edge (and YOLO libraries)
-
-- Fine-tuned “small” Qwen3 models (7B and 14B): still VRAM-hungry for efficient SFT → **Unsloth**.
-- Stock Qwen chat templates on Hugging Face did not handle tool-call tokens correctly → we wrote our own template for SFT.
-
-![TRL-style supervision: train on assistant tokens only (mask user).](./img/train-on-assistant.png){fig-align="center" width="70%" .lightbox}
-
+# Appendix
 
 
 ## VRAM economy is crucial
@@ -1621,27 +1576,6 @@ Hopefully no one from OpenAI in the audience.
 - We tracked experiments diligently with MLOps tooling.
 - *Optional:* Weights & Biases screenshot.
 
-
-
-## Goal: end-to-end fine tuning of an agentic pipeline
-### Making a small-memory student think good(TM)
-
-- Solving ARC-AGI 2 involves:
-  - Understanding input and output grids (vision).
-  - Inferring the input → output rule.
-  - Applying that rule to the test grid.
-- *Optional:* scanned flowchart of the harness — complexity is the point (audience need not decode every box).
-
-
-
-## RL training: what is it about
-### You need something to reinforce
-
-- RL makes the “correct” trajectory more likely after enough iterations — the model needs a *germ* of competence first.
-
-![Sketch: correct trajectory becomes more likely under RL](./img/rl-trajectory-diagram.png){fig-align="center" width="72%" .lightbox}
-
-- **Our issue:** SFT’d Qwen models showed little sign of life — no recovery after a wrong approach.
 
 
 
@@ -1659,58 +1593,7 @@ Side note from notes: frontier models lacked traces; we ultimately did not pursu
 
 
 
-## First pivot: solver pipeline + interleaved thinking
-### Pivoting toward test-time scaling (thinking-first)
 
-- **Stack:** vLLM + Harmony template — engineering overhead.
-- Interleaved-thinking schematic drove the UX of the solver.
-- **Surprise:** GPT-OSS-120B was unexpectedly strong in our agentic harness.
-- **Hypothesis:** agentic RL pretraining wakes “dormant” capabilities worth leveraging even below frontier scale.
-
-
-
-## The second pivot: keep it simple, stupid
-### The main epiphany
-
-- Tool calling + interleaved thinking ≫ our overwrought harness complexity.
-- *Example slide idea:* contrast a simplified trace with the older pipeline.safsdf
-
-
-## State of the art scores
-### First non-trivial results for open-weight models
-
-- Score “jumps” as we iterated on harness and models.
-
-```{python}
-#| echo: false
-#| output: false
-#| execute: true
-from src.plotting import create_baseline_interleaved_scatter, write_plotly_for_glightbox
-
-_post = blog_root / "posts/agentic_coding_arc_agi"
-_out = _post / "presentation-html"
-write_plotly_for_glightbox(
-    create_baseline_interleaved_scatter(style_config=_sota_style),
-    _out / "scores-scatter-interactive.html",
-    fig_key="scatter_baseline_vs_interleaved",
-    preview_png_path=_out / "img" / "scores-scatter-preview.png",
-)
-```
-
-```{=html}
-<div style="text-align:center;margin-top:0.75em">
-  <a href="scores-scatter-interactive.html"
-     class="lightbox"
-     data-type="external"
-     data-width="90vw"
-     data-height="85vh"
-     style="display:inline-block;cursor:pointer">
-    <img src="img/scores-scatter-preview.png"
-         alt="Score jumps scatter — click to open interactive chart"
-         class="r-stretch plotly-glightbox-preview" />
-  </a>
-</div>
-```
 
 # How did GPT-OSS solve the waterfall puzzle?
 
@@ -1788,88 +1671,5 @@ write_plotly_for_glightbox(
 - Same answer on this puzzle. Crystallised intelligence cashed out in very different idioms.
 :::
 
-
-
-
-# Random
-
-## Speaker view...
-### ... and speaker notes are cool!
-
-- For speaker notes, press `s` on your keyboard.
-![Speaker notes](./img/speakerview.png){fig-align="center" width="50%"}
-- notes with:
-
-```
-::: {.notes}
-
-- what one could say :) 
-
-- note that lightbox overlays need to be triggered from presentation screen html window
-
-- we can use speaker notes from separating spoken content from what is on the slides
-:::
-```
-- quarto with reveal.js is cool: [https://quarto.org/docs/presentations/revealjs/presenting.html](https://quarto.org/docs/presentations/revealjs/presenting.html)
-
-
-::: {.notes}
-
-- what one could say :) 
-
-- we can use speaker notes from separating spoken content from what is on the slides
-:::
-
-
-## Lightbox test
-### Figure direct
-
-```{python}
-#| echo: false
-#| output: true
-#| execute: true
-from src.plotting import create_dummy_scatter
-
-fig=create_dummy_scatter()
-fig.show()
-```
-
-## Lightbox test — Strategy A (GLightbox iframe)
-### Click the preview to open the interactive figure in a modal
-
-```{python}
-#| echo: false
-#| output: false
-#| execute: true
-#| fig-cap: "hasdfasfas"
-
-from src.plotting import create_dummy_scatter, write_plotly_for_glightbox
-
-_post = blog_root / "posts/agentic_coding_arc_agi"
-_out = _post / "presentation-html"
-write_plotly_for_glightbox(
-    create_dummy_scatter(),
-    _out / "dummy-glightbox-interactive.html",
-    fig_key="dummy",
-    preview_png_path=_out / "img" / "dummy-glightbox-preview.png",
-    caption="Demo scatter — hover to inspect points, scroll to zoom, drag to pan.",
-)
-```
-
-```{=html}
-<div style="text-align:center;margin-top:0.75em">
-  <a href="dummy-glightbox-interactive.html"
-     class="lightbox"
-     data-type="external"
-     data-width="90vw"
-     data-height="85vh"
-     data-description="Demo scatter — hover to inspect points, scroll to zoom, drag to pan."
-     style="display:inline-block;cursor:pointer">
-    <img src="img/dummy-glightbox-preview.png"
-         alt="Interactive chart — click to open"
-         class="r-stretch plotly-glightbox-preview" />
-  </a>
-</div>
-```
 
 
