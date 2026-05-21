@@ -69,6 +69,8 @@ $presentation-title-slide-text-align: center;
 $presentation-subtitle-font-size: 2.5rem;
 // Figure captions (markdown images, floats, knitr-style `p.caption`)
 $presentation-figure-caption-font-size: 0.55em;
+// Optional wrapper `.big-figure-caption` on a slide or column (see presentation.qmd).
+$presentation-figure-caption-font-size-big: 0.9em;
 
 // GLightbox (`.lightbox`): independent of `$body-bg` / `$body-color`.
 $lightbox-caption-font-family: $font-family-sans-serif;
@@ -369,6 +371,12 @@ body.glightbox-mobile .glightbox-container.glightbox-clean .gdesc-inner {
   font-size: $presentation-figure-caption-font-size;
   margin-top: 0.35em;
   line-height: 1.25;
+}
+
+.reveal .slides section .big-figure-caption figcaption,
+.reveal .slides section .big-figure-caption p.caption,
+.reveal .slides section .big-figure-caption .quarto-float-caption {
+  font-size: $presentation-figure-caption-font-size-big;
 }
 
 /* Title (+ optional ### subtitle) + figure: `## Slide {.slide-figure-only}` + `{.nostretch}`.
