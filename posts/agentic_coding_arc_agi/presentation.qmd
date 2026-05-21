@@ -1264,16 +1264,23 @@ _fig.write_image(str(_png), scale=2)
 ## Lessons learned along the way
 ### Taking the birds eye view
 
-
+::: {.columns}
+::: {.column width="60%"}
 ::: {.incremental}
 - **Tool use + reasoning** => significant jump in LLM performance in reasoning tasks.
   - Python (or similar tools) **grounds the model** - filter bad hypotheses early and **replan**.
-  - The frontier models underrepresented their performance on ARC when evaluated *without* tool use.
+  - Labs underreported their flagship models' performance on ARC **because they evaluated without tool use**.
 - **Small / open-weight models punch above their reputation**
   - We roughly **4×**'d score on `gpt-oss-120b` with the right harness.
 - **Synthetic data isn't magic**: Have to watch out for distribution shift.
   - "Shortcut-y" traces skipped the messy reality of wrong hypotheses and recovery — undermines performance in inference time where replanning is necessary.
 - **Text is a surprisingly rich medium that can be used to teach about other sensory modes**.
+:::
+:::
+
+::: {.column width="40%"}
+![](./img/state_of_art_scatter.png)
+:::
 :::
 
 ::: {.notes}
