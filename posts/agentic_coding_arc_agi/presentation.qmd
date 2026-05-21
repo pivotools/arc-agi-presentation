@@ -1277,29 +1277,7 @@ _fig.write_image(str(_png), scale=2)
 - Through ablations, we determined that such complex agentic loop was no better than a single tool calling loop.
 - Throughout all these endeavours, we often found ourselves at the bleeding edge of things, mostly unexpectedly so.
 - Next slide
-
-
-## Lessons learned
-### A recap from the trenches
-
-- **Tool use + reasoning look like fluid intelligence**
-  - Python (or similar) grounds the model — filter bad hypotheses and replan.
-  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
-- **Small / open-weight models punch above their reputation**
-  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
-- **Synthetic data isn’t magic**
-  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
-
-
-
-::: {.notes}
-- Pretrained LLMs were ablw to detect patterns and reason about transformations.
-- But each ARC puzzle were novel: required combining multiple learnt concepts in ways that were unique to each puzzle.
-- Chain of thought allowed LLMs to perform that adaptation within each task.
-- LLMs can do math within CoT, but it's error prone. Tool calling overcomes that hindrance.
-
 :::
-
 
 ## At the bleeding edge 
 ### The frontier may be closer than it appears to be
