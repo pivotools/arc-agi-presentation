@@ -1269,26 +1269,23 @@ _fig.write_image(str(_png), scale=2)
 
 :::{.notes}
 - Dibya has given you a detailed tour of the journey we took last year, solving ARC puzzles.
-- But he has showed you the happy ph.
+- But he has showed you the happy path.
 - Like all research projects, we took a few turns that later turned out to be bling alleys.
 - For example, we finetuned Qwen models with tool calling.
 - For that, we needed to generate synthetic puzzle solving traces using a model that *knew* the solution.
 - We also created a complex agentic harness, which we wanted to do end-to-end RL on.
-- Through ablations, we determined that such complex agentic loop was no better than a single tool calling loop.
-- Throughout all these endeavours, we often found ourselves at the bleeding edge of things, mostly unexpectedly so.
+- Throughout all these endeavours, we repeatedly found ourselves at the bleeding edge of things.
 - Next slide
 :::
 
 ## At the bleeding edge 
 ### The frontier may be closer than it appears to be
 
-::: {.incremental}
-- Tool call + interleaved thinking ⟶ orchestrating own code execution sandbox (Q2'25).
-- Finetuning for tool calling, limited VRAM ⟶ YOLO libraries (unsloth) (Q2'25).
+- Tool call + interleaved thinking ⟶ orchestrating own **code execution sandbox** (Q2'25).
+- Finetuning for tool calling, limited VRAM ⟶ **YOLO libraries** (unsloth) (Q2'25).
   + Manually fixing chat template for Qwen3.
-- (Non redacted) interleaved thinking traces ⟶ Patching and hosting own GPT-OSS model (Q4'25).
-- Solving ARC puzzles ⟶ ~~Vibe coding~~ **Autonomous** task completion with single prompt (with tool calls) (Q4'25).
-:::
+- (Non redacted) interleaved thinking traces ⟶ **Patching vLLM** and hosting **own GPT-OSS model** (Q4'25).
+- ~~Vibe coding~~ ⟶ **Autonomous** task completion with single prompt (with tool calls) (Q4'25).
 
 :::{.notes}
 - In April, we wre using OpenAI models with tool calling for generating synthetic ARC-like puzzles.
@@ -1298,6 +1295,7 @@ _fig.write_image(str(_png), scale=2)
 - In August 2025, GPT-OSS was released: capable of interleaved thinking and tool calling.
   + We started using it in our agentic harness immediately.
   + No commercial provider deployed GPT-OSS in a way that supported interleaved thinking. We had to host our own inference engine (with custom patches).
+- For our SOTA result: we used LLMs in a completely autonomous tool calling loop without human involvement.
 :::
 
 
@@ -1307,29 +1305,19 @@ _fig.write_image(str(_png), scale=2)
 ::: {.columns}
 ::: {.column width="60%"}
 ::: {.incremental}
-- **Tool use + reasoning** => significant jump in LLM performance in reasoning tasks.
+- **Tool use + reasoning** ⟶ significant jump in LLM performance in reasoning tasks.
   - Python (or similar tools) **grounds the model** - filter bad hypotheses early and **replan**.
   - Labs underreported their flagship models' performance on ARC **because they evaluated without tool use**.
 - **Small / open-weight models punch above their reputation**
   - We roughly **4×**'d score on `gpt-oss-120b` with the right harness.
 - **Synthetic data isn't magic**: Have to watch out for distribution shift.
   - "Shortcut-y" traces skipped the messy reality of wrong hypotheses and recovery — undermines performance in inference time where replanning is necessary.
-- **Text is a surprisingly rich medium that can be used to teach about other sensory modes**.
 :::
 :::
 
 ::: {.column width="40%"}
 ![](./img/state_of_art_scatter.png)
 :::
-:::
-
-::: {.notes}
-- Tool use + reasoning enables LLMs to scale compute
-- Pretrained LLMs were ablw to detect patterns and reason about transformations.
-- But each ARC puzzle were novel: required combining multiple learnt concepts in ways that were unique to each puzzle.
-- Chain of thought allowed LLMs to perform that adaptation within each task.
-- LLMs can do math within CoT, but it's error prone. Tool calling overcomes that hindrance.
-
 :::
 
 ## Practical take-home messages
@@ -1346,12 +1334,6 @@ _fig.write_image(str(_png), scale=2)
   - Models internalize more and more abilities → **harnesses must continuously evolve**.
   - **Limits of innate abilities** of models → exactly where **things get exciting**!
   - **Open weight models** catch up to frontier models after a while.
-:::
-
-::: {.notes}
-- LLMs are good at performing fuzzy search in a large space of actions: Let it do its job!
-- Tell it *exactly* what you want it to do: otherwise it will hack the reward function.
-- LLMs are fantastic at following instructions such as output format by now: use it.
 :::
 
 ## What about the water filling puzzle? {.trace-slide-h}
