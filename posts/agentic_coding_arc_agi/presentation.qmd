@@ -1221,111 +1221,34 @@ _fig.write_image(str(_png), scale=2)
 
 ![](./img/state_of_art_scatter.png)
 
+# Conclusions
 ## Our journey
 
 ![](./img/flipchart/journey/journey_full.png)
 
-## Lessons recap 
-
-::: {style="font-size: 1.5em"}
-
-::: {.fragment}
-::: {.callout-note icon="false" title="From synthetic puzzle generation"}
-Non-reasoning models are necessary for creativity, diversity and naturalness.
-:::
-:::
-
-::: {.fragment}
-::: {.callout-note icon="false" title="Recurring lesson"}
-Tool calling (e.g. code execution) with interleaved thinking makes reasoning models more powerful and reliable.
-:::
-:::
-
-::: {.fragment}
-::: {.callout-note icon="false" title="From side quest"}
-Text is a surprisingly rich medium that can be used to teach about other sensory modes.
-:::
-:::
-
-::: {.fragment}
-::: {.callout-note icon="false" title="From GPT OSS saga / recurring"}
-Cutting-edge AI packages prioritize speed to correctness. This is where a lot of leverage lies.
-:::
-:::
-
-:::
-
-# Conclusions
-
-## Lessons learned
-### A recap from the trenches
-
-- **Tool use + reasoning look like fluid intelligence**
-  - Python (or similar) grounds the model — filter bad hypotheses and replan.
-  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
-- **Small / open-weight models punch above their reputation**
-  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
-- **Synthetic data isn’t magic**
-  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
 
 
 
-::: {.notes}
-- Pretrained LLMs were ablw to detect patterns and reason about transformations.
-- But each ARC puzzle were novel: required combining multiple learnt concepts in ways that were unique to each puzzle.
-- Chain of thought allowed LLMs to perform that adaptation within each task.
-- LLMs can do math within CoT, but it's error prone. Tool calling overcomes that hindrance.
-
-:::
-
-
-## At the bleeding edge
-### Timeline: us vs the field
-
-- **Format idea:** timeline with *our milestones* above and *community / papers* below.
-  - Abstract-representation angle — e.g. Markovian thinker thread (August 2025).
-  - Tool calling + iterative refinement trajectory.
-  - Agentica / Confluence — fast convergence to a similar regime in the broader field.
-
-```{python}
-#| echo: false
-#| output: false
-#| execute: true
-# Timeline sidecar: needs kaleido for PNG; point Quarto at a venv if needed, e.g.
-#   QUARTO_PYTHON=.venv/bin/python quarto render posts/.../presentation.qmd
-
-from src.plotting import create_horizontal_timeline, write_plotly_for_glightbox
-
-_post = blog_root / "posts/agentic_coding_arc_agi"
-_out = _post / "presentation-html"
-write_plotly_for_glightbox(
-    create_horizontal_timeline(),
-    _out / "timeline-interactive.html",
-    fig_key="timeline",
-    preview_png_path=_out / "img" / "timeline-preview.png",
-    caption="Team milestones vs broader AI context (example data)",
-)
-```
-
-```{=html}
-<div style="text-align:center;margin-top:0.75em">
-  <a href="timeline-interactive.html"
-     class="lightbox"
-     data-type="external"
-     data-width="90vw"
-     data-height="85vh"
-     data-description="Team milestones vs broader AI context (example data)"
-     style="display:inline-block;cursor:pointer">
-    <img src="img/timeline-preview.png"
-         alt="Timeline preview — click to open interactive chart"
-         class="r-stretch plotly-glightbox-preview" />
-  </a>
-</div>
-```
+# Bleeding edge stuff we did
+- Reasoning model
+- Agentic coding, coding sandbox
+- SFT: chat template
+- GPT-OSS + interleaved thinking => Harmony chat template (xhigh reasoning?)
+  + Implemented interleeaved thinking for GPT-OSS
+- We had agentic harneess solving complex tasks: **no** human in the loop
 
 
-## (Alternative) At the bleeding edge
+## At the bleeding edge 
 ### The frontier may be closer than it appears to be
+- (Optional) Generating complex synthetic puzzles => using fresh off the oven reasoning models (Q2'25).
+- Tool call + interleaved thinking => orchestrating own code execution sandbox (Q2'25).
+- Finetuning for tool calling, limited VRAM => YOLO libraries (unsloth) (Q2'25).
+  + Looking at the other side of the API.
+  + Manually fixing chat template for Qwen3.
+- Non redacted interleaved thinking traces  => Patching and hosting own GPT-OSS model.
+- Solving ARC puzzles => ~~Vibe coding~~ one shot prompted autonomous task completion.
+
+:::{.notes}
 - In Jan 2025, DeepSeek R1 was released, showed comparable performance to flagship models from OpenAI: The secret: reasoning and finetuning in verifiable domain.
   + In March, we decided to leverage reasoning models for ARC.
 - In April, we wre using OpenAI models with tool calling for generating synthetic ARC-like puzzles.
@@ -1341,6 +1264,32 @@ write_plotly_for_glightbox(
 - In Nov-Dec 2025, as Anthropic and OpenAI released their flagship models, they *underreported* their performance on ARC-AGI-2 (because they evals did not use tool calls).
   + We identified within weeks that tool calls boosts their performance on abstract reasoning.
   + Poetiq would claim SotA score in Dec 2025, using a similar, but more complicated approach.
+
+
+:::
+
+
+## Lessons learned along the way
+### Taking the birds eye view
+
+- **Tool use + reasoning** => significant jump in LLM performance in reasoning tasks.
+  - Python (or similar tools) **grounds the model** - filter bad hypotheses early and **replan**.
+  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
+- **Small / open-weight models punch above their reputation**
+  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
+- **Synthetic data isn't magic**
+  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
+- **Text is a surprisingly rich medium that can be used to teach about other sensory modes**.
+
+
+::: {.notes}
+- Tool use + reasoning enables LLMs to scale compute
+- Pretrained LLMs were ablw to detect patterns and reason about transformations.
+- But each ARC puzzle were novel: required combining multiple learnt concepts in ways that were unique to each puzzle.
+- Chain of thought allowed LLMs to perform that adaptation within each task.
+- LLMs can do math within CoT, but it's error prone. Tool calling overcomes that hindrance.
+
+:::
 
 ## Practical take-home messages
 ### For working effectively with modern LLMs
@@ -1364,10 +1313,8 @@ write_plotly_for_glightbox(
 - LLMs are fantastic at following instructions such as output format by now: use it.
 :::
 
-# Epilogue
-
 ## So… did our solver crack the teaser puzzle? {.trace-slide-h}
-### Paying off the intro example `28a6681f` (one of the hardest puzzle in ARC-AGI-2)
+### Revisiting the water flow puzzle
 *Using GPT 5.5 XHigh*
 ```{=html}
 
@@ -1447,8 +1394,8 @@ write_plotly_for_glightbox(
 
 
 
-## The solution is a (rudimentary) physics simulator
-### LLM mplemented that without any prompting!
+## The solution is a physics simulator
+### LLM did it without any prompting
 
 ```{python}
 #| echo: false
@@ -1518,12 +1465,14 @@ print(
 )
 ```
 ::: {.notes}
+- The physics is very rudimentary
 - Cellular automata like, no notion of forces/acceleration.
 - We will see how that leads to a spectacular failure.
+- Do you think, it shows fluid intelligence?
 :::
 
 
-## Imperfect physical model → solution fails if test grid is mirrored
+## Flip the puzzle => spectacular failure 😂
 ### Hardcoded right-over-left tie breaking → infinite loop!
 
 ```{python}
@@ -1594,12 +1543,6 @@ print(
 )
 ```
 
-
-
-## Do LLMs have fluid intelligence?
-### Yes.
-
-- arc-agi 3
 
 # Appendix (backup)
 
