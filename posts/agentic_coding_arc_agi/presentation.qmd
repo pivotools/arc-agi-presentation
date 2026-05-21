@@ -1311,7 +1311,7 @@ _fig.write_image(str(_png), scale=2)
 - LLMs are fantastic at following instructions such as output format by now: use it.
 :::
 
-## So… how fluid is the intelligence of our solver? {.trace-slide-h}
+## So… did our solver crack the teaser puzzle? {.trace-slide-h}
 ### Revisiting the water flow puzzle
 *Using GPT 5.5 XHigh*
 ```{=html}
@@ -1470,7 +1470,7 @@ print(
 :::
 
 
-## Imperfect physical model → fails with reverse puzzle
+## Flip the puzzle => spectacular failure 😂
 ### Hardcoded right-over-left tie breaking → infinite loop!
 
 ```{python}
@@ -1541,12 +1541,6 @@ print(
 )
 ```
 
-
-
-## Do LLMs have fluid intelligence?
-### Yes.
-
-- arc-agi 3
 
 # Appendix (backup)
 
