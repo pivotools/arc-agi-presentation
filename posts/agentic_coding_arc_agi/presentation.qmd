@@ -1311,8 +1311,8 @@ _fig.write_image(str(_png), scale=2)
 - LLMs are fantastic at following instructions such as output format by now: use it.
 :::
 
-## So… did our solver crack the teaser puzzle? {.trace-slide-h}
-### Paying off the intro example `28a6681f` (one of the hardest puzzle in ARC-AGI-2)
+## So… how fluid is the intelligence of our solver? {.trace-slide-h}
+### Revisiting the water flow puzzle
 *Using GPT 5.5 XHigh*
 ```{=html}
 
@@ -1392,8 +1392,8 @@ _fig.write_image(str(_png), scale=2)
 
 
 
-## The solution is a (rudimentary) physics simulator
-### LLM mplemented that without any prompting!
+## The solution is a physics simulator
+### LLM did it without any prompting
 
 ```{python}
 #| echo: false
@@ -1463,12 +1463,14 @@ print(
 )
 ```
 ::: {.notes}
+- The physics is very rudimentary
 - Cellular automata like, no notion of forces/acceleration.
 - We will see how that leads to a spectacular failure.
+- Do you think, it shows fluid intelligence?
 :::
 
 
-## Imperfect physical model → solution fails if test grid is mirrored
+## Imperfect physical model → fails with reverse puzzle
 ### Hardcoded right-over-left tie breaking → infinite loop!
 
 ```{python}
