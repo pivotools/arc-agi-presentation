@@ -434,17 +434,17 @@ Raymond Catell, 1948, defined **two aspects** of general intelligence
 
 ![](./img/flipchart/training/training_corpus.png)
 
-## Rollouts
+## Solution trajectories
 
 ![](./img/flipchart/training/training_rollouts.png)
 
-## Rollouts
+## Solution trajectories
 
 ![](./img/flipchart/training/rollout.png){.nostretch fig-align="center" width="800px"}
 
 ![](./img/flipchart/training/sample_puzzle.png)
 
-## Rollouts
+## Solution trajectories
 
 ![](./img/flipchart/training/rollout.png){.nostretch fig-align="center" width="800px"}
 
@@ -482,7 +482,7 @@ Let me think step by step. The first example seems to be a reflection. The secon
 :::
 :::
 
-## Rollouts
+## Solution trajectories
 
 ![](./img/flipchart/training/training_rollouts.png)
 
@@ -506,48 +506,34 @@ Let me think step by step. The first example seems to be a reflection. The secon
 
 ![](./img/flipchart/journey/synthetic_puzzles.png)
 
-## Situation hopeless: best models score ~ 0%
+## But how?
 
-![Snapshot of https://www.arcprize.org/leaderboard (Wayback Machine, 17 April 2025).](./img/state-of-arc-april-25.png)
+::: {style="font-size: 1.75em"}
 
-## The imagination vs. execution gap
-
-::: {.callout-tip title="Hypothesis" style="font-size: 1.75em"}
-Even though o3 cannot **solve** puzzles with ARC AGI 2 level difficulty, it might be able to **create** difficult puzzles.
+::: {.fragment}
+- The best model OpenAI o3 had near zero score on ARC AGI 2
 :::
 
-. . .
+::: {.fragment}
+::: {.callout-tip title="Hypothesis"}
+Even though o3 cannot **solve** puzzles with ARC AGI 2 level difficulty, it might be able to **create** difficult puzzles.
+:::
+:::
 
-![](./img/baby_reaching.jpg)
-
-## Closing the gap
-
-![](./img/flipchart/gap/machine.png)
-
-## Closing the gap
-
-![](./img/flipchart/gap/imagine.png)
-
-## Closing the gap
-
-![](./img/flipchart/gap/unreliable.png)
-
-## Closing the gap
-
-![](./img/flipchart/gap/reliable.png)
+:::
 
 ## 8000 synthetic puzzles, 671 concepts / priors
-### Multi-rule composition example
+### Complex, difficult puzzles like ARC AGI 2
 
 ![](./img/multi_rule_composition.png)
 
 ## 8000 synthetic puzzles, 671 concepts / priors
-### Contextual rule application example
+### Complex, difficult puzzles like ARC AGI 2
 
 ![](./img/contextual.png)
 
 ## 8000 synthetic puzzles, 671 concepts / priors
-### Multi-step composition example
+### Complex, difficult puzzles like ARC AGI 2
 
 ![](./img/multi_step_composition.png)
 
@@ -555,30 +541,19 @@ Even though o3 cannot **solve** puzzles with ARC AGI 2 level difficulty, it migh
 
 ::: {style="font-size: 1.75em"}
 ```python
-from collections.abc import Iterator
-from typing import Literal
+def generate_inputs(type: Literal["train", "test"]):
+    """
+    Generates train and test input grids.
+    Usage: train_inputs = list(generate_inputs("train"))
+    """
+    ...
 
-def generate_inputs(
-  type: Literal["train", "test"]
-) -> Iterator[list[list[int]]]:
+def transform(grid: list[list[int]]):
+    """
+    Implements the puzzle's transformation logic.
+    Usage: output_grid = transform(input_grid)
+    """
    ...
-
-def transform(
-  grid: list[list[int]]
-) -> list[list[int]]:
-   ...
-```
-:::
-
-. . .
-
-::: {style="font-size: 1.75em; margin-top: 1.25em"}
-```python
-train_inputs = list(generate_inputs(type="train"))
-
-train_outputs = [
-  transform(grid) for grid in train_inputs
-] 
 ```
 :::
 
@@ -657,6 +632,67 @@ Tool calling (e.g. code execution) makes reasoning models more reliable.
 
 ![](./img/flipchart/tir/agentic_rl.png)
 
+## Example trace {.example-trace}
+
+::: {style="font-size: 1.5em"}
+
+::: {.callout-note appearance="simple" icon="false"}
+Solve this puzzle. The training examples and test inputs are already loaded in the interpreter.
+:::
+
+::: {.callout-reasoning}
+::: {.callout-note icon="false" appearance="minimal"}
+Let me think. The transformation seems to be a reflection. Let me verify with code.
+:::
+:::
+
+::: {.callout-tip appearance="minimal" style="font-size: 1.5em"}
+```
+def transform(grid):
+...
+
+assert transform(train0_inp) == train0_out
+``` 
+:::
+
+::: {.callout-warning appearance="minimal" style="font-size: 1.5em"}
+```
+AssertionError
+```
+:::
+
+::: {.callout-reasoning}
+::: {.callout-note icon="false" appearance="minimal"}
+There is a mismatch. Perhaps the transformation is gravity related? Let me test.
+:::
+:::
+
+::: {.callout-tip appearance="minimal" style="font-size: 1.5em"}
+```
+def transform(grid):
+    ...
+
+assert transform(train0_inp) == train0_out
+```
+:::
+
+::: {.callout-warning appearance="minimal"}
+No output
+:::
+
+::: {.callout-response}
+::: {.callout-note icon="false" appearance="minimal"}
+Here is the `transform` function that solves the puzzle:
+
+```
+def transform(grid):
+    ...
+```
+:::
+:::
+
+:::
+
 ## Our journey
 
 ![](./img/flipchart/journey/agentic_rl.png)
@@ -665,7 +701,7 @@ Tool calling (e.g. code execution) makes reasoning models more reliable.
 
 ![](./img/flipchart/journey/side_quest.png)
 
-## ARC AGI assumes core human priors
+## ARC AGI assumes core visual priors
 
 :::: {.columns}
 
@@ -679,7 +715,7 @@ Tool calling (e.g. code execution) makes reasoning models more reliable.
 
 ::: {.column width="50%"}
 
-::: {.incremental style="font-size: 1.5em"}
+::: {.fragment style="font-size: 1.5em"}
 - [9 chambers]{.mark} in [3 x 3 formation]{.mark}, [separated by gray walls]{.mark}
 - Each chamber contains a [single shape]{.mark}
 - [5]{.mark} chambers have [blue plus]{.mark} shapes
@@ -695,10 +731,11 @@ Tool calling (e.g. code execution) makes reasoning models more reliable.
 
 ::: {.incremental style="font-size: 1.5em"}
 - Counterintuitively, language models performed better on ARC AGI 1.
-- Do language models have visual priors? 
-- Can we train language models to improve their visual skills?
+- Do language models have core visual priors?
 
 :::
+
+<!--
 
 ## Synthetic puzzles $\rightarrow$ synthetic grid descriptions
 
@@ -776,17 +813,26 @@ The grid contains a blue cross in a black background.
 
 ::::
 
-## Fine-tuning Qwen3 on 16K descriptions
+-->
 
-![](./img/result_score_vs_cost_v3.png)
+## Language models are efficient visual learners
 
-## Before and after fine-tuning
+![](./img/result_score_vs_cost_v4.png)
+
+## Language models are efficient visual learners
+
+![](./img/result_score_vs_cost_v5.png)
+
+## Qwen3-14B before and after fine-tuning
 
 :::: {.columns}
 
 ::: {.column width="33%"}
 
-![](./img/puzzle_d35bdbdc/train_input_1.png){width="90%"}
+::: {.big-figure-caption}
+![Held-out puzzle grid](./img/puzzle_d35bdbdc/train_input_1.png){width="90%"}
+:::
+
 :::
 
 
@@ -796,13 +842,10 @@ The grid contains a blue cross in a black background.
 ::: {.fragment style="font-size: 1.1em"}
 ### Before SFT (summary)
 
-::: {.incremental}
 - Yellow pixels at [(2,2), (2,3)]{.mark-red} ...
 - Navy [cross]{.mark-red} at (5, 3), ...
 - Gray pixels at ...
 - [Pink square]{.mark} at ...
-:::
-
 :::
 
 :::
@@ -812,13 +855,11 @@ The grid contains a blue cross in a black background.
 ::: {.fragment style="font-size: 1.1em"}
 ### After SFT (summary)
 
-::: {.incremental}
 - [Yellow hollow square]{.mark} spanning row, col (3, 2) to (5, 4) with [red central pixel]{.mark}
 - [Navy hollow square]{.mark} spanning ... with [green central pixel]{.mark}
 - [Green hollow square]{.mark} spanning ... with [yellow central pixel]{.mark}
 - [Pink hollow square]{.mark} spanning ... with [blue central pixel]{.mark}
 - Surrounded by gray walls
-:::
 :::
 
 :::
@@ -1236,6 +1277,27 @@ _fig.write_image(str(_png), scale=2)
 - Through ablations, we determined that such complex agentic loop was no better than a single tool calling loop.
 - Throughout all these endeavours, we often found ourselves at the bleeding edge of things, mostly unexpectedly so.
 - Next slide
+
+
+## Lessons learned
+### A recap from the trenches
+
+- **Tool use + reasoning look like fluid intelligence**
+  - Python (or similar) grounds the model — filter bad hypotheses and replan.
+  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
+- **Small / open-weight models punch above their reputation**
+  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
+- **Synthetic data isn’t magic**
+  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
+
+
+
+::: {.notes}
+- Pretrained LLMs were ablw to detect patterns and reason about transformations.
+- But each ARC puzzle were novel: required combining multiple learnt concepts in ways that were unique to each puzzle.
+- Chain of thought allowed LLMs to perform that adaptation within each task.
+- LLMs can do math within CoT, but it's error prone. Tool calling overcomes that hindrance.
+
 :::
 
 
