@@ -1231,7 +1231,9 @@ _fig.write_image(str(_png), scale=2)
 - But he has showed you the happy ph.
 - Like all research projects, we took a few turns that later turned out to be bling alleys.
 - For example, we finetuned Qwen models with tool calling.
+- For that, we needed to generate synthetic puzzle solving traces using a model that *knew* the solution.
 - We also created a complex agentic harness, which we wanted to do end-to-end RL on.
+- Through ablations, we determined that such complex agentic loop was no better than a single tool calling loop.
 - Throughout all these endeavours, we often found ourselves at the bleeding edge of things, mostly unexpectedly so.
 - Next slide
 :::
@@ -1241,46 +1243,44 @@ _fig.write_image(str(_png), scale=2)
 ### The frontier may be closer than it appears to be
 
 ::: {.incremental}
-- Tool call + interleaved thinking => orchestrating own code execution sandbox (Q2'25).
-- Finetuning for tool calling, limited VRAM => YOLO libraries (unsloth) (Q2'25).
-  + Looking at the other side of the API.
+- Tool call + interleaved thinking ⟶ orchestrating own code execution sandbox (Q2'25).
+- Finetuning for tool calling, limited VRAM ⟶ YOLO libraries (unsloth) (Q2'25).
   + Manually fixing chat template for Qwen3.
-- Non redacted interleaved thinking traces  => Patching and hosting own GPT-OSS model.
-- Solving ARC puzzles => ~~Vibe coding~~ one shot prompted autonomous task completion.
+- (Non redacted) interleaved thinking traces ⟶ Patching and hosting own GPT-OSS model (Q4'25).
+- Solving ARC puzzles ⟶ ~~Vibe coding~~ **Autonomous** task completion with single prompt (with tool calls) (Q4'25).
 :::
 
 :::{.notes}
-- In Jan 2025, DeepSeek R1 was released, showed comparable performance to flagship models from OpenAI: The secret: reasoning and finetuning in verifiable domain.
-  + In March, we decided to leverage reasoning models for ARC.
 - In April, we wre using OpenAI models with tool calling for generating synthetic ARC-like puzzles.
   + No agentic coding harnesses were available. We orchestrated our own tool calling sandbox.
 - In May, we started our foray into finetuning a Qwen model with tool calling.
   + Libraries (transformers and unsloth) "technically" supported it, but we had to fix the logic for masking tool call tokens correctly.
 - In August 2025, GPT-OSS was released: capable of interleaved thinking and tool calling.
   + We started using it in our agentic harness immediately.
-  + No commercial provider supported the maximum reasoning effort: We had to host our own inference engine (with custom patches).
-  + In November 2025, we showed for the first time that open weight models can achieve nonzero scores on ARC-AGI-2.
-- In November 2025, our coding harness was solving significant number of ARC puzzles in a single tool call loop, no human in the loop.
-  + Claude code will be released in December.
-- In Nov-Dec 2025, as Anthropic and OpenAI released their flagship models, they *underreported* their performance on ARC-AGI-2 (because they evals did not use tool calls).
-  + We identified within weeks that tool calls boosts their performance on abstract reasoning.
-  + Poetiq would claim SotA score in Dec 2025, using a similar, but more complicated approach.
+  + No commercial provider deployed GPT-OSS in a way that supported interleaved thinking. We had to host our own inference engine (with custom patches).
 :::
 
 
 ## Lessons learned along the way
 ### Taking the birds eye view
 
-
+::: {.columns}
+::: {.column width="60%"}
 ::: {.incremental}
 - **Tool use + reasoning** => significant jump in LLM performance in reasoning tasks.
   - Python (or similar tools) **grounds the model** - filter bad hypotheses early and **replan**.
-  - Caveat from notes: some public write-ups underplayed strong models on ARC when evaluated *without* tool use.
+  - Labs underreported their flagship models' performance on ARC **because they evaluated without tool use**.
 - **Small / open-weight models punch above their reputation**
-  - We roughly **4×**’d score on `gpt-oss-120b` with the right harness.
-- **Synthetic data isn't magic**
-  - “Shortcut-y” traces skipped the messy reality of wrong hypotheses and recovery — undermines the training distribution you thought you had.
+  - We roughly **4×**'d score on `gpt-oss-120b` with the right harness.
+- **Synthetic data isn't magic**: Have to watch out for distribution shift.
+  - "Shortcut-y" traces skipped the messy reality of wrong hypotheses and recovery — undermines performance in inference time where replanning is necessary.
 - **Text is a surprisingly rich medium that can be used to teach about other sensory modes**.
+:::
+:::
+
+::: {.column width="40%"}
+![](./img/state_of_art_scatter.png)
+:::
 :::
 
 ::: {.notes}
