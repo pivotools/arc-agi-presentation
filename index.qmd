@@ -1,0 +1,21 @@
+---
+title: "pivotools Blog"
+open-graph:
+  description: "News and updates from the pivotools team"
+  image: default-preview.png
+listing:
+  contents: posts
+  sort: "date desc"
+  type: default
+  categories: true
+  sort-ui: false
+  filter-ui: false
+page-layout: full
+title-block-banner: true
+format:
+  html:
+    include-in-header:
+      text: "<meta property=\"og:url\" content=\"https://pivotools.github.io/pivotools-quarto-blog/\"><meta property=\"og:type\" content=\"website\">"
+---
+
+

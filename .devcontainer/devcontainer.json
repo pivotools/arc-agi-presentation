@@ -1,0 +1,74 @@
+{
+    "name": "Julia Dev Container",
+    "image": "docker.io/library/ubuntu:latest",
+    "runArgs": [
+        "--cap-add=NET_ADMIN",
+        "--cap-add=NET_RAW",
+        "--privileged"
+    ],
+    "features": {
+            "ghcr.io/devcontainers/features/git:1": {},
+            "ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            // keep in sync with
+            "extensions": [
+                // python
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                // documentation
+                "yzhang.markdown-all-in-one",
+                "gruntfuggly.todo-tree",
+                "streetsidesoftware.code-spell-checker",
+                // config files
+                "redhat.vscode-yaml",
+                "tamasfe.even-better-toml",
+                "ms-vscode.makefile-tools",
+                "ms-vscode.vscode-json",
+                "editorconfig.editorconfig",
+                // git / github
+                "donjayamanne.githistory",
+                "maattdd.gitless",
+                // formatting
+                "jkillian.custom-local-formatters",
+            ],
+            "settings": {
+                // Don’t copy ~/.gitconfig into the container
+                "dev.containers.copyGitConfig": false,
+                // Don’t auto-configure a Git credential helper from the host
+                "dev.containers.gitCredentialHelperConfigLocation": "none",
+            }
+        }
+    },
+    "remoteUser": "root",
+    "initializeCommand": [
+        "bash",
+        "-c",
+        "touch ${localWorkspaceFolder}/.devcontainer/.bash_history && GIT_NAME=$(git config --global user.name 2>/dev/null || git config user.name 2>/dev/null || echo \"\")\nGIT_EMAIL=$(git config --global user.email 2>/dev/null || git config user.email 2>/dev/null || echo \"\")\nif [ -n \"$GIT_NAME\" ] && [ -n \"$GIT_EMAIL\" ]; then\n    CONFIG_FILE=\"${localWorkspaceFolder}/.devcontainer/.gitconfig-user\"\n    echo \"[user]\" > \"$CONFIG_FILE\"\n    echo \"    name = $GIT_NAME\" >> \"$CONFIG_FILE\"\n    echo \"    email = $GIT_EMAIL\" >> \"$CONFIG_FILE\"\nfi"
+    ],
+    "mounts": [
+        "source=${localWorkspaceFolder}/.devcontainer/ssh,target=/root/.ssh,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/.devcontainer/.bash_history,target=/root/.bash_history,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/.devcontainer/claude-code-config,target=/root/.claude,type=bind,consistency=cached",
+        "source=${localWorkspaceFolder}/../data,target=/data,type=bind,consistency=cached"
+    ],
+    "postCreateCommand": "bash ${containerWorkspaceFolder}/.devcontainer/post-create-commands.sh",
+    "postStartCommand": "bash ${containerWorkspaceFolder}/.devcontainer/post-start-commands.sh",
+    "waitFor": "postCreateCommand",
+    "containerEnv": {
+        "CLAUDE_CONFIG_DIR": "/root/.claude",
+        "NODE_OPTIONS": "--max-old-space-size=4096"
+    },
+    "remoteEnv": {
+        // Julia configuration
+        "JULIA_DEPOT_PATH": "/root/.julia",
+        "JULIA_PROJECT": "${containerWorkspaceFolder}",
+        "JULIA_NUM_THREADS": "auto",
+        "PATH": "/root/.local/bin:/root/.juliaup/bin:${containerEnv:PATH}",
+        // Use repo-local gitconfig as the global Git config inside the container
+        "GIT_CONFIG_GLOBAL": "${containerWorkspaceFolder}/.devcontainer/gitconfig",
+        // Don't read system-wide gitconfig (/etc/gitconfig)
+        "GIT_CONFIG_NOSYSTEM": "1"
+    }
+}

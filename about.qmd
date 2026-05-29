@@ -1,0 +1,21 @@
+---
+title: "About"
+about:
+  template: jolla
+  links:
+    - icon: envelope
+      text: Email
+      href: mailto:dibyachakravorty@gmail.com
+    - icon: github
+      text: Github
+      href: https://github.com/gutfeeling
+    - icon: twitter-x
+      text: X
+      href: https://x.com/dibyasays
+    - icon: linkedin
+      text: LinkedIn
+      href: https://www.linkedin.com/in/dibya-chakravorty/
+
+---
+
+I am a software engineer from Munich, Germany. Welcome to my blog!
